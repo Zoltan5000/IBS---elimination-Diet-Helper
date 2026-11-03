@@ -1,45 +1,39 @@
-# IBS Elimination Diet Guide
+# IBS Diet Helper
 
-A static, single-page web guide that walks someone with IBS through the three-phase **low FODMAP elimination diet** to find their food triggers. Open `index.html` in a browser; no build step or server is needed.
+An installable web app that coaches someone with IBS through the three-phase **low FODMAP elimination diet** to find their food triggers, week by week. It works on phones, tablets and desktops. Add it to the home screen and it runs full screen, like a regular app, and offline.
 
-## What it covers
+**Live:** https://zoltan5000.github.io/IBS---elimination-Diet-Helper/
 
-1. **Before you start:** red flag symptoms, celiac testing before cutting wheat, finding a dietitian, plus a checklist
-2. **Learn FODMAPs:** the six groups, common sources and swaps
-3. **Track a baseline:** a week of symptom scoring before any change
-4. **Phase 1, Eliminate (2–6 weeks):** do's and don'ts, label reading, a sample day
-5. **Check-in:** compares baseline and Phase 1 diary scores, and says what to do if the diet didn't help
-6. **Phase 2, Reintroduce:** the 3-day challenge, washout periods, example test foods
-7. **Phase 3, Personalise:** builds a personal summary from the tracker results
+## How it works
 
-## Built-in tools
+| Tab | What it does |
+|---|---|
+| **Today** | Your coach. Shows exactly where you are ("Week 2 · Day 4 of elimination", "Lactose challenge, day 2: drink 1 cup of milk"), what to do today, and the next step. New users get a welcome screen with the journey at a glance, everything the app can do, and a readiness checklist. |
+| **Quest** | The gamified part: a retro pixel-art quest map. Each phase is a world and each week or food challenge is a level. You earn a coin for every day logged and a star for every challenge finished, a pixel buddy shows where you are, and there are badges, "LEVEL CLEAR!" celebrations and optional 8-bit sounds. |
+| **Log** | Rate bloating, pain, gas, urgency and stress in about 30 seconds, plus stool type, food and notes. Includes a 4-week bar chart colored by phase, history, and a CSV export for your dietitian. |
+| **Tools** | **Menu checker:** upload a menu photo or PDF, or paste the text, and each dish is marked likely OK, ask or modify, or likely high FODMAP, using *your* results. **Meal ideas:** online recipes (TheMealDB) checked against your triggers, with swaps. |
+| **Learn** | The journey at a glance, the 7-step guide, 12 diet guidelines and every source. |
 
-- **Symptom diary:** daily 0–10 scores for bloating, pain, gas and urgency, plus Bristol stool type, stress, food and notes. It draws a chart colored by phase and exports a CSV to share with a dietitian.
-- **Reintroduction tracker:** one card per FODMAP group (fructans split into grains, garlic and onion) for the test food, day-by-day notes and a result.
-- **Diet guidelines at a glance:** 12 key rules, each citing its source.
-- **Restaurant menu checker:** upload a menu photo or PDF, or paste the text. By default it runs entirely on the device: PDF text is extracted with [pdf.js](https://mozilla.github.io/pdf.js/), photos are read with [Tesseract.js](https://tesseract.projectnaptha.com/) OCR, and each dish is screened against a high-FODMAP keyword list (`js/fodmap-data.js`). Dishes are marked *likely OK*, *ask or modify*, or *likely high FODMAP*. The verdicts take the person's reintroduction results into account, so tolerated groups aren't flagged. When the page is opened on claude.ai as an artifact, there's an optional choice to have Claude read the menu instead.
-- **Meal ideas:** searches the free [TheMealDB](https://www.themealdb.com/) recipe API online, checks every ingredient against the person's triggers, shows the cleanest recipes first and suggests swaps. On claude.ai there's also an optional "Ask Claude for ideas" button.
+### The program
+1. **Get ready:** red flags, celiac testing, a dietitian, and a checklist
+2. **Baseline week:** 7 days of normal eating plus logging
+3. **Elimination, 2–6 weeks:** a week counter, with a check-in unlocked at 2 weeks
+4. **Check-in:** baseline compared with the last 7 days, then a clear next step (including what to do if the diet didn't help)
+5. **Reintroduction:** 8 food challenges (lactose, fructose, sorbitol, mannitol, wheat, garlic, onion, GOS). Each one is 3 days of increasing amounts with a reaction check-in. Moderate or severe symptoms end a challenge early, and a 3-day washout timer runs before the next one.
+6. **Your diet:** foods to eat freely, eat in small amounts, or limit, with a retest option
 
-Diary and tracker data are stored in the browser's `localStorage` on that device only. pdf.js and Tesseract are loaded from a CDN the first time they're needed, so the menu checker and meal ideas need an internet connection.
+## Your data goes with you
+Everything is saved on the device (`localStorage`), and nothing is uploaded. **Settings → Download backup** saves a file; **Restore** loads it on a new phone or browser. Progress from the first version of the guide is migrated automatically.
 
 ## Files
-
-- `index.html`: the guide's content and layout
-- `css/style.css`: styles, with light and dark modes
-- `js/app.js`: step navigation, checklist, symptom diary and reintroduction tracker
-- `js/fodmap-data.js`: FODMAP keyword rules and the verdict logic
-- `js/features.js`: the menu checker and meal ideas
+- `index.html`: the app shell and all content
+- `css/style.css`: app styles (light and dark modes, responsive phone, tablet and desktop layouts, retro quest map)
+- `js/app.js`: program logic, Today coach, quest map, log, badges, backup
+- `js/fodmap-data.js`: FODMAP keyword rules used by the menu checker and meal ideas
+- `js/features.js`: menu checker (pdf.js, Tesseract OCR) and meal ideas (TheMealDB)
+- `manifest.webmanifest`, `sw.js`, `icons/`: install-as-app and offline support
 
 ## Sources
+Monash University Department of Gastroenterology; ACG Clinical Guideline: Management of IBS (2021); British Society of Gastroenterology IBS guidelines (2021); NICE CG61; NIH/NIDDK; University of Michigan FODMAP reintroduction trial; ACG celiac guideline (2023). Full citations are in the app's Learn tab.
 
-The content is drawn from university and medical sources, cited inline and listed on the page:
-
-- Monash University Department of Gastroenterology (the developers of the low FODMAP diet)
-- ACG Clinical Guideline: Management of IBS (Lacy et al., *Am J Gastroenterol* 2021)
-- British Society of Gastroenterology IBS guidelines (Vasant et al., *Gut* 2021)
-- NICE CG61: IBS in adults
-- NIH / NIDDK patient guidance on IBS diet
-- University of Michigan FODMAP reintroduction trial (NCT03052439)
-- ACG celiac disease guideline update (Rubio-Tapia et al., 2023)
-
-> This guide is educational and not a substitute for care from a clinician or FODMAP-trained registered dietitian.
+> Educational only. Not a substitute for care from a clinician or a FODMAP-trained registered dietitian.

@@ -2,45 +2,164 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>IBS Elimination Diet Guide</title>
-  <meta name="description" content="A step-by-step, evidence-based guide to the low FODMAP elimination diet for finding IBS food triggers, with a symptom diary and reintroduction tracker.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>IBS Diet Helper</title>
+  <meta name="description" content="Your step-by-step low FODMAP elimination diet coach for IBS: a week-by-week plan, symptom log, reintroduction challenges, menu checker and meal ideas.">
+  <meta name="theme-color" content="#0f8f6c">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Diet Helper">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<header class="site-header">
-  <div class="wrap">
-    <p class="eyebrow">Step-by-step guide</p>
-    <h1>Finding your IBS food triggers</h1>
-    <p class="lede">A walkthrough of the three-phase low FODMAP elimination diet developed at Monash University and recommended in gastroenterology guidelines. It includes a symptom diary and a reintroduction tracker that save in your browser.</p>
-    <div class="disclaimer" role="note">
-      <strong>This is education, not medical advice.</strong> IBS should be diagnosed by a clinician, and guidelines recommend doing this diet with a FODMAP-trained registered dietitian. Talk to your doctor before you start, especially if you are pregnant, have diabetes, are underweight, or have a history of disordered eating.
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><img src="icons/icon.svg" alt="" width="28" height="28"><span>IBS Diet Helper</span></div>
+    <button type="button" class="icon-btn" id="openSettings" aria-label="Settings and backup">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Zm7.4-2.5a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1l-.4-2.7h-4l-.4 2.7a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L4.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1c.5.4 1.1.7 1.7 1l.4 2.7h4l.4-2.7c.6-.3 1.2-.6 1.7-1l2.5 1 2-3.5-2.1-1.6Z"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <!-- TODAY -->
+    <section class="view" id="view-today" aria-label="Today">
+      <div id="todayBody"></div>
+    </section>
+
+    <!-- PLAN -->
+    <section class="view" id="view-plan" aria-label="Your plan" hidden>
+      <h1 class="view-title">Quest map</h1>
+      <p class="muted">Your journey as a retro adventure. Every day you log earns a coin, every food challenge you finish earns a star, and your buddy shows where you are.</p>
+      <div id="path"></div>
+    </section>
+
+    <!-- LOG -->
+    <section class="view" id="view-log" aria-label="Log symptoms" hidden>
+      <h1 class="view-title">How are you feeling?</h1>
+      <form id="logForm" class="card log-form">
+        <div class="log-top">
+          <label>Date <input type="date" name="date" required></label>
+          <span class="phase-chip" id="logPhase"></span>
+        </div>
+        <div class="sliders">
+          <label class="slider"><span>Bloating</span><input type="range" name="bloating" min="0" max="10" value="0"><output>0</output></label>
+          <label class="slider"><span>Pain</span><input type="range" name="pain" min="0" max="10" value="0"><output>0</output></label>
+          <label class="slider"><span>Gas</span><input type="range" name="gas" min="0" max="10" value="0"><output>0</output></label>
+          <label class="slider"><span>Urgency</span><input type="range" name="urgency" min="0" max="10" value="0"><output>0</output></label>
+        </div>
+        <fieldset class="stool">
+          <legend>Stool type <span class="muted">(Bristol scale, optional)</span></legend>
+          <div class="seg" id="stoolSeg">
+            <label><input type="radio" name="stool" value="1"><span>1<small>hard</small></span></label>
+            <label><input type="radio" name="stool" value="2"><span>2</span></label>
+            <label><input type="radio" name="stool" value="3"><span>3</span></label>
+            <label><input type="radio" name="stool" value="4"><span>4<small>ideal</small></span></label>
+            <label><input type="radio" name="stool" value="5"><span>5</span></label>
+            <label><input type="radio" name="stool" value="6"><span>6</span></label>
+            <label><input type="radio" name="stool" value="7"><span>7<small>watery</small></span></label>
+          </div>
+        </fieldset>
+        <label class="slider"><span>Stress</span><input type="range" name="stress" min="0" max="10" value="0"><output>0</output></label>
+        <label class="field">What I ate <textarea name="food" rows="2" placeholder="Breakfast, lunch, dinner, snacks, drinks"></textarea></label>
+        <label class="field">Notes <textarea name="notes" rows="2" placeholder="Sleep, period, medication, exercise…"></textarea></label>
+        <button type="submit" class="btn primary block">Save today's log</button>
+      </form>
+
+      <div class="card">
+        <div class="card-head"><h2>Last 4 weeks</h2><span class="muted small">average score, 0–10</span></div>
+        <svg id="chart" class="chart" viewBox="0 0 340 140" role="img" aria-label="Bar chart of daily average symptom score over the last 28 days"></svg>
+        <p class="legend" id="legend"></p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>History</h2><button type="button" class="btn ghost small" id="exportCsv">Export CSV</button></div>
+        <ul class="history" id="history"></ul>
+      </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section class="view" id="view-tools" aria-label="Tools" hidden>
+      <h1 class="view-title">Tools</h1>
+      <div class="tabs-inline" role="tablist">
+        <button type="button" role="tab" class="seg-btn active" data-subtab="menu" aria-selected="true">Menu checker</button>
+        <button type="button" role="tab" class="seg-btn" data-subtab="meals" aria-selected="false">Meal ideas</button>
+      </div>
+      <section class="tool" id="menu">
+<h2>Restaurant menu checker</h2>
+  <p>Upload a photo or PDF of a menu, or paste the menu text. The checker marks each dish as <span class="pill good">likely OK</span>, <span class="pill modify">ask or modify</span> or <span class="pill avoid">likely high FODMAP</span>. It uses your reintroduction results, so groups you tolerate aren't flagged.</p>
+  <p class="small">By default everything runs on your device: text is read from the photo or PDF and checked against a list of high-FODMAP ingredients, sauces and cooking styles. Nothing is uploaded. When this page is opened on claude.ai, you can optionally ask Claude to read the menu instead.</p>
+  <div class="card upload">
+    <label class="drop" id="menuDrop">
+      <input type="file" id="menuFile" accept="image/*,application/pdf">
+      <span><strong>Choose a menu photo or PDF</strong><br><span class="small">or drag and drop it here</span></span>
+    </label>
+    <label class="full">Or paste menu text
+      <textarea id="menuText" rows="4" placeholder="Grilled salmon with garlic butter, mashed potato and green beans&#10;Mushroom risotto with parmesan"></textarea>
+    </label>
+    <div class="actions">
+      <button type="button" id="menuCheck">Check menu</button>
+      <button type="button" id="menuStop" class="secondary" hidden>Stop</button>
+      <span id="menuMode" class="small"></span>
     </div>
-    <ul class="quick-links" aria-label="Jump to tools">
-      <li><a href="#guidelines">Diet guidelines</a></li>
-      <li><a href="#diary">Symptom diary</a></li>
-      <li><a href="#reintro">Reintroduction tracker</a></li>
-      <li><a href="#menu">Menu checker</a></li>
-      <li><a href="#meals">Meal ideas</a></li>
-      <li><a href="#sources">Sources</a></li>
+    <p id="menuStatus" class="small" aria-live="polite"></p>
+  </div>
+  <div id="menuResults" class="menu-results"></div>
+  <div class="card tip">
+    <h3>Ordering tips that work almost anywhere</h3>
+    <ul>
+      <li>Choose plain grilled, roasted or steamed meat, fish, eggs or tofu, with rice, potato or polenta.</li>
+      <li>Ask for sauces, dressings and gravies on the side. They're the most common hidden source of garlic and onion.</li>
+      <li>Ask whether the kitchen can cook your dish in plain oil or butter, without garlic or onion.</li>
+      <li>Hard cheeses such as parmesan and cheddar are low in lactose. Cream sauces and soft cheeses aren't.</li>
+      <li>This checker is a guide only. Recipes vary, so ask staff when in doubt.</li>
     </ul>
   </div>
-</header>
-
-<nav class="stepper" aria-label="Guide steps">
-  <div class="wrap">
-    <ol id="stepNav"></ol>
-    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+      </section>
+      <section class="tool" id="meals" hidden>
+<h2>Meal ideas</h2>
+  <p>Get suggestions when you're stuck. It searches an online recipe database (<a href="https://www.themealdb.com/">TheMealDB</a>) and checks each recipe's ingredients against your triggers, with suggested swaps.</p>
+  <div class="card">
+    <div class="row meal-form">
+      <label>Main ingredient
+        <input id="mealIng" list="ingList" placeholder="e.g. chicken, salmon, rice, eggs">
+        <datalist id="ingList"><option>chicken</option><option>salmon</option><option>beef</option><option>pork</option><option>eggs</option><option>rice</option><option>potatoes</option><option>tofu</option><option>prawns</option><option>lamb</option></datalist>
+      </label>
+      <label>Meal
+        <select id="mealType"><option value="">Any</option><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select>
+      </label>
+    </div>
+    <label class="full">Anything else? (optional)
+      <input id="mealNotes" placeholder="e.g. quick, vegetarian, under 30 minutes, what's in my fridge">
+    </label>
+    <div class="actions">
+      <button type="button" id="mealSearch">Find recipes online</button>
+      <button type="button" id="mealAsk" class="secondary" hidden>Ask Claude for ideas</button>
+    </div>
+    <p id="mealStatus" class="small" aria-live="polite"></p>
   </div>
-</nav>
+  <div id="mealResults" class="meal-results"></div>
+      </section>
+    </section>
 
-<main class="wrap" id="main">
-
-<!-- STEP 1 -->
-<section class="step" data-step="1" data-title="Before you start">
-  <h2><span class="num">1</span> Before you start: get checked</h2>
-  <p>The low FODMAP diet is meant for people who already have an IBS diagnosis. Other conditions can cause the same symptoms, so a clinician should rule them out first.<sup><a href="#src-niddk">[NIDDK]</a> <a href="#src-nice">[NICE]</a></sup></p>
+    <!-- LEARN -->
+    <section class="view" id="view-learn" aria-label="Learn" hidden>
+      <h1 class="view-title">Learn</h1>
+      <div class="disclaimer" role="note">
+        <strong>This is education, not medical advice.</strong> IBS should be diagnosed by a clinician, and guidelines recommend doing this diet with a FODMAP-trained registered dietitian. Talk to your doctor before you start, especially if you are pregnant, have diabetes, are underweight, or have a history of disordered eating.
+      </div>
+      <h2 class="section-title">Your journey at a glance</h2>
+      <div id="learnJourney"></div>
+      <h2 class="section-title">The guide, step by step</h2>
+      <div class="lessons">
+<details class="lesson" open>
+<summary><span class="lesson-num">1</span><span>Before you start: get checked</span></summary>
+<div class="lesson-body"><p>The low FODMAP diet is meant for people who already have an IBS diagnosis. Other conditions can cause the same symptoms, so a clinician should rule them out first.<sup><a href="#src-niddk">[NIDDK]</a> <a href="#src-nice">[NICE]</a></sup></p>
 
   <div class="card alert">
     <h3>See a doctor promptly, before any diet change, if you have:</h3>
@@ -71,22 +190,11 @@
   <div class="card">
     <h3>Is this diet right for you?</h3>
     <p>Guidelines rate the evidence for the low FODMAP diet as low quality but still recommend a <em>limited trial</em>, because it helps many people.<sup><a href="#src-acg">[ACG]</a> <a href="#src-bsg">[BSG]</a></sup> In the UK, simpler first-line advice is often tried first: regular meals, less caffeine, alcohol and fizzy drinks, and gradual soluble fiber.<sup><a href="#src-nice">[NICE]</a></sup> If that hasn't helped, the low FODMAP diet is the usual next step.</p>
-  </div>
-
-  <div class="checklist" data-list="prep">
-    <h3>Checklist</h3>
-    <label><input type="checkbox" data-key="prep-dx"> I have an IBS diagnosis from a clinician</label>
-    <label><input type="checkbox" data-key="prep-flags"> I have none of the red flag symptoms above, or they've been checked</label>
-    <label><input type="checkbox" data-key="prep-celiac"> I've been tested for celiac disease (while eating gluten)</label>
-    <label><input type="checkbox" data-key="prep-rd"> I've found a dietitian or talked to my doctor about this plan</label>
-    <label><input type="checkbox" data-key="prep-app"> I have a reliable food list (e.g. the Monash app)</label>
-  </div>
-</section>
-
-<!-- STEP 2 -->
-<section class="step" data-step="2" data-title="Learn FODMAPs">
-  <h2><span class="num">2</span> Understand what you're testing</h2>
-  <p><strong>FODMAP</strong> stands for <strong>F</strong>ermentable <strong>O</strong>ligosaccharides, <strong>D</strong>isaccharides, <strong>M</strong>onosaccharides <strong>A</strong>nd <strong>P</strong>olyols. These are short-chain carbohydrates that are poorly absorbed in the small intestine. They draw water into the gut and are fermented by bacteria in the colon, which produces gas. In people with IBS, whose gut is often more sensitive, this can cause bloating, pain, diarrhea or constipation.<sup><a href="#src-monash-steps">[Monash]</a></sup></p>
+  </div></div>
+</details>
+<details class="lesson">
+<summary><span class="lesson-num">2</span><span>Understand what you're testing</span></summary>
+<div class="lesson-body"><p><strong>FODMAP</strong> stands for <strong>F</strong>ermentable <strong>O</strong>ligosaccharides, <strong>D</strong>isaccharides, <strong>M</strong>onosaccharides <strong>A</strong>nd <strong>P</strong>olyols. These are short-chain carbohydrates that are poorly absorbed in the small intestine. They draw water into the gut and are fermented by bacteria in the colon, which produces gas. In people with IBS, whose gut is often more sensitive, this can cause bloating, pain, diarrhea or constipation.<sup><a href="#src-monash-steps">[Monash]</a></sup></p>
   <p>The diet tests <strong>six groups</strong> one at a time. Most people react to only some of them; in a University of Michigan study, patients reacted to an average of two groups.<sup><a href="#src-michigan">[Michigan]</a></sup></p>
 
   <div class="table-scroll">
@@ -103,26 +211,22 @@
   </table>
   </div>
   <p class="small"><strong>Portion size matters.</strong> Many foods are low FODMAP in a small serve and high in a large one. Monash retests foods regularly and updated many serving sizes in 2025, so use the app for exact amounts rather than any fixed list, including this one.<sup><a href="#src-monash-serve">[Monash]</a> <a href="#src-monash-reintro">[Monash]</a></sup></p>
-  <p class="small">Foods that are naturally free of FODMAPs include plain meat, fish, eggs, firm tofu, most oils, rice, oats, potatoes, carrots, spinach, tomatoes and cucumber.</p>
-</section>
-
-<!-- STEP 3 -->
-<section class="step" data-step="3" data-title="Track a baseline">
-  <h2><span class="num">3</span> Track a baseline week</h2>
-  <p>Before changing anything, record what you eat and how you feel for about a week. NIDDK suggests writing down what you eat and drink each day, along with your symptoms and when they happen, and sharing that with your doctor.<sup><a href="#src-niddk">[NIDDK]</a></sup> This baseline lets you tell later whether the diet actually helped.</p>
+  <p class="small">Foods that are naturally free of FODMAPs include plain meat, fish, eggs, firm tofu, most oils, rice, oats, potatoes, carrots, spinach, tomatoes and cucumber.</p></div>
+</details>
+<details class="lesson">
+<summary><span class="lesson-num">3</span><span>Track a baseline week</span></summary>
+<div class="lesson-body"><p>Before changing anything, record what you eat and how you feel for about a week. NIDDK suggests writing down what you eat and drink each day, along with your symptoms and when they happen, and sharing that with your doctor.<sup><a href="#src-niddk">[NIDDK]</a></sup> This baseline lets you tell later whether the diet actually helped.</p>
 
   <div class="card tip">
     <h3>How to score</h3>
     <p>Rate each symptom from <strong>0</strong> (none) to <strong>10</strong> (worst imaginable) once a day, at the same time. Note stool form too: the Bristol Stool Form Scale runs from type 1 (hard lumps) to type 7 (watery); types 3–4 are typical.</p>
     <p>Also log things that affect IBS but aren't food: stress, sleep, your menstrual cycle, exercise, and medications.</p>
   </div>
-  <p>Use the <a href="#diary" class="jump">symptom diary</a> below. Tag these days as <em>Baseline</em>.</p>
-</section>
-
-<!-- STEP 4 -->
-<section class="step" data-step="4" data-title="Phase 1: Eliminate">
-  <h2><span class="num">4</span> Phase 1: Low FODMAP (2–6 weeks)</h2>
-  <p>Swap high-FODMAP foods for low-FODMAP alternatives in the same food group, for example an orange instead of an apple. The aim is substitution, not cutting out whole food groups, so your diet stays nutritious.<sup><a href="#src-monash-steps">[Monash]</a></sup> Monash recommends 2 to 6 weeks for this phase.</p>
+  <p>Use the <a href="#log" data-goto="log">Log</a> tab. Entries are tagged with your current phase automatically.</p></div>
+</details>
+<details class="lesson">
+<summary><span class="lesson-num">4</span><span>Phase 1: Low FODMAP (2–6 weeks)</span></summary>
+<div class="lesson-body"><p>Swap high-FODMAP foods for low-FODMAP alternatives in the same food group, for example an orange instead of an apple. The aim is substitution, not cutting out whole food groups, so your diet stays nutritious.<sup><a href="#src-monash-steps">[Monash]</a></sup> Monash recommends 2 to 6 weeks for this phase.</p>
 
   <div class="grid-2">
     <div class="card">
@@ -154,13 +258,11 @@
       <li><strong>Snack:</strong> An orange and a small handful of walnuts</li>
       <li><strong>Dinner:</strong> Salmon with potatoes, green beans and zucchini cooked in garlic-infused oil</li>
     </ul>
-  </div>
-</section>
-
-<!-- STEP 5 -->
-<section class="step" data-step="5" data-title="Check-in">
-  <h2><span class="num">5</span> Check-in: did it help?</h2>
-  <p>Compare your recent diary scores with your baseline. The chart in the <a href="#diary" class="jump">diary</a> shows your daily averages.</p>
+  </div></div>
+</details>
+<details class="lesson">
+<summary><span class="lesson-num">5</span><span>Check-in: did it help?</span></summary>
+<div class="lesson-body"><p>Compare your recent diary scores with your baseline. The app compares them for you on the Today screen when you reach the check-in.</p>
   <div class="grid-2">
     <div class="card ok">
       <h3>Symptoms clearly better</h3>
@@ -170,16 +272,11 @@
       <h3>Little or no change after 4–6 weeks</h3>
       <p>FODMAPs may not be your main trigger. Return to your normal diet and talk to your doctor or dietitian about other options. Guidelines also support soluble fiber such as psyllium, medicines targeted to your IBS type, and gut-directed psychological therapies such as CBT or gut-directed hypnotherapy.<sup><a href="#src-acg">[ACG]</a> <a href="#src-bsg">[BSG]</a></sup></p>
     </div>
-  </div>
-  <div class="checkin">
-    <p id="checkinResult" class="small">Add baseline and Phase 1 entries to the diary to see a comparison here.</p>
-  </div>
-</section>
-
-<!-- STEP 6 -->
-<section class="step" data-step="6" data-title="Phase 2: Reintroduce">
-  <h2><span class="num">6</span> Phase 2: Reintroduce one group at a time</h2>
-  <p>Stay on your low FODMAP base diet while you test one FODMAP group at a time, using a food that mainly contains that one FODMAP, such as mango for fructose.<sup><a href="#src-monash-reintro">[Monash]</a></sup> Monash estimates this phase takes 8 to 12 weeks.<sup><a href="#src-monash-steps">[Monash]</a></sup></p>
+  </div></div>
+</details>
+<details class="lesson">
+<summary><span class="lesson-num">6</span><span>Phase 2: Reintroduce one group at a time</span></summary>
+<div class="lesson-body"><p>Stay on your low FODMAP base diet while you test one FODMAP group at a time, using a food that mainly contains that one FODMAP, such as mango for fructose.<sup><a href="#src-monash-reintro">[Monash]</a></sup> Monash estimates this phase takes 8 to 12 weeks.<sup><a href="#src-monash-steps">[Monash]</a></sup></p>
 
   <div class="card">
     <h3>The 3-day challenge</h3>
@@ -221,20 +318,17 @@
       <li>A reaction is about <em>amount</em>, not all-or-nothing. Note the largest serve you tolerated.</li>
     </ul>
   </div>
-  <p>Record each challenge in the <a href="#reintro" class="jump">reintroduction tracker</a> below.</p>
-</section>
-
-<!-- STEP 7 -->
-<section class="step" data-step="7" data-title="Phase 3: Personalise">
-  <h2><span class="num">7</span> Phase 3: Your long-term diet</h2>
-  <p>The goal of the whole process is the <em>least restrictive</em> diet that keeps your symptoms under control. You only limit the groups, and amounts, that you reacted to, and bring everything else back.<sup><a href="#src-monash-steps">[Monash]</a> <a href="#src-bsg">[BSG]</a></sup></p>
+  <p>The app walks you through each challenge day by day on the Today screen.</p></div>
+</details>
+<details class="lesson">
+<summary><span class="lesson-num">7</span><span>Phase 3: Your long-term diet</span></summary>
+<div class="lesson-body"><p>The goal of the whole process is the <em>least restrictive</em> diet that keeps your symptoms under control. You only limit the groups, and amounts, that you reacted to, and bring everything else back.<sup><a href="#src-monash-steps">[Monash]</a> <a href="#src-bsg">[BSG]</a></sup></p>
   <ul>
     <li><strong>Tolerated groups:</strong> Eat these freely again.</li>
     <li><strong>Partly tolerated:</strong> Eat them in the amounts that were fine for you, and spread them out over the day.</li>
     <li><strong>Not tolerated:</strong> Limit them for now, but retest every few months. Tolerance often changes over time.</li>
   </ul>
-  <p>Your personal summary updates from the tracker:</p>
-  <div id="summary" class="summary"></div>
+  <p>Your personal results are on the <a href="#today" data-goto="today">Today</a> screen once you reach this phase.</p>
 
   <div class="card">
     <h3>Other habits that help</h3>
@@ -244,18 +338,12 @@
       <li>Notice how caffeine, alcohol, fatty meals and fizzy drinks affect you.<sup><a href="#src-nice">[NICE]</a></sup></li>
       <li>Manage stress, sleep and activity. The gut-brain connection is a real part of IBS, and gut-directed psychological therapies are recommended in guidelines.<sup><a href="#src-acg">[ACG]</a></sup></li>
     </ul>
-  </div>
-</section>
-
-<div class="step-controls">
-  <button type="button" id="prevBtn" class="secondary">← Back</button>
-  <button type="button" id="nextBtn">Next step →</button>
-</div>
-
-<!-- GUIDELINES -->
-<section class="tool" id="guidelines">
-  <h2>Diet guidelines at a glance</h2>
-  <p class="small">The key rules from the guides above in one place, each with its source. Numbers in brackets link to the full reference at the bottom of the page.</p>
+  </div></div>
+</details>
+      </div>
+      <h2 class="section-title" id="guidelines">Diet guidelines at a glance</h2>
+      <div class="lessons-body">
+<p class="small">The key rules from the guides above in one place, each with its source. Numbers in brackets link to the full reference at the bottom of the page.</p>
   <div class="guide-grid">
     <div class="card"><h3>1. Diagnosis first</h3><p>Get an IBS diagnosis and celiac testing <em>while still eating gluten</em>, and check for red flag symptoms before changing your diet.<sup><a href="#src-acg">[ACG]</a> <a href="#src-nice">[NICE]</a> <a href="#src-celiac">[Celiac]</a></sup></p></div>
     <div class="card"><h3>2. Use expert help</h3><p>The low FODMAP diet should be supervised by a trained dietitian, and reintroduction should follow your own tolerance.<sup><a href="#src-bsg">[BSG]</a></sup></p></div>
@@ -270,130 +358,10 @@
     <div class="card"><h3>11. Probiotics: not routinely</h3><p>The ACG guideline suggests against probiotics for overall IBS symptoms, because the evidence is inconsistent.<sup><a href="#src-acg">[ACG]</a></sup></p></div>
     <div class="card"><h3>12. Mind and gut</h3><p>Stress affects IBS. Gut-directed psychological therapies are recommended alongside diet.<sup><a href="#src-acg">[ACG]</a> <a href="#src-bsg">[BSG]</a></sup> If food rules start to cause anxiety, stop and speak to your clinician.</p></div>
   </div>
-</section>
-
-<!-- TOOLS -->
-<section class="tool" id="diary">
-  <h2>Symptom diary</h2>
-  <form id="diaryForm" class="diary-form">
-    <div class="row">
-      <label>Date <input type="date" name="date" required></label>
-      <label>Phase
-        <select name="phase">
-          <option value="baseline">Baseline</option>
-          <option value="elimination">Phase 1: Elimination</option>
-          <option value="reintro">Phase 2: Reintroduction</option>
-          <option value="personal">Phase 3: Personalised</option>
-        </select>
-      </label>
-    </div>
-    <div class="row sliders">
-      <label>Bloating <output>0</output><input type="range" name="bloating" min="0" max="10" value="0"></label>
-      <label>Pain <output>0</output><input type="range" name="pain" min="0" max="10" value="0"></label>
-      <label>Gas <output>0</output><input type="range" name="gas" min="0" max="10" value="0"></label>
-      <label>Bowel urgency <output>0</output><input type="range" name="urgency" min="0" max="10" value="0"></label>
-    </div>
-    <div class="row">
-      <label>Stool type (Bristol 1–7)
-        <select name="stool">
-          <option value="">Not recorded</option>
-          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
-        </select>
-      </label>
-      <label>Stress (0–10) <input type="number" name="stress" min="0" max="10" value="0"></label>
-    </div>
-    <label class="full">What I ate <textarea name="food" rows="2" placeholder="Breakfast, lunch, dinner, snacks, drinks"></textarea></label>
-    <label class="full">Notes <textarea name="notes" rows="2" placeholder="Sleep, period, medication, exercise..."></textarea></label>
-    <button type="submit">Save entry</button>
-  </form>
-
-  <div class="chart-wrap">
-    <h3>Average symptom score by day</h3>
-    <svg id="chart" viewBox="0 0 600 200" role="img" aria-label="Line chart of daily average symptom score"></svg>
-    <p class="legend"><span class="dot baseline"></span>Baseline <span class="dot elimination"></span>Elimination <span class="dot reintro"></span>Reintroduction <span class="dot personal"></span>Personalised</p>
-  </div>
-
-  <div class="table-scroll">
-    <table id="diaryTable">
-      <thead><tr><th>Date</th><th>Phase</th><th>Avg</th><th>Stool</th><th>Food</th><th></th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <div class="actions">
-    <button type="button" id="exportCsv" class="secondary">Download CSV for your dietitian</button>
-    <button type="button" id="printBtn" class="secondary">Print</button>
-  </div>
-</section>
-
-<section class="tool" id="reintro">
-  <h2>Reintroduction tracker</h2>
-  <p class="small">For each group, record the food you tested and how each day went. Then choose a result.</p>
-  <div id="reintroList" class="reintro-list"></div>
-</section>
-
-<!-- MENU CHECKER -->
-<section class="tool" id="menu">
-  <h2>Restaurant menu checker</h2>
-  <p>Upload a photo or PDF of a menu, or paste the menu text. The checker marks each dish as <span class="pill good">likely OK</span>, <span class="pill modify">ask or modify</span> or <span class="pill avoid">likely high FODMAP</span>. It uses your reintroduction results, so groups you tolerate aren't flagged.</p>
-  <p class="small">By default everything runs on your device: text is read from the photo or PDF and checked against a list of high-FODMAP ingredients, sauces and cooking styles. Nothing is uploaded. When this page is opened on claude.ai, you can optionally ask Claude to read the menu instead.</p>
-  <div class="card upload">
-    <label class="drop" id="menuDrop">
-      <input type="file" id="menuFile" accept="image/*,application/pdf">
-      <span><strong>Choose a menu photo or PDF</strong><br><span class="small">or drag and drop it here</span></span>
-    </label>
-    <label class="full">Or paste menu text
-      <textarea id="menuText" rows="4" placeholder="Grilled salmon with garlic butter, mashed potato and green beans&#10;Mushroom risotto with parmesan"></textarea>
-    </label>
-    <div class="actions">
-      <button type="button" id="menuCheck">Check menu</button>
-      <button type="button" id="menuStop" class="secondary" hidden>Stop</button>
-      <span id="menuMode" class="small"></span>
-    </div>
-    <p id="menuStatus" class="small" aria-live="polite"></p>
-  </div>
-  <div id="menuResults" class="menu-results"></div>
-  <div class="card tip">
-    <h3>Ordering tips that work almost anywhere</h3>
-    <ul>
-      <li>Choose plain grilled, roasted or steamed meat, fish, eggs or tofu, with rice, potato or polenta.</li>
-      <li>Ask for sauces, dressings and gravies on the side. They're the most common hidden source of garlic and onion.</li>
-      <li>Ask whether the kitchen can cook your dish in plain oil or butter, without garlic or onion.</li>
-      <li>Hard cheeses such as parmesan and cheddar are low in lactose. Cream sauces and soft cheeses aren't.</li>
-      <li>This checker is a guide only. Recipes vary, so ask staff when in doubt.</li>
-    </ul>
-  </div>
-</section>
-
-<!-- MEAL IDEAS -->
-<section class="tool" id="meals">
-  <h2>Meal ideas</h2>
-  <p>Get suggestions when you're stuck. It searches an online recipe database (<a href="https://www.themealdb.com/">TheMealDB</a>) and checks each recipe's ingredients against your triggers, with suggested swaps.</p>
-  <div class="card">
-    <div class="row meal-form">
-      <label>Main ingredient
-        <input id="mealIng" list="ingList" placeholder="e.g. chicken, salmon, rice, eggs">
-        <datalist id="ingList"><option>chicken</option><option>salmon</option><option>beef</option><option>pork</option><option>eggs</option><option>rice</option><option>potatoes</option><option>tofu</option><option>prawns</option><option>lamb</option></datalist>
-      </label>
-      <label>Meal
-        <select id="mealType"><option value="">Any</option><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select>
-      </label>
-    </div>
-    <label class="full">Anything else? (optional)
-      <input id="mealNotes" placeholder="e.g. quick, vegetarian, under 30 minutes, what's in my fridge">
-    </label>
-    <div class="actions">
-      <button type="button" id="mealSearch">Find recipes online</button>
-      <button type="button" id="mealAsk" class="secondary" hidden>Ask Claude for ideas</button>
-    </div>
-    <p id="mealStatus" class="small" aria-live="polite"></p>
-  </div>
-  <div id="mealResults" class="meal-results"></div>
-</section>
-
-<!-- SOURCES -->
-<section class="sources" id="sources">
-  <h2>Sources</h2>
-  <ol>
+      </div>
+      <h2 class="section-title" id="sources">Sources</h2>
+      <div class="sources">
+<ol>
     <li id="src-monash-steps">Monash University, Department of Gastroenterology. <em>The 3 steps of the FODMAP diet</em> and the <em>3-step FODMAP Diet</em> information sheet (2026). <a href="https://www.monashfodmap.com/blog/3-phases-low-fodmap-diet/">monashfodmap.com/blog/3-phases-low-fodmap-diet</a> · <a href="https://monashfodmap.com/documents/203/3-step_FODMAP_Diet_2026_A4_info_sheet.pdf">PDF</a></li>
     <li id="src-monash-reintro">Monash University. <em>Reintroduction update</em> (2025) and <em>Interpreting reintroduction challenges</em>. <a href="https://monashfodmap.com/blog/reintroduction-update/">monashfodmap.com/blog/reintroduction-update</a> · <a href="https://monashfodmap.com/blog/interpreting-reintroduction-challenges/">interpreting-reintroduction-challenges</a></li>
     <li id="src-monash-serve">Monash University. <em>Serving size and FODMAPs: why is it so important?</em> <a href="https://monashfodmap.com/blog/serving-size-and-fodmaps-why-it-so-important/">monashfodmap.com</a></li>
@@ -406,13 +374,44 @@
     <li id="src-mealdb">Recipe suggestions: <a href="https://www.themealdb.com/">TheMealDB</a> free recipe API. These recipes aren't designed for low FODMAP; this page flags ingredients and suggests swaps.</li>
   </ol>
   <p class="small">Reviewed November 2026. Food FODMAP content and recommended serving sizes change as foods are retested; always check the current Monash app.</p>
-</section>
+      </div>
+    </section>
+  </main>
 
-</main>
+  <nav class="tabbar" aria-label="Main">
+    <a href="#today" data-tab="today">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Today</span></a>
+    <a href="#plan" data-tab="plan">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm12 12a3 3 0 1 1 0 6 3 3 0 0 1 0-6ZM6 9v4a4 4 0 0 0 4 4h5" fill="none" stroke-width="2"/></svg><span>Quest</span></a>
+    <a href="#log" data-tab="log" class="tab-log">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke-width="2.6" stroke-linecap="round"/></svg><span>Log</span></a>
+    <a href="#tools" data-tab="tools">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v8m-3-8v5a3 3 0 0 0 6 0V3M7 11v10M17 3c-2 0-3 2.5-3 6s1 4 3 4v8" fill="none" stroke-width="2" stroke-linecap="round"/></svg><span>Tools</span></a>
+    <a href="#learn" data-tab="learn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke-width="2"/></svg><span>Learn</span></a>
+  </nav>
+</div>
 
-<footer class="wrap site-footer">
-  <p>Your diary and tracker data are saved only in this browser on this device. Nothing is sent anywhere.</p>
-</footer>
+<!-- Settings sheet -->
+<div class="sheet-backdrop" id="settings" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="sheet-head"><h2 id="settingsTitle">Settings and backup</h2><button type="button" class="icon-btn" data-close aria-label="Close">✕</button></div>
+    <p class="muted small">Your data is saved on this device only. To move it to a new phone or browser, download a backup and restore it there.</p>
+    <div class="stack">
+      <button type="button" class="btn primary block" id="backupBtn">Download backup file</button>
+      <label class="btn ghost block file-btn">Restore from a backup file<input type="file" id="restoreFile" accept="application/json,.json"></label>
+      <button type="button" class="btn ghost block" id="installBtn" hidden>Install app on this device</button>
+      <p class="muted small" id="installHint">To install: on iPhone, tap Share and then <strong>Add to Home Screen</strong>. On Android, open the browser menu and tap <strong>Install app</strong>.</p>
+      <hr>
+      <label class="switch"><span><b>8-bit sounds</b><br><span class="muted small">Coin and level-clear sounds</span></span><input type="checkbox" id="soundToggle"></label>
+      <hr>
+      <button type="button" class="btn ghost block" id="backPhase">Go back one phase</button>
+      <button type="button" class="btn danger block" id="resetBtn">Start over (erase everything)</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="js/fodmap-data.js"></script>
 <script src="js/app.js"></script>

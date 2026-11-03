@@ -1,251 +1,755 @@
+/*
+ * IBS Diet Helper: program logic.
+ * The app walks someone through the Monash three-phase low FODMAP diet
+ * (baseline, elimination, check-in, reintroduction, personalisation),
+ * keeps a symptom log, and turns progress into a retro quest map.
+ * All data stays in this browser (localStorage); backups are JSON files.
+ */
 (function () {
   'use strict';
 
-  /* ---------- storage (fails safely in private mode) ---------- */
-  var KEY = 'ibs-guide-v1';
-  function load() {
-    try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; }
-  }
-  var state = load();
-  state.diary = state.diary || [];
-  state.checks = state.checks || {};
-  state.reintro = state.reintro || {};
-  state.step = state.step || 1;
-  function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
-  }
-
+  var KEY = 'ibs-helper-v2', OLD_KEY = 'ibs-guide-v1';
+  function $(id) { return document.getElementById(id); }
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
 
-  /* ---------- stepper ---------- */
-  var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
-  var nav = document.getElementById('stepNav');
-  var prevBtn = document.getElementById('prevBtn');
-  var nextBtn = document.getElementById('nextBtn');
+  /* ---------- dates (local calendar days) ---------- */
+  function iso(d) { var m = d.getMonth() + 1, x = d.getDate(); return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (x < 10 ? '0' : '') + x; }
+  function today() { return iso(new Date()); }
+  function parse(s) { var p = String(s).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function diff(a, b) { return Math.round((parse(b) - parse(a)) / 864e5); }
+  function addDays(s, n) { var d = parse(s); d.setDate(d.getDate() + n); return iso(d); }
+  function nice(s) { return parse(s).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }); }
 
-  steps.forEach(function (s, i) {
-    var li = document.createElement('li');
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.textContent = (i + 1) + '. ' + s.dataset.title;
-    b.addEventListener('click', function () { go(i + 1, true); });
-    li.appendChild(b);
-    nav.appendChild(li);
-  });
+  /* ---------- program content ---------- */
+  var PHASES = {
+    prep:        { name: 'Get ready', icon: '🩺', color: 'var(--c-prep)', dur: 'Before you start',
+                   you: 'See your doctor to confirm IBS, get tested for celiac disease while still eating gluten, and find a dietitian if you can.',
+                   app: ['Readiness checklist', 'Red-flag symptoms', 'The guide in Learn'] },
+    baseline:    { name: 'Baseline week', icon: '📝', color: 'var(--c-baseline)', dur: '7 days',
+                   you: 'Eat as you normally do and log how you feel every day.',
+                   app: ['Quick daily log', 'Streaks and coins', 'Symptom chart'] },
+    elimination: { name: 'Elimination', icon: '🥗', color: 'var(--c-elimination)', dur: '2–6 weeks',
+                   you: 'Swap high-FODMAP foods for low-FODMAP ones and keep logging.',
+                   app: ['Week counter', 'Menu checker', 'Meal ideas', 'Daily tips'] },
+    checkin:     { name: 'Check-in', icon: '📊', color: 'var(--c-prep)', dur: '1 day',
+                   you: 'See whether your symptoms have improved enough to move on.',
+                   app: ['Before and after comparison', 'Clear next step'] },
+    reintro:     { name: 'Reintroduction', icon: '🧪', color: 'var(--c-reintro)', dur: '8–12 weeks',
+                   you: 'Test one FODMAP group at a time: 3 challenge days, then a few days\' break.',
+                   app: ['Day-by-day challenge coach', 'Reaction check-ins', 'Washout timer', 'Results'] },
+    personal:    { name: 'Your diet', icon: '⭐', color: 'var(--c-personal)', dur: 'Long term',
+                   you: 'Eat everything you tolerate and limit only your triggers. Retest them every few months.',
+                   app: ['Your food results', 'Menu checker uses your results', 'Retest a group'] }
+  };
+  var ORDER = ['prep', 'baseline', 'elimination', 'checkin', 'reintro', 'personal'];
 
-  function go(n, scroll) {
-    n = Math.max(1, Math.min(steps.length, n));
-    state.step = n;
-    steps.forEach(function (s, i) { s.classList.toggle('active', i + 1 === n); });
-    Array.prototype.forEach.call(nav.querySelectorAll('button'), function (b, i) {
-      if (i + 1 === n) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
-      b.classList.toggle('done', i + 1 < n);
+  // Example amounts commonly used for the 3-day challenge. Monash revised its
+  // challenge foods and serve sizes in 2025; the app tells users to check theirs.
+  var GROUPS = [
+    { id: 'lactose', name: 'Lactose', emoji: '🥛', food: 'cow\'s milk', doses: ['½ cup (125 ml)', '1 cup (250 ml)', '1½ cups (375 ml)'] },
+    { id: 'fructose', name: 'Fructose', emoji: '🥭', food: 'mango (or honey)', doses: ['¼ mango (or 1 tsp honey)', '½ mango (or 2 tsp honey)', '1 mango (or 1 tbsp honey)'] },
+    { id: 'sorbitol', name: 'Sorbitol', emoji: '🍑', food: 'a sorbitol test food from the Monash app', doses: ['a small serve', 'a medium serve', 'a large serve'] },
+    { id: 'mannitol', name: 'Mannitol', emoji: '🍄', food: 'button mushrooms', doses: ['½ cup', '1 cup', '1½ cups'] },
+    { id: 'fructan-grain', name: 'Fructans: wheat', emoji: '🍞', food: 'wheat bread', doses: ['1 slice', '2 slices', '3 slices'] },
+    { id: 'fructan-garlic', name: 'Fructans: garlic', emoji: '🧄', food: 'garlic', doses: ['¼ clove', '½ clove', '1 clove'] },
+    { id: 'fructan-onion', name: 'Fructans: onion', emoji: '🧅', food: 'onion', doses: ['1 tbsp chopped', '¼ onion', '½ onion'] },
+    { id: 'gos', name: 'GOS (legumes)', emoji: '🫘', food: 'canned lentils or chickpeas, rinsed', doses: ['¼ cup', '½ cup', '1 cup'] }
+  ];
+  var G = {}; GROUPS.forEach(function (g) { G[g.id] = g; });
+  var RESULT = { tolerated: 'Tolerated', partial: 'Small amounts OK', trigger: 'Trigger' };
+  var REACT = [
+    { face: '😀', label: 'None' }, { face: '🙂', label: 'Mild' },
+    { face: '😣', label: 'Moderate' }, { face: '😫', label: 'Severe' }
+  ];
+  var TIPS = [
+    'Garlic-infused oil gives garlic flavor without the FODMAPs, because fructans don\'t dissolve in oil.',
+    'Check labels for honey, inulin, chicory root, onion and garlic powder, and sweeteners ending in "-itol".',
+    'Spread fruit out: about one serve per meal or snack.',
+    'Hard cheeses like cheddar and parmesan are naturally low in lactose.',
+    'Use the green tops of spring onions or chives for an onion flavor.',
+    'Eating out? Use the menu checker in Tools, and ask for sauces on the side.',
+    'Keep up fiber with oats, potatoes with skin, kiwi, chia and linseed.',
+    'Regular meals help. Try not to skip meals or leave long gaps.',
+    'Stress and poor sleep can flare IBS too. Note them in your log.',
+    'Stuck for dinner ideas? Try Meal ideas in Tools.',
+    'Portion size matters: many foods are fine in a small serve.',
+    'A slip-up isn\'t a failure. Note it and carry on.'
+  ];
+
+  /* ---------- state ---------- */
+  function fresh() {
+    return { v: 2, phase: 'prep', starts: { prep: today() }, checks: {}, diary: [], ch: {}, active: '', washoutUntil: '', outcome: '', sound: false, badges: {} };
+  }
+  function load() {
+    try {
+      var s = JSON.parse(localStorage.getItem(KEY));
+      if (s && s.v === 2) return s;
+      var old = JSON.parse(localStorage.getItem(OLD_KEY));
+      if (old) return migrate(old);
+    } catch (e) { /* ignore */ }
+    return fresh();
+  }
+  function migrate(old) {
+    var s = fresh();
+    s.checks = old.checks || {};
+    s.diary = (old.diary || []).map(function (e) { var x = {}; for (var k in e) x[k] = e[k]; return x; });
+    Object.keys(old.reintro || {}).forEach(function (g) {
+      var r = old.reintro[g];
+      if (G[g] && r) s.ch[g] = { status: r.result ? 'done' : 'pending', result: r.result || '', food: r.food || '', days: [], end: r.result ? today() : '' };
     });
-    document.getElementById('progressBar').style.width = (n / steps.length * 100) + '%';
-    prevBtn.disabled = n === 1;
-    nextBtn.textContent = n === steps.length ? 'Go to tools ↓' : 'Next step →';
-    save();
-    if (scroll) document.getElementById('main').scrollIntoView({ behavior: 'smooth' });
-  }
-  prevBtn.addEventListener('click', function () { go(state.step - 1, true); });
-  nextBtn.addEventListener('click', function () {
-    if (state.step === steps.length) document.getElementById('diary').scrollIntoView({ behavior: 'smooth' });
-    else go(state.step + 1, true);
-  });
-
-  /* ---------- checklist ---------- */
-  Array.prototype.forEach.call(document.querySelectorAll('.checklist input'), function (cb) {
-    cb.checked = !!state.checks[cb.dataset.key];
-    cb.addEventListener('change', function () { state.checks[cb.dataset.key] = cb.checked; save(); });
-  });
-
-  /* ---------- diary ---------- */
-  var form = document.getElementById('diaryForm');
-  var SYM = ['bloating', 'pain', 'gas', 'urgency'];
-  var PHASE_LABEL = { baseline: 'Baseline', elimination: 'Elimination', reintro: 'Reintroduction', personal: 'Personalised' };
-
-  form.date.value = new Date().toISOString().slice(0, 10);
-  Array.prototype.forEach.call(form.querySelectorAll('input[type=range]'), function (r) {
-    var out = r.previousElementSibling;
-    r.addEventListener('input', function () { out.textContent = r.value; });
-  });
-  // Default the phase to the last one used
-  if (state.diary.length) form.phase.value = state.diary[state.diary.length - 1].phase;
-
-  function avg(e) {
-    var t = 0; SYM.forEach(function (k) { t += Number(e[k]) || 0; });
-    return Math.round(t / SYM.length * 10) / 10;
-  }
-
-  form.addEventListener('submit', function (ev) {
-    ev.preventDefault();
-    var e = { id: Date.now() };
-    ['date', 'phase', 'stool', 'stress', 'food', 'notes'].concat(SYM).forEach(function (k) { e[k] = form[k].value; });
-    state.diary.push(e);
-    state.diary.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : a.id - b.id; });
-    save();
-    form.food.value = ''; form.notes.value = '';
-    renderDiary();
-  });
-
-  function renderDiary() {
-    var tb = document.querySelector('#diaryTable tbody');
-    if (!state.diary.length) {
-      tb.innerHTML = '<tr><td colspan="6" class="small">No entries yet.</td></tr>';
-    } else {
-      tb.innerHTML = state.diary.slice().reverse().map(function (e) {
-        return '<tr><td>' + esc(e.date) + '</td><td>' + esc(PHASE_LABEL[e.phase]) + '</td><td>' + avg(e) +
-          '</td><td>' + esc(e.stool || '–') + '</td><td>' + esc(e.food) +
-          '</td><td><button type="button" class="link" data-del="' + e.id + '" aria-label="Delete entry">✕</button></td></tr>';
-      }).join('');
-    }
-    renderChart();
-    renderCheckin();
-  }
-
-  document.querySelector('#diaryTable tbody').addEventListener('click', function (ev) {
-    var id = ev.target.getAttribute('data-del');
-    if (!id || !confirm('Delete this entry?')) return;
-    state.diary = state.diary.filter(function (e) { return String(e.id) !== id; });
-    save(); renderDiary();
-  });
-
-  function renderChart() {
-    var svg = document.getElementById('chart');
-    var W = 600, H = 200, L = 30, R = 10, T = 10, B = 24;
-    var pts = state.diary;
-    var html = '';
-    for (var y = 0; y <= 10; y += 5) {
-      var yy = T + (H - T - B) * (1 - y / 10);
-      html += '<line class="grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + yy + '" y2="' + yy + '"/>' +
-        '<text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end">' + y + '</text>';
-    }
-    if (pts.length) {
-      var n = pts.length;
-      var xs = function (i) { return n === 1 ? (L + W - R) / 2 : L + (W - L - R) * i / (n - 1); };
-      var ys = function (v) { return T + (H - T - B) * (1 - v / 10); };
-      html += '<polyline class="line" points="' + pts.map(function (e, i) { return xs(i) + ',' + ys(avg(e)); }).join(' ') + '"/>';
-      pts.forEach(function (e, i) {
-        html += '<circle class="pt-' + esc(e.phase) + '" cx="' + xs(i) + '" cy="' + ys(avg(e)) + '" r="4"><title>' +
-          esc(e.date) + ': ' + avg(e) + ' (' + esc(PHASE_LABEL[e.phase]) + ')</title></circle>';
+    var last = s.diary.length ? s.diary[s.diary.length - 1].phase : '';
+    if (ORDER.indexOf(last) > 0) {
+      s.phase = last;
+      ORDER.forEach(function (p) {
+        var first = s.diary.filter(function (e) { return e.phase === p; })[0];
+        if (first) s.starts[p] = first.date;
       });
-      html += '<text x="' + L + '" y="' + (H - 6) + '">' + esc(pts[0].date) + '</text>' +
-        '<text x="' + (W - R) + '" y="' + (H - 6) + '" text-anchor="end">' + esc(pts[n - 1].date) + '</text>';
-    } else {
-      html += '<text x="' + (W / 2) + '" y="' + (H / 2) + '" text-anchor="middle">Your entries will appear here</text>';
     }
-    svg.innerHTML = html;
+    return s;
+  }
+  var state = load();
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage full or blocked */ } }
+
+  function chal(id) { return state.ch[id] || (state.ch[id] = { status: 'pending', result: '', food: '', days: [], end: '' }); }
+  function daysIn(p) { return state.starts[p] ? diff(state.starts[p], today()) + 1 : 0; }
+  function phaseIdx(p) { return ORDER.indexOf(p || state.phase); }
+  function entryFor(date) { return state.diary.filter(function (e) { return e.date === date; })[0]; }
+  function avg(e) { var t = 0; ['bloating', 'pain', 'gas', 'urgency'].forEach(function (k) { t += Number(e[k]) || 0; }); return Math.round(t / 4 * 10) / 10; }
+  function mean(a) { return a.length ? a.reduce(function (x, y) { return x + y; }, 0) / a.length : 0; }
+  function doneCount() { return GROUPS.filter(function (g) { return chal(g.id).status === 'done'; }).length; }
+  function streak() {
+    var set = {}; state.diary.forEach(function (e) { set[e.date] = 1; });
+    var d = set[today()] ? today() : addDays(today(), -1), n = 0;
+    while (set[d]) { n++; d = addDays(d, -1); }
+    return n;
+  }
+  function coins() { var s = {}; state.diary.forEach(function (e) { s[e.date] = 1; }); return Object.keys(s).length; }
+  function score() { return coins() * 100 + doneCount() * 1000 + Object.keys(state.badges).length * 500; }
+  function scoreColor(v) { return v < 2.5 ? 'var(--good)' : v < 5 ? 'var(--warn)' : 'var(--bad)'; }
+
+  // Shared with features.js: reintroduction results for personalised checks
+  window.IBSGuide = {
+    reintro: function () {
+      var o = {};
+      GROUPS.forEach(function (g) { var c = chal(g.id); o[g.id] = { result: c.status === 'done' ? c.result : '', food: c.food }; });
+      return o;
+    }
+  };
+
+  /* ---------- UI helpers ---------- */
+  var toastTimer;
+  function toast(msg) {
+    var t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2600);
+  }
+  function ring(value, max, label, sub) {
+    var r = 40, c = 2 * Math.PI * r, f = Math.max(0, Math.min(1, max ? value / max : 0));
+    return '<svg class="ring" viewBox="0 0 96 96" aria-hidden="true"><circle class="track" cx="48" cy="48" r="' + r + '"/>' +
+      '<circle class="bar" cx="48" cy="48" r="' + r + '" stroke-dasharray="' + c + '" stroke-dashoffset="' + (c * (1 - f)) + '"/>' +
+      '<text x="48" y="' + (sub ? 44 : 48) + '">' + esc(label) + '</text>' +
+      (sub ? '<text class="ring-sub" x="48" y="64">' + esc(sub) + '</text>' : '') + '</svg>';
+  }
+  function hero(p, eyebrow, title, text, ringHtml, meter) {
+    return '<div class="hero" style="--phase:' + PHASES[p].color + '"><div class="hero-row"><div style="flex:1">' +
+      '<div class="eyebrow">' + esc(eyebrow) + '</div><h1>' + esc(title) + '</h1><p>' + esc(text) + '</p></div>' +
+      (ringHtml || '') + '</div>' + (meter || '') + '</div>';
+  }
+  function hud() {
+    return '<a class="hud" href="#plan" data-goto="plan" aria-label="Open quest map">' +
+      '<span>SCORE<b>' + ('000000' + score()).slice(-6) + '</b></span>' +
+      '<span><i class="px-coin"></i>×<b>' + coins() + '</b></span>' +
+      '<span>★<b>' + doneCount() + '/8</b></span>' +
+      '<span>🔥<b>' + streak() + '</b></span></a>';
+  }
+  function logCard() {
+    var e = entryFor(today());
+    if (e) {
+      return '<div class="card task"><div class="kicker">Today</div><h2>You logged today</h2>' +
+        '<p class="done-today">✓ Average score ' + avg(e) + ' / 10. Nice work.</p>' +
+        '<div class="btn-row"><a class="btn ghost" href="#log" data-goto="log">Update today\'s log</a></div></div>';
+    }
+    return '<div class="card task"><div class="kicker">Today</div><h2>How is your gut today?</h2>' +
+      '<p class="muted">It takes about 30 seconds and earns you a coin.</p>' +
+      '<div class="btn-row"><a class="btn accent" href="#log" data-goto="log">Log today</a></div></div>';
+  }
+  function tipCard() {
+    var i = (daysIn(state.phase) + state.diary.length) % TIPS.length;
+    return '<div class="card tip"><div class="card-head"><h2>💡 Tip</h2></div><p>' + esc(TIPS[i]) + '</p></div>';
+  }
+  function toolCards() {
+    return '<div class="features">' +
+      feature('🍽️', 'Eating out?', 'Check a menu photo or PDF', 'tools', 'menu') +
+      feature('🥘', 'Meal ideas', 'Recipes without your triggers', 'tools', 'meals') + '</div>';
+  }
+  function feature(icon, title, text, tab, sub) {
+    return '<button type="button" class="feature" data-goto="' + tab + '"' + (sub ? ' data-sub="' + sub + '"' : '') + '>' +
+      '<span class="f-icon">' + icon + '</span><b>' + esc(title) + '</b><span>' + esc(text) + '</span></button>';
   }
 
-  function mean(arr) { return arr.reduce(function (a, b) { return a + b; }, 0) / arr.length; }
+  /* ---------- journey at a glance (welcome + learn) ---------- */
+  function journeyHTML() {
+    return '<div class="journey">' + ORDER.map(function (p, i) {
+      var ph = PHASES[p];
+      return '<div class="phase-card" style="--pc:' + ph.color + '"><div class="ph-icon">' + ph.icon + '</div>' +
+        '<div class="ph-body"><h3>' + (i + 1) + '. ' + esc(ph.name) + ' <span class="dur">' + esc(ph.dur) + '</span></h3>' +
+        '<p class="you"><strong>You:</strong> ' + esc(ph.you) + '</p>' +
+        '<p class="app-does"><strong>The app:</strong> ' + ph.app.map(function (a) { return '<span>' + esc(a) + '</span>'; }).join('') + '</p></div></div>';
+    }).join('') + '</div>';
+  }
+  function featuresHTML() {
+    return '<div class="features">' +
+      feature('🏠', 'Today coach', 'Tells you exactly what to do each day', 'today') +
+      feature('➕', 'Quick log', 'Rate symptoms in 30 seconds', 'log') +
+      feature('🗺️', 'Quest map', 'Retro map of your progress, coins and badges', 'plan') +
+      feature('🧪', 'Challenge coach', 'Food, amount and check-in for each test day', 'plan') +
+      feature('🍽️', 'Menu checker', 'Upload a menu photo or PDF to see what fits', 'tools', 'menu') +
+      feature('🥘', 'Meal ideas', 'Online recipes filtered for your triggers', 'tools', 'meals') +
+      feature('📚', 'The guide', 'Step-by-step lessons with medical sources', 'learn') +
+      feature('💾', 'Backup and install', 'Add to your home screen; move to a new phone', 'settings') +
+      '</div>';
+  }
 
-  function renderCheckin() {
-    var el = document.getElementById('checkinResult');
-    var base = state.diary.filter(function (e) { return e.phase === 'baseline'; }).map(avg);
-    var elim = state.diary.filter(function (e) { return e.phase === 'elimination'; });
-    // Use the most recent 7 elimination days, when symptoms have had time to settle
-    var recent = elim.slice(-7).map(avg);
-    if (!base.length || !recent.length) {
-      el.textContent = 'Add Baseline and Phase 1 entries to the diary to see a comparison here.';
+  /* ---------- TODAY ---------- */
+  var CHECKS = [
+    ['prep-dx', 'A clinician has diagnosed IBS'],
+    ['prep-flags', 'I have no red-flag symptoms, or they\'ve been checked (see Learn, step 1)'],
+    ['prep-celiac', 'I\'ve been tested for celiac disease while eating gluten'],
+    ['prep-rd', 'I\'ve found a dietitian, or talked to my doctor about this plan'],
+    ['prep-app', 'I have a reliable food list, such as the Monash FODMAP app']
+  ];
+
+  function renderToday() {
+    var p = state.phase, html = '';
+    if (p === 'prep') {
+      var done = CHECKS.filter(function (c) { return state.checks[c[0]]; }).length;
+      html += '<div class="welcome"><p class="muted">Welcome 👋</p><h1>Find out which foods trigger your IBS</h1>' +
+        '<p>This app coaches you through the low FODMAP elimination diet, the approach developed at Monash University and recommended in gastroenterology guidelines. It takes about 3 months, and the app tells you what to do each day.</p></div>' +
+        '<h2 class="section-title">Your journey at a glance</h2>' + journeyHTML() +
+        '<h2 class="section-title">How the app helps</h2>' + featuresHTML() +
+        '<div class="card" id="readyCard"><div class="card-head"><h2>Before you start</h2><span class="muted small">' + done + ' of ' + CHECKS.length + '</span></div>' +
+        '<div class="checks">' + CHECKS.map(function (c) {
+          return '<label><input type="checkbox" data-check="' + c[0] + '"' + (state.checks[c[0]] ? ' checked' : '') + '><span>' + esc(c[1]) + '</span></label>';
+        }).join('') + '</div>' +
+        '<div class="btn-row"><button type="button" class="btn primary" data-act="phase" data-to="baseline">Start my baseline week</button></div>' +
+        (done < 3 ? '<p class="muted small">You can start anyway, but guidelines recommend these checks first.</p>' : '') + '</div>';
+    } else if (p === 'baseline') {
+      var d = daysIn('baseline'), logs = state.diary.filter(function (e) { return e.phase === 'baseline'; }).length;
+      html += hero(p, 'World 2 · Baseline week', 'Day ' + Math.min(d, 7) + ' of 7', 'Eat as you normally do. Just log how you feel.', ring(Math.min(d, 7), 7, Math.min(d, 7) + '/7', 'days'));
+      html += hud() + logCard();
+      if (d >= 7 || logs >= 7) {
+        html += '<div class="card good"><h2>Baseline complete 🎉</h2><p>You have ' + logs + ' days logged. Next: the elimination phase.</p>' +
+          '<p class="muted small">Before you start, read "Phase 1" in Learn and plan your first week\'s meals.</p>' +
+          '<div class="btn-row"><button type="button" class="btn primary" data-act="phase" data-to="elimination">Start elimination</button></div></div>';
+      } else {
+        html += '<div class="card"><h2>What\'s next</h2><p>In ' + (7 - d) + ' day' + (7 - d === 1 ? '' : 's') + ' you\'ll start the elimination phase. Use this week to read the guide and stock up on low-FODMAP basics.</p>' +
+          '<div class="btn-row"><a class="btn ghost" href="#learn" data-goto="learn">Read the guide</a><button type="button" class="btn ghost" data-act="phase" data-to="elimination" data-early="1">Start elimination early</button></div></div>';
+      }
+      html += tipCard();
+    } else if (p === 'elimination') {
+      var de = daysIn('elimination'), wk = Math.ceil(de / 7), dow = ((de - 1) % 7) + 1;
+      var meter = '<div class="hero-meter"><div class="track"><div class="fill" style="width:' + Math.min(100, de / 42 * 100) + '%"></div></div>' +
+        '<div class="labels"><span>Start</span><span>2 wks</span><span>4 wks</span><span>6 wks</span></div></div>';
+      html += hero(p, 'World 3 · Elimination', 'Week ' + wk + ' · Day ' + dow, 'Strict low FODMAP. Aim for 2 to 6 weeks.', ring(Math.min(de, 28), 28, String(de), de === 1 ? 'day' : 'days'), meter);
+      html += hud() + logCard();
+      if (de >= 14) {
+        html += '<div class="card good"><h2>Ready for your check-in?</h2><p>You\'ve done ' + de + ' days. Most people know whether it\'s helping by 2 to 4 weeks. Stop at 6 weeks either way.</p>' +
+          '<div class="btn-row"><button type="button" class="btn primary" data-act="phase" data-to="checkin">Do my check-in</button></div></div>';
+      } else {
+        html += '<div class="card"><h2>Keep going 💪</h2><p>' + (14 - de) + ' more day' + (14 - de === 1 ? '' : 's') + ' until your first check-in.</p></div>';
+      }
+      html += tipCard() + toolCards();
+    } else if (p === 'checkin') {
+      html += hero(p, 'World 4 · Check-in', 'Did it help?', 'Here\'s how you felt before and during elimination.');
+      var base = state.diary.filter(function (e) { return e.phase === 'baseline' || e.phase === 'prep'; }).map(avg);
+      var elim = state.diary.filter(function (e) { return e.phase === 'elimination'; }).slice(-7).map(avg);
+      if (base.length && elim.length) {
+        var b = mean(base), r = mean(elim), pct = b > 0 ? Math.round((b - r) / b * 100) : 0;
+        html += '<div class="card"><h2>Average symptom score</h2><div class="compare">' +
+          '<div class="row"><span>Baseline</span><span class="bar"><i style="width:' + (b * 10) + '%;background:var(--c-baseline)"></i></span><span>' + b.toFixed(1) + '</span></div>' +
+          '<div class="row"><span>Last 7 days</span><span class="bar"><i style="width:' + (r * 10) + '%;background:var(--c-elimination)"></i></span><span>' + r.toFixed(1) + '</span></div></div>' +
+          '<p><strong>' + (pct > 0 ? pct + '% better.' : 'No improvement.') + '</strong> ' +
+          (pct >= 30 ? 'That suggests FODMAPs play a role in your symptoms.' : pct > 0 ? 'A small change. Think about how you feel overall, too.' : 'FODMAPs may not be your main trigger.') + '</p></div>';
+      } else {
+        html += '<div class="card warn"><p>There aren\'t enough baseline and elimination logs to compare. Go by how you feel overall.</p></div>';
+      }
+      html += '<div class="card"><h2>What now?</h2>' +
+        '<div class="btn-row"><button type="button" class="btn primary" data-act="phase" data-to="reintro">It helped. Start reintroduction</button></div>' +
+        '<div class="btn-row"><button type="button" class="btn ghost" data-act="extend">Give it 2 more weeks</button><button type="button" class="btn ghost" data-act="nohelp">It didn\'t help</button></div></div>';
+    } else if (p === 'reintro') {
+      html += renderReintroToday();
+    } else if (p === 'personal') {
+      html += renderPersonal();
+    }
+    $('todayBody').innerHTML = html;
+  }
+
+  function renderReintroToday() {
+    var html = '', n = doneCount();
+    var c = state.active && chal(state.active), g = state.active && G[state.active];
+    if (c && g) {
+      var dayN = c.days.length + 1, loggedToday = c.days.length && c.days[c.days.length - 1].date === today();
+      if (loggedToday) dayN = c.days.length;
+      html += hero('reintro', 'World 5 · Level ' + (GROUPS.indexOf(g) + 1) + ' · ' + g.name, 'Challenge day ' + dayN + ' of 3', 'Keep the rest of your diet low FODMAP.', ring(c.days.length, 3, c.days.length + '/3', 'days'));
+      html += hud();
+      html += '<div class="card task"><div class="kicker">' + (loggedToday ? 'Done for today' : 'Today\'s challenge') + '</div>' +
+        '<div class="days3">' + [0, 1, 2].map(function (i) {
+          var dd = c.days[i];
+          return '<div class="d ' + (dd ? 'r' + dd.reaction : (i === c.days.length && !loggedToday ? 'now' : '')) + '">Day ' + (i + 1) + (dd ? '<br>' + REACT[dd.reaction].face : '') + '</div>';
+        }).join('') + '</div>';
+      if (loggedToday) {
+        html += '<p class="done-today">✓ Day ' + c.days.length + ' logged.</p><p>Come back tomorrow for day ' + (c.days.length + 1) + ': ' + esc(g.doses[c.days.length]) + ' of ' + esc(c.food || g.food) + '.</p>';
+      } else {
+        html += '<h2>Eat ' + esc(g.doses[c.days.length]) + ' of ' + esc(c.food || g.food) + '</h2>' +
+          '<div class="big-food"><span class="emoji">' + g.emoji + '</span><div><b>' + esc(g.name) + ' test</b><span class="muted small">Have it with a meal, then check in this evening or tomorrow morning.</span></div></div>' +
+          '<p><strong>How did you feel afterwards?</strong></p><div class="reactions">' +
+          REACT.map(function (r, i) { return '<button type="button" class="react" data-act="react" data-level="' + i + '"><span class="face">' + r.face + '</span>' + r.label + '</button>'; }).join('') + '</div>' +
+          '<p class="muted small">Moderate or severe symptoms end the challenge early. That\'s useful information, not a failure.</p>';
+      }
+      html += '<p class="muted small">Amounts are examples. Check the Monash app or your dietitian for your exact serves.</p>' +
+        '<div class="btn-row"><button type="button" class="btn ghost small" data-act="cancel">Stop this challenge</button></div></div>';
+      html += logCard();
+      return html;
+    }
+    if (state.washoutUntil && diff(today(), state.washoutUntil) > 0) {
+      var left = diff(today(), state.washoutUntil);
+      html += hero('reintro', 'World 5 · Washout', left + ' day' + (left === 1 ? '' : 's') + ' to go', 'Back to strict low FODMAP so your gut settles before the next test.', ring(3 - left, 3, String(left), 'left'));
+      html += hud() + logCard();
+      html += '<div class="card"><h2>Feeling back to normal?</h2><p>Wait until your symptoms are back to baseline before the next test. Usually that\'s 2 to 3 days.</p>' +
+        '<div class="btn-row"><button type="button" class="btn ghost" data-act="endwashout">I\'m back to normal, choose next test</button></div></div>';
+      html += resultsCard();
+      return html;
+    }
+    if (n === GROUPS.length) {
+      html += hero('reintro', 'World 5 · Complete', 'All 8 groups tested!', 'You now know your triggers. Time to build your long-term diet.', ring(8, 8, '8/8', 'groups'));
+      html += hud() + '<div class="card good"><h2>🏁 Reintroduction complete</h2><div class="btn-row"><button type="button" class="btn primary" data-act="phase" data-to="personal">Build my long-term diet</button></div></div>';
+      html += resultsCard();
+      return html;
+    }
+    html += hero('reintro', 'World 5 · Reintroduction', n + ' of 8 groups tested', 'Pick your next food challenge.', ring(n, 8, n + '/8', 'tested'));
+    html += hud();
+    var pending = GROUPS.filter(function (x) { return chal(x.id).status !== 'done'; });
+    html += '<div class="card task"><div class="kicker">Next level</div><h2>Choose your next challenge</h2><p class="muted small">Test one group at a time. The suggested order works for most people, but any order is fine.</p><div class="results">' +
+      pending.map(function (x, i) {
+        return '<div class="result-row"><span class="emoji">' + x.emoji + '</span><span class="name">' + esc(x.name) + '<br><span class="muted small">Test food: ' + esc(x.food) + '</span></span>' +
+          '<button type="button" class="btn ' + (i === 0 ? 'accent' : 'ghost') + ' small" data-act="start" data-g="' + x.id + '">' + (i === 0 ? 'Start' : 'Start') + '</button></div>';
+      }).join('') + '</div></div>';
+    html += resultsCard() + logCard();
+    return html;
+  }
+
+  function resultsCard() {
+    var done = GROUPS.filter(function (g) { return chal(g.id).status === 'done'; });
+    if (!done.length) return '';
+    return '<div class="card"><h2>Your results so far</h2><div class="results">' + done.map(function (g) {
+      var c = chal(g.id);
+      return '<div class="result-row"><span class="emoji">' + g.emoji + '</span><span class="name">' + esc(g.name) + '</span>' +
+        '<select data-act="setresult" data-g="' + g.id + '" aria-label="Result for ' + esc(g.name) + '" style="width:auto">' +
+        Object.keys(RESULT).map(function (k) { return '<option value="' + k + '"' + (c.result === k ? ' selected' : '') + '>' + RESULT[k] + '</option>'; }).join('') +
+        '</select></div>';
+    }).join('') + '</div><p class="muted small">You can change a result if you think the test was affected by stress, illness or your period.</p></div>';
+  }
+
+  function renderPersonal() {
+    var html = '';
+    if (state.outcome === 'nohelp') {
+      html += hero('personal', 'Your next step', 'Talk to your clinician', 'The diet didn\'t clearly help, and that\'s useful to know.');
+      html += '<div class="card"><h2>What to do now</h2><ul>' +
+        '<li>Go back to your normal, varied diet.</li>' +
+        '<li>Ask your doctor or dietitian about other options: soluble fiber such as psyllium, medicines for your IBS type, or gut-directed psychological therapies such as CBT or hypnotherapy.</li>' +
+        '<li>Take your symptom log with you. Export it from the Log tab.</li></ul>' +
+        '<div class="btn-row"><button type="button" class="btn ghost" data-act="restart">Start the program again</button></div></div>';
+      return html;
+    }
+    var buckets = { tolerated: [], partial: [], trigger: [] };
+    GROUPS.forEach(function (g) { var c = chal(g.id); if (c.status === 'done' && buckets[c.result]) buckets[c.result].push(g); });
+    html += hero('personal', 'World 6 · Your diet', 'Your food results', 'Eat freely what you tolerate. Limit only your triggers.', ring(buckets.tolerated.length, 8, buckets.tolerated.length + '/8', 'tolerated'));
+    html += hud();
+    function block(title, cls, list, hint) {
+      return '<div class="card ' + cls + '"><h2>' + title + '</h2>' + (list.length ? '<div class="results">' + list.map(function (g) {
+        var c = chal(g.id);
+        return '<div class="result-row"><span class="emoji">' + g.emoji + '</span><span class="name">' + esc(g.name) + '</span>' +
+          (cls !== 'good' ? '<button type="button" class="btn ghost small" data-act="retest" data-g="' + g.id + '">Retest' + (c.end ? ' after ' + nice(addDays(c.end, 90)) : '') + '</button>' : '') + '</div>';
+      }).join('') + '</div>' : '<p class="muted">' + hint + '</p>') + '</div>';
+    }
+    html += block('✅ Eat freely', 'good', buckets.tolerated, 'None yet');
+    html += block('⚠️ Small amounts are fine', 'warn', buckets.partial, 'None');
+    html += block('⛔ Limit for now', 'bad', buckets.trigger, 'None. Great news!');
+    html += '<div class="card tip"><h2>Keep it flexible</h2><p>Tolerance often changes over time, so retest your triggers every few months. The menu checker and meal ideas now use these results.</p></div>' + toolCards();
+    return html;
+  }
+
+  /* ---------- actions ---------- */
+  function setPhase(p, opts) {
+    var from = state.phase;
+    state.phase = p;
+    state.starts[p] = today();
+    if (p !== 'personal') state.outcome = '';
+    save();
+    if (phaseIdx(p) > phaseIdx(from) && !(opts && opts.quiet)) celebrate('WORLD CLEAR!', PHASES[from].name + ' complete');
+    render();
+  }
+
+  document.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.dataset.check) { state.checks[t.dataset.check] = t.checked; save(); renderToday(); return; }
+    if (t.dataset.act === 'setresult') { chal(t.dataset.g).result = t.value; save(); toast('Result updated'); }
+  });
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-act],[data-goto]');
+    if (!el) return;
+    if (el.dataset.goto) {
+      e.preventDefault();
+      if (el.dataset.goto === 'settings') { openSettings(); return; }
+      go(el.dataset.goto);
+      if (el.dataset.sub) subtab(el.dataset.sub);
       return;
     }
-    var b = mean(base), r = mean(recent);
-    var pct = b > 0 ? Math.round((b - r) / b * 100) : 0;
-    var msg = 'Baseline average: ' + b.toFixed(1) + ' / 10. Recent Phase 1 average (last ' + recent.length +
-      ' entries): ' + r.toFixed(1) + ' / 10. ';
-    if (pct >= 30) msg += 'That\'s about a ' + pct + '% improvement, which suggests FODMAPs are playing a role. You\'re likely ready for Phase 2.';
-    else if (pct > 0) msg += 'That\'s a ' + pct + '% improvement. Keep going if you\'ve been on Phase 1 for less than 4 weeks; if it\'s been 4–6 weeks, discuss next steps with your clinician.';
-    else msg += 'No improvement yet. If you\'ve followed Phase 1 closely for 4–6 weeks, talk to your clinician about other options.';
-    if (elim.length < 14) msg += ' (You have ' + elim.length + ' Phase 1 entries. Two weeks or more gives a fairer comparison.)';
-    el.textContent = msg;
+    var a = el.dataset.act, gid = el.dataset.g;
+    if (a === 'phase') {
+      if (el.dataset.early && !confirm('Guidelines suggest a full baseline week first, so you can tell later whether the diet helped. Start elimination anyway?')) return;
+      setPhase(el.dataset.to);
+    } else if (a === 'extend') {
+      state.phase = 'elimination'; save(); toast('Two more weeks. You\'ve got this!'); render();
+    } else if (a === 'nohelp') {
+      state.outcome = 'nohelp'; state.phase = 'personal'; state.starts.personal = today(); save(); render();
+    } else if (a === 'restart') {
+      if (confirm('Start the program again? Your symptom log is kept.')) { var d = state.diary; state = fresh(); state.diary = d; save(); render(); }
+    } else if (a === 'start') {
+      if (state.active) return;
+      var c = chal(gid); c.status = 'active'; c.days = []; c.result = ''; c.food = c.food || ''; c.start = today();
+      state.active = gid; state.washoutUntil = ''; save();
+      toast(G[gid].emoji + ' ' + G[gid].name + ' challenge started');
+      render(); go('today');
+    } else if (a === 'react') {
+      react(Number(el.dataset.level));
+    } else if (a === 'cancel') {
+      if (!confirm('Stop this challenge without a result? You can test this group again later.')) return;
+      var cc = chal(state.active); cc.status = 'pending'; cc.days = []; state.active = ''; save(); render();
+    } else if (a === 'endwashout') {
+      state.washoutUntil = ''; save(); render();
+    } else if (a === 'retest') {
+      var rc = chal(gid); rc.status = 'pending'; rc.result = ''; rc.days = [];
+      state.phase = 'reintro'; state.washoutUntil = ''; save(); toast('Added back to your challenges'); render(); go('today');
+    } else if (a === 'level') {
+      showLevel(el.dataset.level);
+    }
+  });
+
+  function react(level) {
+    var c = chal(state.active), g = G[state.active];
+    c.days.push({ date: today(), reaction: level });
+    var finished = level >= 2 || c.days.length === 3;
+    if (finished) {
+      if (level >= 2) c.result = c.days.length === 1 ? 'trigger' : 'partial';
+      else c.result = level === 0 ? 'tolerated' : 'partial';
+      c.status = 'done'; c.end = today();
+      state.active = '';
+      state.washoutUntil = addDays(today(), 3);
+      save();
+      celebrate('LEVEL CLEAR!', g.name + ': ' + RESULT[c.result]);
+    } else {
+      save();
+      toast(REACT[level].face + ' Day ' + c.days.length + ' saved. See you tomorrow!');
+      blip();
+    }
+    render();
   }
 
-  document.getElementById('exportCsv').addEventListener('click', function () {
-    var cols = ['date', 'phase', 'bloating', 'pain', 'gas', 'urgency', 'stool', 'stress', 'food', 'notes'];
+  /* ---------- LOG ---------- */
+  var form = $('logForm');
+  function fillForm(date) {
+    var e = entryFor(date) || {};
+    ['bloating', 'pain', 'gas', 'urgency', 'stress'].forEach(function (k) {
+      form[k].value = e[k] || 0; form[k].nextElementSibling.textContent = form[k].value;
+    });
+    Array.prototype.forEach.call(form.querySelectorAll('input[name=stool]'), function (r) { r.checked = String(e.stool || '') === r.value; });
+    form.food.value = e.food || ''; form.notes.value = e.notes || '';
+    form.querySelector('button[type=submit]').textContent = entryFor(date) ? 'Update this day' : 'Save today\'s log';
+  }
+  form.date.addEventListener('change', function () { fillForm(form.date.value); });
+  Array.prototype.forEach.call(form.querySelectorAll('input[type=range]'), function (r) {
+    r.addEventListener('input', function () { r.nextElementSibling.textContent = r.value; });
+  });
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var date = form.date.value || today(), existing = entryFor(date);
+    var e = existing || { id: Date.now(), date: date, phase: state.phase };
+    ['bloating', 'pain', 'gas', 'urgency', 'stress'].forEach(function (k) { e[k] = form[k].value; });
+    var st = form.querySelector('input[name=stool]:checked'); e.stool = st ? st.value : '';
+    e.food = form.food.value; e.notes = form.notes.value;
+    if (state.active) e.challenge = state.active;
+    if (!existing) { state.diary.push(e); state.diary.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }); }
+    save();
+    if (existing) toast('Updated'); else { toast('+1 coin 🪙 Logged!'); coinSound(); }
+    render();
+    if (!existing && date === today()) go('today');
+  });
+
+  function renderLog() {
+    var ph = state.phase === 'checkin' ? 'elimination' : state.phase;
+    var chip = $('logPhase'); chip.textContent = PHASES[ph].name; chip.style.setProperty('--phase', PHASES[ph].color);
+    // chart: last 28 days
+    var svg = $('chart'), W = 340, H = 140, L = 22, B = 20, T = 8, n = 28, bw = (W - L) / n;
+    var map = {}; state.diary.forEach(function (e) { map[e.date] = e; });
+    var h = '';
+    [0, 5, 10].forEach(function (v) {
+      var y = T + (H - T - B) * (1 - v / 10);
+      h += '<line class="grid" x1="' + L + '" x2="' + W + '" y1="' + y + '" y2="' + y + '"/><text x="' + (L - 4) + '" y="' + (y + 3) + '" text-anchor="end">' + v + '</text>';
+    });
+    for (var i = 0; i < n; i++) {
+      var d = addDays(today(), i - n + 1), e = map[d], x = L + i * bw + 1.5;
+      if (e) {
+        var v = avg(e), bh = Math.max(2, (H - T - B) * v / 10);
+        h += '<rect x="' + x + '" y="' + (H - B - bh) + '" width="' + (bw - 3) + '" height="' + bh + '" rx="2" fill="' + PHASES[e.phase === 'checkin' ? 'elimination' : (PHASES[e.phase] ? e.phase : 'baseline')].color + '"><title>' + nice(d) + ': ' + v + '</title></rect>';
+      }
+      if (i % 7 === 0 || i === n - 1) h += '<text x="' + (x + bw / 2) + '" y="' + (H - 6) + '" text-anchor="middle">' + (i === n - 1 ? 'today' : parse(d).getDate() + '/' + (parse(d).getMonth() + 1)) + '</text>';
+    }
+    if (!state.diary.length) h += '<text x="' + (W / 2) + '" y="' + (H / 2) + '" text-anchor="middle">Your logs will show up here</text>';
+    svg.innerHTML = h;
+    var used = {}; state.diary.forEach(function (e) { used[e.phase === 'checkin' ? 'elimination' : e.phase] = 1; });
+    $('legend').innerHTML = ORDER.filter(function (p) { return used[p]; }).map(function (p) { return '<span><i style="background:' + PHASES[p].color + '"></i>' + PHASES[p].name + '</span>'; }).join('');
+    // history
+    $('history').innerHTML = state.diary.length ? state.diary.slice().reverse().slice(0, 60).map(function (e) {
+      var v = avg(e);
+      return '<li><span class="score" style="background:' + scoreColor(v) + '">' + v + '</span><span class="txt"><b>' + nice(e.date) + '</b> <span class="meta">· ' + esc((PHASES[e.phase] || PHASES.baseline).name) +
+        (e.challenge && G[e.challenge] ? ' · ' + G[e.challenge].emoji : '') + (e.stool ? ' · stool ' + esc(e.stool) : '') + '</span>' +
+        (e.food ? '<div class="food">' + esc(e.food) + '</div>' : '') + '</span>' +
+        '<span><button type="button" class="link" data-edit="' + e.date + '" aria-label="Edit">✎</button><button type="button" class="link" data-del="' + e.id + '" aria-label="Delete">✕</button></span></li>';
+    }).join('') : '<li class="muted">No logs yet.</li>';
+  }
+  $('history').addEventListener('click', function (e) {
+    var del = e.target.getAttribute('data-del'), ed = e.target.getAttribute('data-edit');
+    if (ed) { form.date.value = ed; fillForm(ed); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    if (del && confirm('Delete this log?')) {
+      state.diary = state.diary.filter(function (x) { return String(x.id) !== del; });
+      save(); renderLog(); renderToday();
+    }
+  });
+  $('exportCsv').addEventListener('click', function () {
+    var cols = ['date', 'phase', 'challenge', 'bloating', 'pain', 'gas', 'urgency', 'stool', 'stress', 'food', 'notes'];
     var lines = [cols.join(',') + ',average'].concat(state.diary.map(function (e) {
       return cols.map(function (c) { return '"' + String(e[c] == null ? '' : e[c]).replace(/"/g, '""') + '"'; }).join(',') + ',' + avg(e);
     }));
-    var blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    download('ibs-symptom-log.csv', lines.join('\n'), 'text/csv');
+  });
+  function download(name, text, type) {
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'ibs-symptom-diary.csv';
-    document.body.appendChild(a); a.click(); a.remove();
-  });
-  document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+    a.href = URL.createObjectURL(new Blob([text], { type: type }));
+    a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  }
 
-  /* ---------- reintroduction tracker ---------- */
-  var GROUPS = [
-    { id: 'fructose', name: 'Fructose', eg: 'e.g. mango or honey' },
-    { id: 'lactose', name: 'Lactose', eg: 'e.g. cow\'s milk or yogurt' },
-    { id: 'fructan-grain', name: 'Fructans: grains', eg: 'e.g. wheat bread' },
-    { id: 'fructan-garlic', name: 'Fructans: garlic', eg: 'e.g. garlic' },
-    { id: 'fructan-onion', name: 'Fructans: onion', eg: 'e.g. onion' },
-    { id: 'gos', name: 'GOS', eg: 'e.g. canned lentils' },
-    { id: 'sorbitol', name: 'Sorbitol', eg: 'a sorbitol food from the app' },
-    { id: 'mannitol', name: 'Mannitol', eg: 'e.g. button mushrooms' }
+  /* ---------- QUEST MAP (retro, gamified) ---------- */
+  // Original pixel buddy: a friendly gut-shaped blob. G body, W eye white, K pupil, P cheek, D feet.
+  var SPRITE = [
+    '...GGGGGG...',
+    '..GGGGGGGG..',
+    '.GGGGGGGGGG.',
+    '.GWWGGGGWWG.',
+    'GGWKGGGGWKGG',
+    'GGGGGGGGGGGG',
+    'GPGGGKKGGGPG',
+    'GGGGGGGGGGGG',
+    '.GGGGGGGGGG.',
+    '..GGGGGGGG..',
+    '..DD....DD..',
+    '.DDD....DDD.'
   ];
-  var RESULT = {
-    '': 'Not tested',
-    tolerated: 'Tolerated',
-    partial: 'Tolerated in small amounts',
-    trigger: 'Trigger'
-  };
-  var list = document.getElementById('reintroList');
-
-  function renderReintro() {
-    list.innerHTML = GROUPS.map(function (g) {
-      var d = state.reintro[g.id] || {};
-      var dayFields = [1, 2, 3].map(function (n) {
-        return '<label>Day ' + n + ' amount and symptoms<input data-g="' + g.id + '" data-f="d' + n + '" value="' +
-          esc(d['d' + n]) + '" placeholder="e.g. ½ cup, mild bloating"></label>';
-      }).join('');
-      var opts = Object.keys(RESULT).map(function (k) {
-        return '<option value="' + k + '"' + (d.result === k ? ' selected' : '') + '>' + RESULT[k] + '</option>';
-      }).join('');
-      return '<div class="reintro-item"><h3>' + g.name + ' <span class="status ' + esc(d.result || '') + '">' +
-        RESULT[d.result || ''] + '</span></h3><div class="row">' +
-        '<label>Test food<input data-g="' + g.id + '" data-f="food" value="' + esc(d.food) + '" placeholder="' + g.eg + '"></label>' +
-        dayFields +
-        '<label>Result<select data-g="' + g.id + '" data-f="result">' + opts + '</select></label>' +
-        '</div></div>';
-    }).join('');
-    renderSummary();
+  var PAL = { G: '#4ade80', W: '#ffffff', K: '#1b1b2f', P: '#f9a8d4', D: '#166534' };
+  function spriteSVG(size) {
+    var r = '';
+    SPRITE.forEach(function (row, y) {
+      for (var x = 0; x < row.length; x++) if (PAL[row[x]]) r += '<rect x="' + x + '" y="' + y + '" width="1.02" height="1.02" fill="' + PAL[row[x]] + '"/>';
+    });
+    return '<svg class="buddy" viewBox="0 0 12 12" width="' + size + '" height="' + size + '" shape-rendering="crispEdges" aria-hidden="true">' + r + '</svg>';
   }
 
-  list.addEventListener('change', function (ev) {
-    var t = ev.target, g = t.getAttribute('data-g');
-    if (!g) return;
-    state.reintro[g] = state.reintro[g] || {};
-    state.reintro[g][t.getAttribute('data-f')] = t.value;
-    save();
-    if (t.tagName === 'SELECT') renderReintro(); else renderSummary();
+  function levels() {
+    var p = phaseIdx(), worlds = [];
+    function st(i) { return p > i ? 'done' : p === i ? 'current' : 'locked'; }
+    worlds.push({ n: 1, name: 'GET READY', phase: 'prep', levels: [{ id: 'prep', label: '1-1', icon: '🩺', state: st(0), title: 'Get ready', text: PHASES.prep.you }] });
+    var bl = state.diary.filter(function (e) { return e.phase === 'baseline'; }).length;
+    worlds.push({ n: 2, name: 'BASELINE', phase: 'baseline', levels: [{ id: 'baseline', label: '2-1', icon: '📝', state: st(1), coins: Math.min(7, bl), title: 'Baseline week', text: 'Log 7 days of normal eating. ' + Math.min(7, bl) + ' of 7 coins collected.' }] });
+    var de = p === 2 ? daysIn('elimination') : p > 2 && state.starts.elimination ? diff(state.starts.elimination, state.starts.checkin || today()) : 0, el = [];
+    for (var w = 1; w <= 6; w++) {
+      var s = p < 2 ? 'locked' : de >= w * 7 ? 'done' : (p === 2 && de > (w - 1) * 7) ? 'current' : p > 2 ? 'skipped' : 'locked';
+      el.push({ id: 'elim' + w, label: '3-' + w, icon: w <= 2 ? '🥗' : '✨', state: s, bonus: w > 2, title: 'Elimination week ' + w + (w > 2 ? ' (bonus)' : ''), text: w <= 2 ? 'Strict low FODMAP. Two weeks is the minimum before your check-in.' : 'Optional extra week. Stop by week 6 either way.' });
+    }
+    worlds.push({ n: 3, name: 'ELIMINATION', phase: 'elimination', levels: el });
+    worlds.push({ n: 4, name: 'CHECK-IN', phase: 'checkin', levels: [{ id: 'checkin', label: 'BOSS', icon: '📊', state: st(3), boss: true, title: 'The check-in', text: 'Compare how you felt before and during elimination. If it helped, World 5 opens.' }] });
+    worlds.push({ n: 5, name: 'REINTRODUCTION', phase: 'reintro', levels: GROUPS.map(function (g, i) {
+      var c = chal(g.id), s = c.status === 'done' ? 'done' : state.active === g.id ? 'current' : p >= 4 ? 'open' : 'locked';
+      return { id: 'g:' + g.id, label: '5-' + (i + 1), icon: g.emoji, state: s, result: c.status === 'done' ? c.result : '', title: g.name + ' challenge', text: '3 days of ' + g.food + ': ' + g.doses.join(', then ') + '.', group: g.id };
+    }) });
+    worlds.push({ n: 6, name: 'YOUR DIET', phase: 'personal', levels: [{ id: 'personal', label: 'GOAL', icon: '🏁', state: st(5), title: 'Your long-term diet', text: PHASES.personal.you }] });
+    return worlds;
+  }
+
+  var BADGES = [
+    { id: 'first-log', icon: '🪙', name: 'First coin', test: function () { return coins() >= 1; } },
+    { id: 'streak7', icon: '🔥', name: '7-day streak', test: function () { return streak() >= 7; } },
+    { id: 'baseline', icon: '📝', name: 'Baseline done', test: function () { return phaseIdx() > 1; } },
+    { id: 'elim14', icon: '💪', name: '2 weeks strong', test: function () { return phaseIdx() > 2 || daysIn('elimination') >= 14 && state.phase === 'elimination'; } },
+    { id: 'first-clear', icon: '⭐', name: 'First challenge', test: function () { return doneCount() >= 1; } },
+    { id: 'coins30', icon: '💰', name: '30 coins', test: function () { return coins() >= 30; } },
+    { id: 'all8', icon: '🏆', name: 'All 8 tested', test: function () { return doneCount() === 8; } },
+    { id: 'goal', icon: '👑', name: 'Your diet', test: function () { return state.phase === 'personal' && state.outcome !== 'nohelp'; } }
+  ];
+  function checkBadges(silent) {
+    var fresh = [];
+    BADGES.forEach(function (b) { if (!state.badges[b.id] && b.test()) { state.badges[b.id] = today(); fresh.push(b); } });
+    if (fresh.length) { save(); if (!silent) setTimeout(function () { celebrate('BADGE GET!', fresh[0].icon + ' ' + fresh[0].name); }, 900); }
+  }
+
+  function renderPlan() {
+    var worlds = levels(), curWorld = 0;
+    worlds.forEach(function (w) { if (w.levels.some(function (l) { return l.state === 'current'; })) curWorld = w.n; });
+    var html = '<div class="retro">' +
+      '<div class="px-hud"><span>SCORE<br><b>' + ('000000' + score()).slice(-6) + '</b></span><span><i class="px-coin"></i>×' + coins() + '</span>' +
+      '<span>STARS<br><b>' + doneCount() + '/8</b></span><span>WORLD<br><b>' + (curWorld || worlds.filter(function (w) { return phaseIdx(w.phase) <= phaseIdx(); }).length) + '</b></span></div>';
+    worlds.forEach(function (w) {
+      var locked = w.levels.every(function (l) { return l.state === 'locked'; });
+      html += '<section class="world' + (locked ? ' locked' : '') + '"><h2 class="px-title">WORLD ' + w.n + '<small>' + w.name + '</small></h2><div class="level-row">';
+      w.levels.forEach(function (l) {
+        var star = l.result ? '<span class="px-star ' + l.result + '">' + (l.result === 'tolerated' ? '★' : l.result === 'partial' ? '½' : '✕') + '</span>' : l.state === 'done' ? '<span class="px-star tolerated">★</span>' : '';
+        html += '<button type="button" class="tile ' + l.state + (l.bonus ? ' bonus' : '') + (l.boss ? ' boss' : '') + '" data-act="level" data-level="' + l.id + '" aria-label="' + esc(l.title + ', ' + l.state) + '">' +
+          (l.state === 'current' ? '<span class="buddy-wrap">' + spriteSVG(34) + '</span>' : '') +
+          '<span class="t-icon">' + (l.state === 'locked' ? '🔒' : l.icon) + '</span><span class="t-label">' + l.label + '</span>' + star +
+          (l.coins != null ? '<span class="t-coins">' + new Array(8).join('.').split('').map(function (_, i) { return '<i class="px-coin' + (i < l.coins ? '' : ' off') + '"></i>'; }).join('') + '</span>' : '') +
+          '</button>';
+      });
+      html += '</div><div class="ground"></div></section>';
+    });
+    html += '<div class="px-box" id="levelInfo" aria-live="polite"><p>TAP A LEVEL TO SEE WHAT\'S INSIDE.</p></div>';
+    html += '<h2 class="px-title">BADGES</h2><div class="badges">' + BADGES.map(function (b) {
+      var got = state.badges[b.id];
+      return '<div class="px-badge' + (got ? ' got' : '') + '"><span>' + (got ? b.icon : '?') + '</span><small>' + (got ? esc(b.name) : '???') + '</small></div>';
+    }).join('') + '</div>';
+    html += '<p class="px-foot">1 COIN = 1 DAY LOGGED · ★ = TOLERATED · ½ = SMALL AMOUNTS OK · ✕ = TRIGGER (STILL A WIN: NOW YOU KNOW!)</p></div>';
+    $('path').innerHTML = html;
+  }
+
+  function showLevel(id) {
+    var l; levels().forEach(function (w) { w.levels.forEach(function (x) { if (x.id === id) l = x; }); });
+    if (!l) return;
+    var status = { done: 'CLEARED', current: 'YOU ARE HERE', locked: 'LOCKED', open: 'READY', skipped: 'SKIPPED (OPTIONAL)' }[l.state];
+    var action = '';
+    if (l.group && l.state === 'open' && state.phase === 'reintro' && !state.active) action = '<button type="button" class="px-btn" data-act="start" data-g="' + l.group + '">START LEVEL ▶</button>';
+    if (l.state === 'current') action = '<button type="button" class="px-btn" data-goto="today">GO TO TODAY ▶</button>';
+    $('levelInfo').innerHTML = '<p class="px-small">' + esc(l.label) + ' · ' + status + (l.result ? ' · ' + esc(RESULT[l.result]).toUpperCase() : '') + '</p>' +
+      '<h3>' + l.icon + ' ' + esc(l.title) + '</h3><p>' + esc(l.text) + '</p>' + action;
+    blip();
+  }
+
+  /* ---------- celebrations and 8-bit sound ---------- */
+  function celebrate(title, sub) {
+    var o = document.createElement('div');
+    o.className = 'celebrate'; o.setAttribute('role', 'status');
+    var coinsHtml = '';
+    for (var i = 0; i < 14; i++) coinsHtml += '<i class="px-coin fall" style="left:' + (Math.random() * 100) + '%;animation-delay:' + (Math.random() * .6) + 's"></i>';
+    o.innerHTML = coinsHtml + '<div class="c-box">' + spriteSVG(64) + '<div class="c-title">' + esc(title) + '</div><div class="c-sub">' + esc(sub || '') + '</div><div class="c-hint">TAP TO CONTINUE</div></div>';
+    o.addEventListener('click', function () { o.remove(); });
+    document.body.appendChild(o);
+    fanfare();
+    setTimeout(function () { if (o.parentNode) o.remove(); }, 3500);
+  }
+  var actx = null;
+  function tone(freq, start, dur, type) {
+    if (!state.sound) return;
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      var o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + start;
+      o.type = type || 'square'; o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(.06, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur);
+    } catch (e) { /* audio unavailable */ }
+  }
+  function blip() { tone(660, 0, .06); }
+  function coinSound() { tone(988, 0, .08); tone(1319, .08, .25); }
+  function fanfare() { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, i * .1, .18); }); tone(1047, .45, .4, 'triangle'); }
+
+  /* ---------- navigation ---------- */
+  var TABS = ['today', 'plan', 'log', 'tools', 'learn'];
+  function go(tab) {
+    if (TABS.indexOf(tab) === -1) tab = 'today';
+    TABS.forEach(function (t) { $('view-' + t).hidden = t !== tab; });
+    Array.prototype.forEach.call(document.querySelectorAll('.tabbar a'), function (a) {
+      if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    if (location.hash !== '#' + tab) history.replaceState(null, '', '#' + tab);
+    if (tab === 'log') { if (!form.date.value) form.date.value = today(); fillForm(form.date.value); }
+    window.scrollTo(0, 0);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.tabbar a'), function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); go(a.dataset.tab); });
+  });
+  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (TABS.indexOf(h) !== -1) go(h); });
+
+  function subtab(name) {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-subtab]'), function (b) {
+      var on = b.dataset.subtab === name; b.classList.toggle('active', on); b.setAttribute('aria-selected', on);
+    });
+    $('menu').hidden = name !== 'menu'; $('meals').hidden = name !== 'meals';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-subtab]'), function (b) {
+    b.addEventListener('click', function () { subtab(b.dataset.subtab); });
   });
 
-  function renderSummary() {
-    var buckets = { tolerated: [], partial: [], trigger: [], '': [] };
-    GROUPS.forEach(function (g) {
-      var d = state.reintro[g.id] || {};
-      buckets[d.result || ''].push(g.name + (d.food ? ' (' + d.food + ')' : ''));
-    });
-    function card(title, items, cls, hint) {
-      return '<div class="card ' + cls + '"><h3>' + title + '</h3>' +
-        (items.length ? '<ul>' + items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul>' : '<p class="small">' + hint + '</p>') +
-        '</div>';
-    }
-    document.getElementById('summary').innerHTML =
-      card('Eat freely', buckets.tolerated, 'ok', 'None recorded yet') +
-      card('Eat in your tolerated amounts', buckets.partial, 'warn', 'None recorded yet') +
-      card('Limit for now, retest later', buckets.trigger, 'alert', 'None recorded yet') +
-      card('Still to test', buckets[''], '', 'All groups tested');
+  /* ---------- settings, backup, install ---------- */
+  function openSettings() { $('settings').hidden = false; $('soundToggle').checked = !!state.sound; }
+  $('openSettings').addEventListener('click', openSettings);
+  $('settings').addEventListener('click', function (e) { if (e.target === this || e.target.hasAttribute('data-close')) this.hidden = true; });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') $('settings').hidden = true; });
+  $('soundToggle').addEventListener('change', function () { state.sound = this.checked; save(); if (state.sound) coinSound(); });
+  $('backupBtn').addEventListener('click', function () {
+    download('ibs-diet-helper-backup-' + today() + '.json', JSON.stringify(state, null, 1), 'application/json');
+    toast('Backup downloaded');
+  });
+  $('restoreFile').addEventListener('change', function () {
+    var f = this.files[0]; if (!f) return;
+    var input = this;
+    f.text().then(function (t) {
+      var s = JSON.parse(t);
+      if (!s || s.v !== 2 || !Array.isArray(s.diary)) throw new Error('bad');
+      if (!confirm('Replace everything on this device with this backup (' + s.diary.length + ' logs)?')) return;
+      state = s; save(); render(); toast('Backup restored'); $('settings').hidden = true;
+    }).catch(function () { toast('That file isn\'t a valid backup.'); }).then(function () { input.value = ''; });
+  });
+  $('backPhase').addEventListener('click', function () {
+    var i = phaseIdx();
+    if (i <= 0) { toast('You\'re at the start already.'); return; }
+    var prev = ORDER[i - 1];
+    if (!confirm('Go back to "' + PHASES[prev].name + '"? Your logs and results are kept.')) return;
+    state.phase = prev; state.outcome = ''; save(); render(); $('settings').hidden = true; go('today');
+  });
+  $('resetBtn').addEventListener('click', function () {
+    if (!confirm('Erase all your logs and progress on this device? Download a backup first if you might want them.')) return;
+    state = fresh(); save(); render(); $('settings').hidden = true; go('today');
+  });
+  var deferredInstall = null;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredInstall = e; $('installBtn').hidden = false; });
+  $('installBtn').addEventListener('click', function () {
+    if (!deferredInstall) return;
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(function () { deferredInstall = null; $('installBtn').hidden = true; });
+  });
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
   }
 
-  window.IBSGuide = { reintro: function () { return state.reintro; } };
-
-  go(state.step, false);
-  renderDiary();
-  renderReintro();
+  /* ---------- render ---------- */
+  function render() {
+    if (!PHASES[state.phase]) state.phase = 'prep';
+    checkBadges();
+    renderToday(); renderPlan(); renderLog();
+  }
+  $('learnJourney').innerHTML = journeyHTML() + '<h2 class="section-title">Everything the app can do</h2>' + featuresHTML();
+  checkBadges(true);
+  render();
+  form.date.value = today();
+  go(location.hash.slice(1) || 'today');
 })();
