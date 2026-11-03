@@ -14,16 +14,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=20261103b">
+  <link rel="stylesheet" href="css/style.css?v=20261103c">
 </head>
 <body>
 
 <div class="app">
   <header class="topbar">
     <div class="brand"><img src="icons/icon.svg" alt="" width="28" height="28"><span>IBS Diet Helper</span></div>
+    <div class="top-actions">
+    <button type="button" class="saved-chip" id="savedChip" aria-label="Your data is saved on this device. Open data settings">✓ Saved</button>
     <button type="button" class="icon-btn" id="openSettings" aria-label="Settings and backup">
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Zm7.4-2.5a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1l-.4-2.7h-4l-.4 2.7a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L4.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1c.5.4 1.1.7 1.7 1l.4 2.7h4l.4-2.7c.6-.3 1.2-.6 1.7-1l2.5 1 2-3.5-2.1-1.6Z"/></svg>
     </button>
+    </div>
   </header>
 
   <main>
@@ -395,10 +398,11 @@
 <!-- Settings sheet -->
 <div class="sheet-backdrop" id="settings" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-    <div class="sheet-head"><h2 id="settingsTitle">Settings and backup</h2><button type="button" class="icon-btn" data-close aria-label="Close">✕</button></div>
-    <p class="muted small">Your data is saved on this device only. To move it to a new phone or browser, download a backup and restore it there.</p>
+    <div class="sheet-head"><h2 id="settingsTitle">Your data and settings</h2><button type="button" class="icon-btn" data-close aria-label="Close">✕</button></div>
+    <dl class="data-status" id="dataStatus"></dl>
+    <p class="muted small">Nothing is uploaded: your logs stay private on this device. To move them to a new phone or browser, save a backup and restore it there.</p>
     <div class="stack">
-      <button type="button" class="btn primary block" id="backupBtn">Download backup file</button>
+      <button type="button" class="btn primary block" id="backupBtn">Save a backup file</button>
       <label class="btn ghost block file-btn">Restore from a backup file<input type="file" id="restoreFile" accept="application/json,.json"></label>
       <button type="button" class="btn ghost block" id="installBtn" hidden>Install app on this device</button>
       <p class="muted small" id="installHint">To install: on iPhone, tap Share and then <strong>Add to Home Screen</strong>. On Android, open the browser menu and tap <strong>Install app</strong>.</p>
@@ -413,8 +417,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/fodmap-data.js?v=20261103b"></script>
-<script src="js/app.js?v=20261103b"></script>
-<script src="js/features.js?v=20261103b"></script>
+<script src="js/fodmap-data.js?v=20261103c"></script>
+<script src="js/app.js?v=20261103c"></script>
+<script src="js/features.js?v=20261103c"></script>
 </body>
 </html>

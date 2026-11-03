@@ -22,6 +22,7 @@
   function parse(s) { var p = String(s).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
   function diff(a, b) { return Math.round((parse(b) - parse(a)) / 864e5); }
   function addDays(s, n) { var d = parse(s); d.setDate(d.getDate() + n); return iso(d); }
+  function ago(s) { var n = diff(s, today()); return n <= 0 ? 'today' : n === 1 ? 'yesterday' : n + ' days ago'; }
   function nice(s) { return parse(s).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }); }
 
   /* ---------- program content ---------- */
@@ -112,7 +113,28 @@
     return s;
   }
   var state = load();
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage full or blocked */ } }
+  var storageOk = true, persisted = null, deferredInstall = null;
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); storageOk = true; } catch (e) { storageOk = false; }
+    updateSavedChip();
+  }
+  // Ask the browser not to clear this site's data automatically (granted
+  // silently by most browsers once the site is used or installed).
+  function askPersist() {
+    if (!navigator.storage || !navigator.storage.persisted) return;
+    navigator.storage.persisted().then(function (p) {
+      if (p || !state.diary.length) { persisted = p; updateSavedChip(); return; }
+      return navigator.storage.persist().then(function (r) { persisted = r; updateSavedChip(); });
+    }).catch(function () {});
+  }
+  function isStandalone() { return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
+  function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+  function isIOSSafari() { return isIOS() && !/crios|fxios|edgios|opios/i.test(navigator.userAgent); }
+  function updateSavedChip() {
+    var c = $('savedChip'); if (!c) return;
+    c.classList.toggle('warn', !storageOk);
+    c.innerHTML = storageOk ? '<span aria-hidden="true">✓</span> Saved <span class="long">on this device</span>' : '<span aria-hidden="true">⚠</span> Not saving';
+  }
 
   function chal(id) { return state.ch[id] || (state.ch[id] = { status: 'pending', result: '', food: '', days: [], end: '' }); }
   function daysIn(p) { return state.starts[p] ? diff(state.starts[p], today()) + 1 : 0; }
@@ -163,7 +185,7 @@
       '<span>SCORE<b>' + ('000000' + score()).slice(-6) + '</b></span>' +
       '<span><i class="px-coin"></i>×<b>' + coins() + '</b></span>' +
       '<span>★<b>' + doneCount() + '/8</b></span>' +
-      '<span>🔥<b>' + streak() + '</b></span></a>';
+      '<span>🔥<b>' + streak() + '</b></span></a><!--nudge-->';
   }
   function logCard() {
     var e = entryFor(today());
@@ -284,7 +306,55 @@
     } else if (p === 'personal') {
       html += renderPersonal();
     }
+    var n = nudges();
+    html = html.indexOf('<!--nudge-->') !== -1 ? html.replace('<!--nudge-->', n) : n + html;
     $('todayBody').innerHTML = html;
+  }
+
+  /* ---------- keeping data safe: nudges ---------- */
+  function nudges() {
+    var out = '';
+    if (!storageOk) {
+      out += '<div class="card bad"><h2>⚠️ This browser isn\'t saving your data</h2><p>It may be a private or incognito window, or storage is turned off. Open the app in a normal window so your logs are kept.</p></div>';
+    }
+    var t = today();
+    var backupDue = state.diary.length >= 3 && !(state.backupSnooze > t) &&
+      (state.backupNudge || !state.lastBackup || diff(state.lastBackup, t) >= 7);
+    if (backupDue) {
+      var why = state.backupNudge ? 'You just finished "' + esc(state.backupNudge) + '", so this is a good moment to save a copy.'
+        : state.lastBackup ? 'Your last backup was ' + ago(state.lastBackup) + '.' : 'You haven\'t made a backup yet.';
+      out += '<div class="card warn nudge"><h2>💾 Back up your progress</h2><p>' + why + ' A backup is one small file. Save it to iCloud Drive or Google Drive, or email it to yourself, and you can restore it on any device.</p>' +
+        '<div class="btn-row"><button type="button" class="btn primary" data-act="backup">Save backup</button><button type="button" class="btn ghost" data-act="snooze-backup">Later</button></div></div>';
+    }
+    if (!isStandalone() && state.diary.length >= 1 && !state.installNever && !(state.installSnooze > t)) {
+      var steps;
+      if (isIOS()) {
+        steps = isIOSSafari()
+          ? '<ol class="steps"><li>Tap the <b>Share</b> button <span class="kbd">⬆︎</span> at the bottom of Safari.</li><li>Scroll down and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>.</li></ol>'
+          : '<p>Open this page in <b>Safari</b>, tap <b>Share</b> <span class="kbd">⬆︎</span>, then <b>Add to Home Screen</b>.</p>';
+      } else if (deferredInstall) {
+        steps = '<div class="btn-row"><button type="button" class="btn primary" data-act="install">Install app</button></div>';
+      } else {
+        steps = '<p>Open your browser menu <span class="kbd">⋮</span> and tap <b>Install app</b> or <b>Add to Home screen</b>.</p>';
+      }
+      out += '<div class="card tip nudge"><h2>📲 Add the app to your home screen</h2>' +
+        '<p>It opens full-screen like a normal app' + (isIOS() ? ', and it protects your data: Safari can delete data from websites you haven\'t opened for 7 days, but home-screen apps are exempt.' : ' and keeps your data safer.') + '</p>' + steps +
+        '<div class="btn-row"><button type="button" class="btn ghost small" data-act="snooze-install">Later</button><button type="button" class="btn ghost small" data-act="never-install">Don\'t show again</button></div></div>';
+    }
+    return out;
+  }
+
+  function doBackup() {
+    var name = 'ibs-diet-helper-backup-' + today() + '.json', text = JSON.stringify(state, null, 1);
+    function done() { state.lastBackup = today(); state.backupNudge = ''; state.backupSnooze = ''; save(); render(); toast('Backup saved 💾'); }
+    try {
+      var file = new File([text], name, { type: 'application/json' });
+      if (navigator.canShare && navigator.canShare({ files: [file] }) && /android|iphone|ipad|ipod/i.test(navigator.userAgent + (isIOS() ? 'ipad' : ''))) {
+        navigator.share({ files: [file], title: 'IBS Diet Helper backup' }).then(done).catch(function (e) { if (e && e.name !== 'AbortError') { download(name, text, 'application/json'); done(); } });
+        return;
+      }
+    } catch (e) { /* fall back to a download */ }
+    download(name, text, 'application/json'); done();
   }
 
   function renderReintroToday() {
@@ -388,6 +458,7 @@
     state.phase = p;
     state.starts[p] = today();
     if (p !== 'personal') state.outcome = '';
+    if (phaseIdx(p) > phaseIdx(from) && state.diary.length) { state.backupNudge = PHASES[from].name; state.backupSnooze = ''; }
     save();
     if (phaseIdx(p) > phaseIdx(from) && !(opts && opts.quiet)) celebrate('WORLD CLEAR!', PHASES[from].name + ' complete');
     render();
@@ -437,6 +508,16 @@
       state.phase = 'reintro'; state.washoutUntil = ''; save(); toast('Added back to your challenges'); render(); go('today');
     } else if (a === 'level') {
       showLevel(el.dataset.level);
+    } else if (a === 'backup') {
+      doBackup();
+    } else if (a === 'snooze-backup') {
+      state.backupSnooze = addDays(today(), 2); state.backupNudge = ''; save(); render(); toast('We\'ll remind you in a couple of days');
+    } else if (a === 'snooze-install') {
+      state.installSnooze = addDays(today(), 3); save(); render();
+    } else if (a === 'never-install') {
+      state.installNever = true; save(); render(); toast('You can install any time from Settings');
+    } else if (a === 'install') {
+      if (deferredInstall) { deferredInstall.prompt(); deferredInstall.userChoice.then(function () { deferredInstall = null; render(); }); }
     }
   });
 
@@ -485,7 +566,7 @@
     if (state.active) e.challenge = state.active;
     if (!existing) { state.diary.push(e); state.diary.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }); }
     save();
-    if (existing) toast('Updated'); else { toast('+1 coin 🪙 Logged!'); coinSound(); }
+    if (existing) toast('Updated and saved on this device'); else { toast('+1 coin 🪙 Saved on this device'); coinSound(); askPersist(); }
     render();
     if (!existing && date === today()) go('today');
   });
@@ -700,15 +781,23 @@
   });
 
   /* ---------- settings, backup, install ---------- */
-  function openSettings() { $('settings').hidden = false; $('soundToggle').checked = !!state.sound; }
+  function openSettings() {
+    $('settings').hidden = false; $('soundToggle').checked = !!state.sound;
+    var rows = [
+      ['Where your data lives', storageOk ? 'In this browser, on this device only' : 'Not saving: open the app in a normal browser window'],
+      ['Protected from automatic clean-up', persisted === true ? 'Yes' : isStandalone() ? 'Yes (installed app)' : persisted === false ? 'Not yet. Installing the app helps.' : 'Unknown in this browser'],
+      ['Installed as an app', isStandalone() ? 'Yes' : 'No'],
+      ['Last backup', state.lastBackup ? nice(state.lastBackup) + ' (' + ago(state.lastBackup) + ')' : 'Never'],
+      ['Logs saved', state.diary.length + (state.diary.length === 1 ? ' day' : ' days')]
+    ];
+    $('dataStatus').innerHTML = rows.map(function (r) { return '<div><dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd></div>'; }).join('');
+  }
+  $('savedChip').addEventListener('click', openSettings);
   $('openSettings').addEventListener('click', openSettings);
   $('settings').addEventListener('click', function (e) { if (e.target === this || e.target.hasAttribute('data-close')) this.hidden = true; });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') $('settings').hidden = true; });
   $('soundToggle').addEventListener('change', function () { state.sound = this.checked; save(); if (state.sound) coinSound(); });
-  $('backupBtn').addEventListener('click', function () {
-    download('ibs-diet-helper-backup-' + today() + '.json', JSON.stringify(state, null, 1), 'application/json');
-    toast('Backup downloaded');
-  });
+  $('backupBtn').addEventListener('click', function () { doBackup(); openSettings(); });
   $('restoreFile').addEventListener('change', function () {
     var f = this.files[0]; if (!f) return;
     var input = this;
@@ -730,8 +819,8 @@
     if (!confirm('Erase all your logs and progress on this device? Download a backup first if you might want them.')) return;
     state = fresh(); save(); render(); $('settings').hidden = true; go('today');
   });
-  var deferredInstall = null;
-  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredInstall = e; $('installBtn').hidden = false; });
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredInstall = e; $('installBtn').hidden = false; renderToday(); });
+  window.addEventListener('appinstalled', function () { deferredInstall = null; $('installBtn').hidden = true; toast('Installed! Open it from your home screen.'); renderToday(); });
   $('installBtn').addEventListener('click', function () {
     if (!deferredInstall) return;
     deferredInstall.prompt();
@@ -749,6 +838,8 @@
   }
   $('learnJourney').innerHTML = journeyHTML() + '<h2 class="section-title">Everything the app can do</h2>' + featuresHTML();
   checkBadges(true);
+  save();
+  askPersist();
   render();
   form.date.value = today();
   go(location.hash.slice(1) || 'today');

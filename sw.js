@@ -1,6 +1,6 @@
 /* Offline support: cache the app shell; always try the network first so updates arrive. */
-var CACHE = 'ibs-diet-helper-20261103b';
-var SHELL = ['./', 'index.html', 'css/style.css?v=20261103b', 'js/app.js?v=20261103b', 'js/features.js?v=20261103b', 'js/fodmap-data.js?v=20261103b',
+var CACHE = 'ibs-diet-helper-20261103c';
+var SHELL = ['./', 'index.html', 'css/style.css?v=20261103c', 'js/app.js?v=20261103c', 'js/features.js?v=20261103c', 'js/fodmap-data.js?v=20261103c',
   'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png'];
 
 self.addEventListener('install', function (e) {
