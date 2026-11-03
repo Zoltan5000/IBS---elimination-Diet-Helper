@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IBS Elimination Diet Guide</title>
+  <meta name="description" content="A step-by-step, evidence-based guide to the low FODMAP elimination diet for finding IBS food triggers, with a symptom diary and reintroduction tracker.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <p class="eyebrow">Step-by-step guide</p>
+    <h1>Finding your IBS food triggers</h1>
+    <p class="lede">A walkthrough of the three-phase low FODMAP elimination diet developed at Monash University and recommended in gastroenterology guidelines. It includes a symptom diary and a reintroduction tracker that save in your browser.</p>
+    <div class="disclaimer" role="note">
+      <strong>This is education, not medical advice.</strong> IBS should be diagnosed by a clinician, and guidelines recommend doing this diet with a FODMAP-trained registered dietitian. Talk to your doctor before you start, especially if you are pregnant, have diabetes, are underweight, or have a history of disordered eating.
+    </div>
+    <ul class="quick-links" aria-label="Jump to tools">
+      <li><a href="#guidelines">Diet guidelines</a></li>
+      <li><a href="#diary">Symptom diary</a></li>
+      <li><a href="#reintro">Reintroduction tracker</a></li>
+      <li><a href="#menu">Menu checker</a></li>
+      <li><a href="#meals">Meal ideas</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ul>
+  </div>
+</header>
+
+<nav class="stepper" aria-label="Guide steps">
+  <div class="wrap">
+    <ol id="stepNav"></ol>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</nav>
+
+<main class="wrap" id="main">
+
+<!-- STEP 1 -->
+<section class="step" data-step="1" data-title="Before you start">
+  <h2><span class="num">1</span> Before you start: get checked</h2>
+  <p>The low FODMAP diet is meant for people who already have an IBS diagnosis. Other conditions can cause the same symptoms, so a clinician should rule them out first.<sup><a href="#src-niddk">[NIDDK]</a> <a href="#src-nice">[NICE]</a></sup></p>
+
+  <div class="card alert">
+    <h3>See a doctor promptly, before any diet change, if you have:</h3>
+    <ul>
+      <li>Blood in your stool or rectal bleeding</li>
+      <li>Weight loss you can't explain</li>
+      <li>A family history of bowel, ovarian or celiac disease</li>
+      <li>Anemia, fever, or symptoms that wake you at night</li>
+      <li>Symptoms that started after age 50, or a sudden change in bowel habit</li>
+    </ul>
+    <p class="small">These are "red flag" or "alarm" features listed in NICE and ACG guidance. They call for medical investigation, not a diet experiment.<sup><a href="#src-nice">[NICE]</a> <a href="#src-acg">[ACG]</a></sup></p>
+  </div>
+
+  <div class="card">
+    <h3>Get tested for celiac disease <em>before</em> cutting wheat</h3>
+    <p>The low FODMAP diet reduces wheat, rye and barley. Celiac blood tests and biopsies depend on you eating gluten, so going low-gluten first can give a false negative. The ACG guideline recommends celiac testing in people with IBS-type diarrhea symptoms.<sup><a href="#src-acg">[ACG]</a> <a href="#src-celiac">[Celiac]</a></sup></p>
+  </div>
+
+  <div class="card">
+    <h3>Line up support</h3>
+    <ul>
+      <li><strong>A FODMAP-trained dietitian.</strong> The British Society of Gastroenterology says the diet should be supervised by a trained dietitian.<sup><a href="#src-bsg">[BSG]</a></sup></li>
+      <li><strong>The Monash University FODMAP Diet app.</strong> It has lab-tested serving sizes for thousands of foods and is updated as foods are retested.<sup><a href="#src-monash-steps">[Monash]</a></sup></li>
+      <li><strong>A plan for the next 2–3 months.</strong> Avoid starting right before travel, holidays or major life events.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Is this diet right for you?</h3>
+    <p>Guidelines rate the evidence for the low FODMAP diet as low quality but still recommend a <em>limited trial</em>, because it helps many people.<sup><a href="#src-acg">[ACG]</a> <a href="#src-bsg">[BSG]</a></sup> In the UK, simpler first-line advice is often tried first: regular meals, less caffeine, alcohol and fizzy drinks, and gradual soluble fiber.<sup><a href="#src-nice">[NICE]</a></sup> If that hasn't helped, the low FODMAP diet is the usual next step.</p>
+  </div>
+
+  <div class="checklist" data-list="prep">
+    <h3>Checklist</h3>
+    <label><input type="checkbox" data-key="prep-dx"> I have an IBS diagnosis from a clinician</label>
+    <label><input type="checkbox" data-key="prep-flags"> I have none of the red flag symptoms above, or they've been checked</label>
+    <label><input type="checkbox" data-key="prep-celiac"> I've been tested for celiac disease (while eating gluten)</label>
+    <label><input type="checkbox" data-key="prep-rd"> I've found a dietitian or talked to my doctor about this plan</label>
+    <label><input type="checkbox" data-key="prep-app"> I have a reliable food list (e.g. the Monash app)</label>
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section class="step" data-step="2" data-title="Learn FODMAPs">
+  <h2><span class="num">2</span> Understand what you're testing</h2>
+  <p><strong>FODMAP</strong> stands for <strong>F</strong>ermentable <strong>O</strong>ligosaccharides, <strong>D</strong>isaccharides, <strong>M</strong>onosaccharides <strong>A</strong>nd <strong>P</strong>olyols. These are short-chain carbohydrates that are poorly absorbed in the small intestine. They draw water into the gut and are fermented by bacteria in the colon, which produces gas. In people with IBS, whose gut is often more sensitive, this can cause bloating, pain, diarrhea or constipation.<sup><a href="#src-monash-steps">[Monash]</a></sup></p>
+  <p>The diet tests <strong>six groups</strong> one at a time. Most people react to only some of them; in a University of Michigan study, patients reacted to an average of two groups.<sup><a href="#src-michigan">[Michigan]</a></sup></p>
+
+  <div class="table-scroll">
+  <table class="groups">
+    <thead><tr><th>Group</th><th>Common high sources</th><th>Typical lower-FODMAP swaps</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Fructose</strong> <span class="tag">monosaccharide</span></td><td>Honey, mango, apples, pears, agave, high-fructose corn syrup</td><td>Oranges, strawberries, blueberries, kiwi, maple syrup</td></tr>
+      <tr><td><strong>Lactose</strong> <span class="tag">disaccharide</span></td><td>Milk, yogurt, ice cream, soft cheeses like ricotta and cottage cheese</td><td>Lactose-free milk and yogurt, hard cheeses like cheddar and parmesan</td></tr>
+      <tr><td><strong>Fructans</strong> <span class="tag">oligosaccharide</span></td><td>Wheat, rye and barley breads and pasta, onion, garlic, inulin or chicory root</td><td>Rice, oats, quinoa, spelt sourdough, garlic-infused oil, chives, green tops of spring onion</td></tr>
+      <tr><td><strong>GOS</strong> <span class="tag">oligosaccharide</span></td><td>Chickpeas, lentils, kidney beans, cashews, pistachios</td><td>Small serves of canned, rinsed lentils or chickpeas, firm tofu, peanuts, walnuts</td></tr>
+      <tr><td><strong>Sorbitol</strong> <span class="tag">polyol</span></td><td>Stone fruit (apricot, peach, plum), blackberries, sugar-free gum and mints (E420)</td><td>Grapes, pineapple, citrus; check labels for "-itol" sweeteners</td></tr>
+      <tr><td><strong>Mannitol</strong> <span class="tag">polyol</span></td><td>Mushrooms, cauliflower, snow peas, some sweet potato serves (E421)</td><td>Carrot, zucchini, bell pepper, green beans, potato</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="small"><strong>Portion size matters.</strong> Many foods are low FODMAP in a small serve and high in a large one. Monash retests foods regularly and updated many serving sizes in 2025, so use the app for exact amounts rather than any fixed list, including this one.<sup><a href="#src-monash-serve">[Monash]</a> <a href="#src-monash-reintro">[Monash]</a></sup></p>
+  <p class="small">Foods that are naturally free of FODMAPs include plain meat, fish, eggs, firm tofu, most oils, rice, oats, potatoes, carrots, spinach, tomatoes and cucumber.</p>
+</section>
+
+<!-- STEP 3 -->
+<section class="step" data-step="3" data-title="Track a baseline">
+  <h2><span class="num">3</span> Track a baseline week</h2>
+  <p>Before changing anything, record what you eat and how you feel for about a week. NIDDK suggests writing down what you eat and drink each day, along with your symptoms and when they happen, and sharing that with your doctor.<sup><a href="#src-niddk">[NIDDK]</a></sup> This baseline lets you tell later whether the diet actually helped.</p>
+
+  <div class="card tip">
+    <h3>How to score</h3>
+    <p>Rate each symptom from <strong>0</strong> (none) to <strong>10</strong> (worst imaginable) once a day, at the same time. Note stool form too: the Bristol Stool Form Scale runs from type 1 (hard lumps) to type 7 (watery); types 3–4 are typical.</p>
+    <p>Also log things that affect IBS but aren't food: stress, sleep, your menstrual cycle, exercise, and medications.</p>
+  </div>
+  <p>Use the <a href="#diary" class="jump">symptom diary</a> below. Tag these days as <em>Baseline</em>.</p>
+</section>
+
+<!-- STEP 4 -->
+<section class="step" data-step="4" data-title="Phase 1: Eliminate">
+  <h2><span class="num">4</span> Phase 1: Low FODMAP (2–6 weeks)</h2>
+  <p>Swap high-FODMAP foods for low-FODMAP alternatives in the same food group, for example an orange instead of an apple. The aim is substitution, not cutting out whole food groups, so your diet stays nutritious.<sup><a href="#src-monash-steps">[Monash]</a></sup> Monash recommends 2 to 6 weeks for this phase.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Do</h3>
+      <ul>
+        <li>Plan meals and shop with a list for the first week</li>
+        <li>Check labels for honey, inulin, chicory root, high-fructose corn syrup, onion and garlic powder, and sweeteners ending in "-itol"</li>
+        <li>Use garlic-infused oil: fructans don't dissolve in oil, so it carries the flavor without the FODMAPs</li>
+        <li>Spread fruit out: about one serve per meal or snack</li>
+        <li>Keep up fiber from oats, potatoes with skin, kiwi, chia, linseed and allowed vegetables</li>
+        <li>Keep logging symptoms daily</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Avoid</h3>
+      <ul>
+        <li>Staying in this phase longer than needed. Long-term restriction can reduce beneficial gut bacteria and makes eating harder than it needs to be.<sup><a href="#src-acg">[ACG]</a></sup></li>
+        <li>Cutting out foods that aren't high in FODMAPs "just in case"</li>
+        <li>Expecting perfection. A slip-up isn't a failure; note it and carry on.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>A sample low FODMAP day</h3>
+    <ul>
+      <li><strong>Breakfast:</strong> Oats with lactose-free milk, blueberries and a teaspoon of maple syrup</li>
+      <li><strong>Lunch:</strong> Rice or quinoa bowl with chicken or firm tofu, spinach, carrot, cucumber and an olive oil and lemon dressing</li>
+      <li><strong>Snack:</strong> An orange and a small handful of walnuts</li>
+      <li><strong>Dinner:</strong> Salmon with potatoes, green beans and zucchini cooked in garlic-infused oil</li>
+    </ul>
+  </div>
+</section>
+
+<!-- STEP 5 -->
+<section class="step" data-step="5" data-title="Check-in">
+  <h2><span class="num">5</span> Check-in: did it help?</h2>
+  <p>Compare your recent diary scores with your baseline. The chart in the <a href="#diary" class="jump">diary</a> shows your daily averages.</p>
+  <div class="grid-2">
+    <div class="card ok">
+      <h3>Symptoms clearly better</h3>
+      <p>FODMAPs are likely playing a role. Move on to Phase 2 to find out <em>which</em> ones. Don't stay on the strict diet: reintroduction is where you learn what you can eat.</p>
+    </div>
+    <div class="card warn">
+      <h3>Little or no change after 4–6 weeks</h3>
+      <p>FODMAPs may not be your main trigger. Return to your normal diet and talk to your doctor or dietitian about other options. Guidelines also support soluble fiber such as psyllium, medicines targeted to your IBS type, and gut-directed psychological therapies such as CBT or gut-directed hypnotherapy.<sup><a href="#src-acg">[ACG]</a> <a href="#src-bsg">[BSG]</a></sup></p>
+    </div>
+  </div>
+  <div class="checkin">
+    <p id="checkinResult" class="small">Add baseline and Phase 1 entries to the diary to see a comparison here.</p>
+  </div>
+</section>
+
+<!-- STEP 6 -->
+<section class="step" data-step="6" data-title="Phase 2: Reintroduce">
+  <h2><span class="num">6</span> Phase 2: Reintroduce one group at a time</h2>
+  <p>Stay on your low FODMAP base diet while you test one FODMAP group at a time, using a food that mainly contains that one FODMAP, such as mango for fructose.<sup><a href="#src-monash-reintro">[Monash]</a></sup> Monash estimates this phase takes 8 to 12 weeks.<sup><a href="#src-monash-steps">[Monash]</a></sup></p>
+
+  <div class="card">
+    <h3>The 3-day challenge</h3>
+    <ol class="days">
+      <li><strong>Day 1:</strong> Eat a moderate serve of the test food.</li>
+      <li><strong>Day 2:</strong> If you feel fine, eat a larger serve.</li>
+      <li><strong>Day 3:</strong> If still fine, eat a large serve, about what you'd normally eat.</li>
+      <li><strong>Then a washout:</strong> Return to strict low FODMAP for 2–3 days, or until symptoms settle, before the next test.</li>
+    </ol>
+    <p>If you get moderate or severe symptoms on any day, stop that challenge. Don't move to the next day. Wait until you're back to baseline before testing the next group.<sup><a href="#src-monash-reintro">[Monash]</a></sup></p>
+  </div>
+
+  <div class="card">
+    <h3>Example test foods</h3>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Group</th><th>Example test food</th></tr></thead>
+      <tbody>
+        <tr><td>Fructose</td><td>Mango or honey</td></tr>
+        <tr><td>Lactose</td><td>Cow's milk or regular yogurt</td></tr>
+        <tr><td>Fructans (grains)</td><td>Wheat bread or wheat pasta</td></tr>
+        <tr><td>Fructans (garlic)</td><td>Garlic</td></tr>
+        <tr><td>Fructans (onion)</td><td>Onion</td></tr>
+        <tr><td>GOS</td><td>Canned lentils or chickpeas, in a larger serve</td></tr>
+        <tr><td>Sorbitol</td><td>A sorbitol-only fruit listed in the app</td></tr>
+        <tr><td>Mannitol</td><td>Button mushrooms</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="small">Fructans are often tested separately for grains, garlic and onion, because people react differently to each. Monash revised its recommended challenge foods and serving sizes in 2025, so get the exact foods and amounts for each day from the Monash app or your dietitian.<sup><a href="#src-monash-reintro">[Monash]</a></sup></p>
+  </div>
+
+  <div class="card tip">
+    <h3>Tips for a clean test</h3>
+    <ul>
+      <li>Test when life is relatively calm. Stress, illness, poor sleep or your period can cause symptoms that have nothing to do with the food.</li>
+      <li>Don't combine test foods with other high-FODMAP foods.</li>
+      <li>If a result is unclear, repeat that challenge later.</li>
+      <li>A reaction is about <em>amount</em>, not all-or-nothing. Note the largest serve you tolerated.</li>
+    </ul>
+  </div>
+  <p>Record each challenge in the <a href="#reintro" class="jump">reintroduction tracker</a> below.</p>
+</section>
+
+<!-- STEP 7 -->
+<section class="step" data-step="7" data-title="Phase 3: Personalise">
+  <h2><span class="num">7</span> Phase 3: Your long-term diet</h2>
+  <p>The goal of the whole process is the <em>least restrictive</em> diet that keeps your symptoms under control. You only limit the groups, and amounts, that you reacted to, and bring everything else back.<sup><a href="#src-monash-steps">[Monash]</a> <a href="#src-bsg">[BSG]</a></sup></p>
+  <ul>
+    <li><strong>Tolerated groups:</strong> Eat these freely again.</li>
+    <li><strong>Partly tolerated:</strong> Eat them in the amounts that were fine for you, and spread them out over the day.</li>
+    <li><strong>Not tolerated:</strong> Limit them for now, but retest every few months. Tolerance often changes over time.</li>
+  </ul>
+  <p>Your personal summary updates from the tracker:</p>
+  <div id="summary" class="summary"></div>
+
+  <div class="card">
+    <h3>Other habits that help</h3>
+    <ul>
+      <li>Eat regular meals and don't rush them. Several smaller meals may help if large meals bring on cramping.<sup><a href="#src-niddk">[NIDDK]</a></sup></li>
+      <li>Increase soluble fiber, such as psyllium, gradually. Insoluble bran doesn't seem to help.<sup><a href="#src-acg">[ACG]</a></sup></li>
+      <li>Notice how caffeine, alcohol, fatty meals and fizzy drinks affect you.<sup><a href="#src-nice">[NICE]</a></sup></li>
+      <li>Manage stress, sleep and activity. The gut-brain connection is a real part of IBS, and gut-directed psychological therapies are recommended in guidelines.<sup><a href="#src-acg">[ACG]</a></sup></li>
+    </ul>
+  </div>
+</section>
+
+<div class="step-controls">
+  <button type="button" id="prevBtn" class="secondary">← Back</button>
+  <button type="button" id="nextBtn">Next step →</button>
+</div>
+
+<!-- GUIDELINES -->
+<section class="tool" id="guidelines">
+  <h2>Diet guidelines at a glance</h2>
+  <p class="small">The key rules from the guides above in one place, each with its source. Numbers in brackets link to the full reference at the bottom of the page.</p>
+  <div class="guide-grid">
+    <div class="card"><h3>1. Diagnosis first</h3><p>Get an IBS diagnosis and celiac testing <em>while still eating gluten</em>, and check for red flag symptoms before changing your diet.<sup><a href="#src-acg">[ACG]</a> <a href="#src-nice">[NICE]</a> <a href="#src-celiac">[Celiac]</a></sup></p></div>
+    <div class="card"><h3>2. Use expert help</h3><p>The low FODMAP diet should be supervised by a trained dietitian, and reintroduction should follow your own tolerance.<sup><a href="#src-bsg">[BSG]</a></sup></p></div>
+    <div class="card"><h3>3. Start with the basics</h3><p>Eat regular meals and take your time. Drink about 8 cups of fluid a day, limit tea and coffee to 3 cups, cut down on alcohol and fizzy drinks, and limit fresh fruit to 3 portions a day.<sup><a href="#src-nice">[NICE]</a></sup></p></div>
+    <div class="card"><h3>4. Keep elimination short</h3><p>Follow strict low FODMAP for 2–6 weeks only. It's a test, not a forever diet.<sup><a href="#src-monash-steps">[Monash]</a></sup></p></div>
+    <div class="card"><h3>5. Swap, don't drop</h3><p>Replace high-FODMAP foods with low-FODMAP foods from the same food group so your diet stays balanced.<sup><a href="#src-monash-steps">[Monash]</a></sup></p></div>
+    <div class="card"><h3>6. Portion size matters</h3><p>Many foods are fine in small serves. Check lab-tested serving sizes in the Monash app.<sup><a href="#src-monash-serve">[Monash]</a></sup></p></div>
+    <div class="card"><h3>7. Test one group at a time</h3><p>Use a 3-day challenge with increasing serves, then a washout before the next group.<sup><a href="#src-monash-reintro">[Monash]</a></sup></p></div>
+    <div class="card"><h3>8. Aim for the least restriction</h3><p>Bring back every food you tolerate. Long-term strict restriction risks poor nutrition and changes to gut bacteria.<sup><a href="#src-acg">[ACG]</a> <a href="#src-bsg">[BSG]</a></sup></p></div>
+    <div class="card"><h3>9. Fiber: soluble, slowly</h3><p>Soluble fiber such as psyllium helps IBS symptoms, while wheat bran doesn't. Increase fiber gradually to avoid gas.<sup><a href="#src-acg">[ACG]</a> <a href="#src-niddk">[NIDDK]</a></sup></p></div>
+    <div class="card"><h3>10. "Gluten-free" isn't the goal</h3><p>A gluten-free diet isn't recommended for IBS on its own. Wheat matters here because of its fructans, not its gluten.<sup><a href="#src-bsg">[BSG]</a></sup></p></div>
+    <div class="card"><h3>11. Probiotics: not routinely</h3><p>The ACG guideline suggests against probiotics for overall IBS symptoms, because the evidence is inconsistent.<sup><a href="#src-acg">[ACG]</a></sup></p></div>
+    <div class="card"><h3>12. Mind and gut</h3><p>Stress affects IBS. Gut-directed psychological therapies are recommended alongside diet.<sup><a href="#src-acg">[ACG]</a> <a href="#src-bsg">[BSG]</a></sup> If food rules start to cause anxiety, stop and speak to your clinician.</p></div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="tool" id="diary">
+  <h2>Symptom diary</h2>
+  <form id="diaryForm" class="diary-form">
+    <div class="row">
+      <label>Date <input type="date" name="date" required></label>
+      <label>Phase
+        <select name="phase">
+          <option value="baseline">Baseline</option>
+          <option value="elimination">Phase 1: Elimination</option>
+          <option value="reintro">Phase 2: Reintroduction</option>
+          <option value="personal">Phase 3: Personalised</option>
+        </select>
+      </label>
+    </div>
+    <div class="row sliders">
+      <label>Bloating <output>0</output><input type="range" name="bloating" min="0" max="10" value="0"></label>
+      <label>Pain <output>0</output><input type="range" name="pain" min="0" max="10" value="0"></label>
+      <label>Gas <output>0</output><input type="range" name="gas" min="0" max="10" value="0"></label>
+      <label>Bowel urgency <output>0</output><input type="range" name="urgency" min="0" max="10" value="0"></label>
+    </div>
+    <div class="row">
+      <label>Stool type (Bristol 1–7)
+        <select name="stool">
+          <option value="">Not recorded</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
+        </select>
+      </label>
+      <label>Stress (0–10) <input type="number" name="stress" min="0" max="10" value="0"></label>
+    </div>
+    <label class="full">What I ate <textarea name="food" rows="2" placeholder="Breakfast, lunch, dinner, snacks, drinks"></textarea></label>
+    <label class="full">Notes <textarea name="notes" rows="2" placeholder="Sleep, period, medication, exercise..."></textarea></label>
+    <button type="submit">Save entry</button>
+  </form>
+
+  <div class="chart-wrap">
+    <h3>Average symptom score by day</h3>
+    <svg id="chart" viewBox="0 0 600 200" role="img" aria-label="Line chart of daily average symptom score"></svg>
+    <p class="legend"><span class="dot baseline"></span>Baseline <span class="dot elimination"></span>Elimination <span class="dot reintro"></span>Reintroduction <span class="dot personal"></span>Personalised</p>
+  </div>
+
+  <div class="table-scroll">
+    <table id="diaryTable">
+      <thead><tr><th>Date</th><th>Phase</th><th>Avg</th><th>Stool</th><th>Food</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="actions">
+    <button type="button" id="exportCsv" class="secondary">Download CSV for your dietitian</button>
+    <button type="button" id="printBtn" class="secondary">Print</button>
+  </div>
+</section>
+
+<section class="tool" id="reintro">
+  <h2>Reintroduction tracker</h2>
+  <p class="small">For each group, record the food you tested and how each day went. Then choose a result.</p>
+  <div id="reintroList" class="reintro-list"></div>
+</section>
+
+<!-- MENU CHECKER -->
+<section class="tool" id="menu">
+  <h2>Restaurant menu checker</h2>
+  <p>Upload a photo or PDF of a menu, or paste the menu text. The checker marks each dish as <span class="pill good">likely OK</span>, <span class="pill modify">ask or modify</span> or <span class="pill avoid">likely high FODMAP</span>. It uses your reintroduction results, so groups you tolerate aren't flagged.</p>
+  <p class="small">By default everything runs on your device: text is read from the photo or PDF and checked against a list of high-FODMAP ingredients, sauces and cooking styles. Nothing is uploaded. When this page is opened on claude.ai, you can optionally ask Claude to read the menu instead.</p>
+  <div class="card upload">
+    <label class="drop" id="menuDrop">
+      <input type="file" id="menuFile" accept="image/*,application/pdf">
+      <span><strong>Choose a menu photo or PDF</strong><br><span class="small">or drag and drop it here</span></span>
+    </label>
+    <label class="full">Or paste menu text
+      <textarea id="menuText" rows="4" placeholder="Grilled salmon with garlic butter, mashed potato and green beans&#10;Mushroom risotto with parmesan"></textarea>
+    </label>
+    <div class="actions">
+      <button type="button" id="menuCheck">Check menu</button>
+      <button type="button" id="menuStop" class="secondary" hidden>Stop</button>
+      <span id="menuMode" class="small"></span>
+    </div>
+    <p id="menuStatus" class="small" aria-live="polite"></p>
+  </div>
+  <div id="menuResults" class="menu-results"></div>
+  <div class="card tip">
+    <h3>Ordering tips that work almost anywhere</h3>
+    <ul>
+      <li>Choose plain grilled, roasted or steamed meat, fish, eggs or tofu, with rice, potato or polenta.</li>
+      <li>Ask for sauces, dressings and gravies on the side. They're the most common hidden source of garlic and onion.</li>
+      <li>Ask whether the kitchen can cook your dish in plain oil or butter, without garlic or onion.</li>
+      <li>Hard cheeses such as parmesan and cheddar are low in lactose. Cream sauces and soft cheeses aren't.</li>
+      <li>This checker is a guide only. Recipes vary, so ask staff when in doubt.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- MEAL IDEAS -->
+<section class="tool" id="meals">
+  <h2>Meal ideas</h2>
+  <p>Get suggestions when you're stuck. It searches an online recipe database (<a href="https://www.themealdb.com/">TheMealDB</a>) and checks each recipe's ingredients against your triggers, with suggested swaps.</p>
+  <div class="card">
+    <div class="row meal-form">
+      <label>Main ingredient
+        <input id="mealIng" list="ingList" placeholder="e.g. chicken, salmon, rice, eggs">
+        <datalist id="ingList"><option>chicken</option><option>salmon</option><option>beef</option><option>pork</option><option>eggs</option><option>rice</option><option>potatoes</option><option>tofu</option><option>prawns</option><option>lamb</option></datalist>
+      </label>
+      <label>Meal
+        <select id="mealType"><option value="">Any</option><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select>
+      </label>
+    </div>
+    <label class="full">Anything else? (optional)
+      <input id="mealNotes" placeholder="e.g. quick, vegetarian, under 30 minutes, what's in my fridge">
+    </label>
+    <div class="actions">
+      <button type="button" id="mealSearch">Find recipes online</button>
+      <button type="button" id="mealAsk" class="secondary" hidden>Ask Claude for ideas</button>
+    </div>
+    <p id="mealStatus" class="small" aria-live="polite"></p>
+  </div>
+  <div id="mealResults" class="meal-results"></div>
+</section>
+
+<!-- SOURCES -->
+<section class="sources" id="sources">
+  <h2>Sources</h2>
+  <ol>
+    <li id="src-monash-steps">Monash University, Department of Gastroenterology. <em>The 3 steps of the FODMAP diet</em> and the <em>3-step FODMAP Diet</em> information sheet (2026). <a href="https://www.monashfodmap.com/blog/3-phases-low-fodmap-diet/">monashfodmap.com/blog/3-phases-low-fodmap-diet</a> · <a href="https://monashfodmap.com/documents/203/3-step_FODMAP_Diet_2026_A4_info_sheet.pdf">PDF</a></li>
+    <li id="src-monash-reintro">Monash University. <em>Reintroduction update</em> (2025) and <em>Interpreting reintroduction challenges</em>. <a href="https://monashfodmap.com/blog/reintroduction-update/">monashfodmap.com/blog/reintroduction-update</a> · <a href="https://monashfodmap.com/blog/interpreting-reintroduction-challenges/">interpreting-reintroduction-challenges</a></li>
+    <li id="src-monash-serve">Monash University. <em>Serving size and FODMAPs: why is it so important?</em> <a href="https://monashfodmap.com/blog/serving-size-and-fodmaps-why-it-so-important/">monashfodmap.com</a></li>
+    <li id="src-acg">Lacy BE, Pimentel M, Brenner DM, et al. ACG Clinical Guideline: Management of Irritable Bowel Syndrome. <em>Am J Gastroenterol.</em> 2021;116(1):17–44. doi:10.14309/ajg.0000000000001036. <a href="https://pubmed.ncbi.nlm.nih.gov/33315591/">PubMed 33315591</a></li>
+    <li id="src-bsg">Vasant DH, Paine PA, Black CJ, et al. British Society of Gastroenterology guidelines on the management of irritable bowel syndrome. <em>Gut.</em> 2021;70(7):1214–1240. doi:10.1136/gutjnl-2021-324598. <a href="https://pubmed.ncbi.nlm.nih.gov/33903147/">PubMed 33903147</a></li>
+    <li id="src-nice">National Institute for Health and Care Excellence (NICE). <em>Irritable bowel syndrome in adults: diagnosis and management</em> (CG61). <a href="https://www.nice.org.uk/guidance/cg61/chapter/1-guidance">nice.org.uk/guidance/cg61</a></li>
+    <li id="src-niddk">National Institute of Diabetes and Digestive and Kidney Diseases (NIH). <em>Eating, Diet, &amp; Nutrition for Irritable Bowel Syndrome</em> and <em>Treatment for IBS</em>. <a href="https://www.niddk.nih.gov/health-information/digestive-diseases/irritable-bowel-syndrome">niddk.nih.gov</a></li>
+    <li id="src-michigan">Eswaran S, et al. University of Michigan blinded FODMAP reintroduction trial (NCT03052439), <em>Clin Gastroenterol Hepatol</em>, 2024. <a href="https://clinicaltrials.gov/study/NCT03052439">ClinicalTrials.gov NCT03052439</a></li>
+    <li id="src-celiac">Celiac testing requires gluten in the diet: Rubio-Tapia A, et al. ACG Guidelines Update: Diagnosis and Management of Celiac Disease. <em>Am J Gastroenterol.</em> 2023;118(1):59–76. <a href="https://pubmed.ncbi.nlm.nih.gov/36602836/">PubMed 36602836</a></li>
+    <li id="src-mealdb">Recipe suggestions: <a href="https://www.themealdb.com/">TheMealDB</a> free recipe API. These recipes aren't designed for low FODMAP; this page flags ingredients and suggests swaps.</li>
+  </ol>
+  <p class="small">Reviewed November 2026. Food FODMAP content and recommended serving sizes change as foods are retested; always check the current Monash app.</p>
+</section>
+
+</main>
+
+<footer class="wrap site-footer">
+  <p>Your diary and tracker data are saved only in this browser on this device. Nothing is sent anywhere.</p>
+</footer>
+
+<script src="js/fodmap-data.js"></script>
+<script src="js/app.js"></script>
+<script src="js/features.js"></script>
+</body>
+</html>
