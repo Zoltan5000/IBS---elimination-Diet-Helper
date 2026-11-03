@@ -81,6 +81,29 @@
     'A slip-up isn\'t a failure. Note it and carry on.'
   ];
 
+  // Encouragement from public-domain books (quoted from the original texts).
+  var QUOTES = [
+    { t: 'Begin at the beginning, and go on till you come to the end: then stop.', who: 'the King', src: 'Lewis Carroll, Alice\'s Adventures in Wonderland (1865)', tags: ['start'] },
+    { t: 'Why, sometimes I\'ve believed as many as six impossible things before breakfast.', who: 'the Queen', src: 'Lewis Carroll, Through the Looking-Glass (1871)', tags: ['start', 'general'] },
+    { t: 'It\'s no use going back to yesterday, because I was a different person then.', who: 'Alice', src: 'Lewis Carroll, Alice\'s Adventures in Wonderland (1865)', tags: ['tough', 'progress'] },
+    { t: 'You have plenty of courage, I am sure. All you need is confidence in yourself.', who: 'Oz', src: 'L. Frank Baum, The Wonderful Wizard of Oz (1900)', tags: ['general', 'challenge'] },
+    { t: 'Isn\'t it nice to think that tomorrow is a new day with no mistakes in it yet?', who: 'Anne', src: 'L. M. Montgomery, Anne of Green Gables (1908)', tags: ['tough', 'general'] },
+    { t: 'I\'m not afraid of storms, for I\'m learning how to sail my ship.', who: 'Amy', src: 'Louisa May Alcott, Little Women (1868)', tags: ['challenge', 'tough', 'progress'] },
+    { t: 'Where you tend a rose, my lad, a thistle cannot grow.', who: '', src: 'Frances Hodgson Burnett, The Secret Garden (1911)', tags: ['good', 'general'] },
+    { t: 'If you look the right way, you can see that the whole world is a garden.', who: '', src: 'Frances Hodgson Burnett, The Secret Garden (1911)', tags: ['good', 'finish'] },
+    { t: 'The moment you doubt whether you can fly, you cease for ever to be able to do it.', who: '', src: 'J. M. Barrie, Peter and Wendy (1911)', tags: ['challenge', 'progress'] }
+  ];
+  function pickQuote(tag) {
+    var list = QUOTES.filter(function (q) { return q.tags.indexOf(tag) !== -1; });
+    if (!list.length) list = QUOTES;
+    var day = Math.floor(Date.now() / 864e5);
+    return list[day % list.length];
+  }
+  function quoteHTML(q) {
+    return '<figure class="quote"><blockquote>“' + esc(q.t) + '”</blockquote><figcaption>' + (q.who ? esc(q.who) + ', ' : '') + '<cite>' + esc(q.src) + '</cite></figcaption></figure>';
+  }
+  function quoteCard(tag) { return '<div class="card quote-card"><div class="kicker">📖 A little encouragement</div>' + quoteHTML(pickQuote(tag)) + '</div>'; }
+
   /* ---------- state ---------- */
   function fresh() {
     return { v: 2, phase: 'prep', starts: { prep: today() }, checks: {}, diary: [], ch: {}, active: '', washoutUntil: '', outcome: '', sound: false, badges: {} };
@@ -191,8 +214,8 @@
     var e = entryFor(today());
     if (e) {
       return '<div class="card task"><div class="kicker">Today</div><h2>You logged today</h2>' +
-        '<p class="done-today">✓ Average score ' + avg(e) + ' / 10. Nice work.</p>' +
-        '<div class="btn-row"><a class="btn ghost" href="#log" data-goto="log">Update today\'s log</a></div></div>';
+        '<p class="done-today">✓ Symptom score ' + avg(e) + ' / 10' + (e.diet != null ? ' · Diet score ' + e.diet + ' / 100' : '') + '</p>' +
+        '<div class="btn-row"><button type="button" class="btn primary" data-act="review">See today\'s review</button><a class="btn ghost" href="#log" data-goto="log">Update log</a></div></div>';
     }
     return '<div class="card task"><div class="kicker">Today</div><h2>How is your gut today?</h2>' +
       '<p class="muted">It takes about 30 seconds and earns you a coin.</p>' +
@@ -246,18 +269,28 @@
 
   function renderToday() {
     var p = state.phase, html = '';
-    if (p === 'prep') {
+    if (p === 'prep' && state.prepDone) {
+      html += hero('prep', 'World 1 · Get ready', 'Step 1 done ✓', 'You\'ve checked with your doctor. Start your baseline week whenever you\'re ready.', ring(1, 1, '✓', 'done'));
+      html += '<div class="card task"><div class="kicker">Next step</div><h2>Start your baseline week</h2>' +
+        '<p>For 7 days, eat as you normally do and log how you feel. This gives you something to compare against later.</p>' +
+        '<div class="btn-row"><button type="button" class="btn accent" data-act="phase" data-to="baseline">Start my baseline week</button></div>' +
+        '<p class="muted small">Confirmed ' + esc(nice(state.prepDone)) + '. <button type="button" class="link" data-act="prepundo">Undo</button></p></div>';
+      html += '<details class="card fold"><summary>How the app works</summary>' + journeyHTML() + featuresHTML() + '</details>';
+      html += quoteCard('start');
+    } else if (p === 'prep') {
       var done = CHECKS.filter(function (c) { return state.checks[c[0]]; }).length;
       html += '<div class="welcome"><p class="muted">Welcome 👋</p><h1>Find out which foods trigger your IBS</h1>' +
         '<p>This app coaches you through the low FODMAP elimination diet, the approach developed at Monash University and recommended in gastroenterology guidelines. It takes about 3 months, and the app tells you what to do each day.</p></div>' +
-        '<h2 class="section-title">Your journey at a glance</h2>' + journeyHTML() +
-        '<h2 class="section-title">How the app helps</h2>' + featuresHTML() +
-        '<div class="card" id="readyCard"><div class="card-head"><h2>Before you start</h2><span class="muted small">' + done + ' of ' + CHECKS.length + '</span></div>' +
+        '<div class="card task" id="readyCard"><div class="kicker">Step 1</div><div class="card-head"><h2>Check with your doctor first</h2><span class="muted small">' + done + ' of ' + CHECKS.length + '</span></div>' +
+        '<p class="muted small">Other conditions can cause the same symptoms, and celiac tests only work while you\'re still eating gluten. See <a href="#learn" data-goto="learn">Learn, step 1</a> for the red-flag symptoms.</p>' +
         '<div class="checks">' + CHECKS.map(function (c) {
           return '<label><input type="checkbox" data-check="' + c[0] + '"' + (state.checks[c[0]] ? ' checked' : '') + '><span>' + esc(c[1]) + '</span></label>';
         }).join('') + '</div>' +
-        '<div class="btn-row"><button type="button" class="btn primary" data-act="phase" data-to="baseline">Start my baseline week</button></div>' +
-        (done < 3 ? '<p class="muted small">You can start anyway, but guidelines recommend these checks first.</p>' : '') + '</div>';
+        '<div class="btn-row"><button type="button" class="btn primary" data-act="prepdone" data-start="1">✓ Done: start my baseline week</button></div>' +
+        '<div class="btn-row"><button type="button" class="btn ghost" data-act="prepdone">✓ Done: I\'ll start later</button></div>' +
+        '<p class="muted small">Confirming hides this checklist so it doesn\'t come back every day.</p></div>' +
+        '<h2 class="section-title">Your journey at a glance</h2>' + journeyHTML() +
+        '<h2 class="section-title">How the app helps</h2>' + featuresHTML() + quoteCard('start');
     } else if (p === 'baseline') {
       var d = daysIn('baseline'), logs = state.diary.filter(function (e) { return e.phase === 'baseline'; }).length;
       html += hero(p, 'World 2 · Baseline week', 'Day ' + Math.min(d, 7) + ' of 7', 'Eat as you normally do. Just log how you feel.', ring(Math.min(d, 7), 7, Math.min(d, 7) + '/7', 'days'));
@@ -305,6 +338,10 @@
       html += renderReintroToday();
     } else if (p === 'personal') {
       html += renderPersonal();
+    }
+    if (p !== 'prep') {
+      var te = entryFor(today());
+      html += quoteCard(te && te.diet != null && te.diet < 60 ? 'tough' : { baseline: 'start', elimination: 'general', checkin: 'progress', reintro: 'challenge', personal: 'finish' }[p] || 'general');
     }
     var n = nudges();
     html = html.indexOf('<!--nudge-->') !== -1 ? html.replace('<!--nudge-->', n) : n + html;
@@ -508,6 +545,15 @@
       state.phase = 'reintro'; state.washoutUntil = ''; save(); toast('Added back to your challenges'); render(); go('today');
     } else if (a === 'level') {
       showLevel(el.dataset.level);
+    } else if (a === 'prepdone') {
+      ['prep-dx', 'prep-flags', 'prep-celiac'].forEach(function (k) { state.checks[k] = true; });
+      state.prepDone = today(); save();
+      if (el.dataset.start) setPhase('baseline'); else { toast('Step 1 done ✓'); render(); }
+      window.scrollTo(0, 0);
+    } else if (a === 'prepundo') {
+      state.prepDone = ''; save(); render();
+    } else if (a === 'review') {
+      var re = entryFor(today()); if (re) showReview(re, false);
     } else if (a === 'backup') {
       doBackup();
     } else if (a === 'snooze-backup') {
@@ -541,6 +587,92 @@
     render();
   }
 
+  /* ---------- diet review after each log ---------- */
+  function dietReview(e) {
+    var F = window.FODMAP, text = String(e.food || '').trim();
+    var ph = e.phase === 'checkin' ? 'elimination' : e.phase, practice = ph === 'prep' || ph === 'baseline';
+    var tol = {};
+    if (ph === 'reintro' || ph === 'personal') GROUPS.forEach(function (g) { var c = chal(g.id); if (c.status === 'done') tol[g.id] = c.result; });
+    var active = e.challenge && G[e.challenge] && ph === 'reintro' ? e.challenge : '';
+    if (active) tol[active] = 'tolerated';
+    // Check each item separately, so "lactose-free milk" doesn't excuse "creamy pasta".
+    var parts = text.split(/[,.;\n]+|\s(?:and|then|plus)\s/i).filter(function (x) { return x.trim(); });
+    var flags = [], seen = {};
+    parts.forEach(function (part) {
+      F.judge(F.scan(part), tol).flags.forEach(function (f) { var k = f.word + '|' + f.group; if (!seen[k]) { seen[k] = 1; flags.push(f); } });
+    });
+    var good = text ? F.scanGood(text) : [];
+    var score = null, worst = {};
+    if (text) {
+      // One penalty per food (its worst flag): high -12, "often contains" -5, portion-dependent -3
+      flags.forEach(function (f) {
+        var pts = f.severity === 'avoid' ? 12 : f.level === 'often' ? 5 : 3;
+        worst[f.word] = Math.max(worst[f.word] || 0, pts);
+      });
+      score = 100;
+      Object.keys(worst).forEach(function (w) { score -= worst[w]; });
+      score = Math.max(0, score);
+    }
+    var well = [], improve = [], st = streak();
+    well.push('You logged today' + (st >= 2 ? ': that\'s a ' + st + '-day streak 🔥' : '') + '. Regular logs make your results reliable.');
+    if (good.length) well.push('Good low-FODMAP choices: ' + good.slice(0, 6).join(', ') + '.');
+    if (text && !flags.length) well.push(practice ? 'Nothing high-FODMAP spotted.' : 'No common high-FODMAP foods spotted. Nicely done!');
+    if (active) well.push(G[active].emoji + ' Your ' + G[active].name.toLowerCase() + ' test food doesn\'t count against you. It\'s part of the challenge.');
+    if (e.stool === '3' || e.stool === '4') well.push('Stool type ' + e.stool + ' is in the typical range.');
+    var base = state.diary.filter(function (x) { return x !== e && (x.phase === 'baseline' || x.phase === 'prep'); }).map(avg);
+    if (!practice && base.length >= 3 && avg(e) < mean(base) - 0.5) well.push('Symptoms today (' + avg(e) + ') are below your baseline average (' + mean(base).toFixed(1) + ').');
+    var byWord = {}, order = [];
+    flags.forEach(function (f) { if (!byWord[f.word]) { byWord[f.word] = []; order.push(f.word); } byWord[f.word].push(f); });
+    order.forEach(function (w) {
+      var fs = byWord[w], f = fs[0], names = fs.map(function (x) { return F.GROUPS[x.group].name; }).join(' and ');
+      if (f.level === 'often') improve.push('“' + w + '” often contains ' + names + '. Check the label or ask how it\'s made. Swap idea: ' + F.GROUPS[f.group].swap + '.');
+      else if (f.severity === 'modify') improve.push('“' + w + '” is fine in a small serve (' + names + '). Check the amount in the Monash app.');
+      else improve.push('“' + w + '” is high in ' + names + '. Try instead: ' + F.GROUPS[f.group].swap + '.');
+    });
+    if (!text) improve.push('Add what you ate next time to get a diet score and tips.');
+    else if (text.split(/[,.;\n+&]|\band\b|\bwith\b/).filter(function (x) { return x.trim(); }).length < 3) improve.push('Add a bit more detail, like snacks, drinks and sauces, for a more accurate score.');
+    if (Number(e.stress) >= 7) improve.push('Stress was high today, and stress alone can flare IBS. A short walk or a few slow breaths may help.');
+    if (!practice && avg(e) >= 6 && flags.length) improve.push('Your symptoms were higher today. The foods above may be part of the reason.');
+    var nFoods = Object.keys(worst || {}).length;
+    var label = score == null ? 'No score yet'
+      : practice ? (nFoods ? 'Preview: ' + nFoods + ' food' + (nFoods === 1 ? '' : 's') + ' to swap later' : 'Already low-FODMAP friendly!')
+      : score >= 90 ? 'Right on track!' : score >= 70 ? 'Mostly on track' : score >= 50 ? 'A few swaps needed' : 'Tough day. Tomorrow\'s a fresh start';
+    return { score: score, label: label, well: well, improve: improve, practice: practice, personal: ph === 'personal' };
+  }
+
+  var reviewOpen = false, queued = [];
+  function showReview(e, isNew) {
+    var r = dietReview(e), col = r.score == null ? 'var(--muted)' : r.score >= 90 ? 'var(--good)' : r.score >= 70 ? 'var(--primary)' : r.score >= 50 ? 'var(--warn)' : 'var(--bad)';
+    var rad = 40, c = 2 * Math.PI * rad, f = r.score == null ? 0 : r.score / 100;
+    var o = document.createElement('div');
+    o.className = 'sheet-backdrop review-sheet';
+    o.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="reviewTitle">' +
+      '<div class="coin-strip"><i class="px-coin"></i> ' + (isNew ? '+1 COIN · ' + coins() + ' TOTAL' : 'UPDATED') + ' · SAVED ON THIS DEVICE</div>' +
+      '<div class="review-head"><svg class="ring score-ring" viewBox="0 0 96 96" aria-hidden="true" style="--rc:' + col + '"><circle class="track" cx="48" cy="48" r="' + rad + '"/>' +
+      '<circle class="bar" cx="48" cy="48" r="' + rad + '" stroke-dasharray="' + c + '" stroke-dashoffset="' + (c * (1 - f)) + '"/>' +
+      '<text x="48" y="44">' + (r.score == null ? '–' : r.score) + '</text><text class="ring-sub" x="48" y="64">' + (r.score == null ? 'no food' : 'of 100') + '</text></svg>' +
+      '<div><div class="kicker">' + (r.practice ? 'Practice diet score' : r.personal ? 'Your personal diet score' : 'Today\'s diet score') + '</div><h2 id="reviewTitle">' + esc(r.label) + '</h2>' +
+      '<p class="muted small">' + (r.practice ? 'This week you eat as normal, so there\'s nothing to fix yet. This shows what would be flagged once elimination starts.'
+        : r.personal ? 'Based on your own reintroduction results.' : 'Based on the foods you listed, compared with the low FODMAP diet.') + '</p></div></div>' +
+      '<h3 class="rv-h good">What went well</h3><ul class="rv-list good">' + r.well.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
+      (r.improve.length ? '<h3 class="rv-h warn">' + (r.practice ? 'Good to know for next week' : 'Where you could improve') + '</h3><ul class="rv-list warn">' + r.improve.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
+      quoteHTML(pickQuote(r.score != null && r.score < 60 ? 'tough' : r.score >= 90 ? 'good' : 'general')) +
+      '<p class="muted small">The score is a guide based on keywords, and portions and recipes vary. Your dietitian has the final say.</p>' +
+      '<div class="btn-row"><button type="button" class="btn primary" data-close>Got it</button><button type="button" class="btn ghost" data-close data-edit-log>Edit log</button></div></div>';
+    function close(edit) {
+      o.remove(); reviewOpen = false;
+      if (edit) { go('log'); form.date.value = e.date; fillForm(e.date); }
+      var q = queued; queued = []; q.forEach(function (a) { celebrate(a[0], a[1]); });
+    }
+    o.addEventListener('click', function (ev) {
+      if (ev.target === o) return close(false);
+      var b = ev.target.closest('[data-close]'); if (b) close(b.hasAttribute('data-edit-log'));
+    });
+    $('toast').classList.remove('show');
+    document.body.appendChild(o); reviewOpen = true;
+    var btn = o.querySelector('[data-close]'); if (btn) btn.focus();
+  }
+
   /* ---------- LOG ---------- */
   var form = $('logForm');
   function fillForm(date) {
@@ -564,11 +696,13 @@
     var st = form.querySelector('input[name=stool]:checked'); e.stool = st ? st.value : '';
     e.food = form.food.value; e.notes = form.notes.value;
     if (state.active) e.challenge = state.active;
+    e.diet = dietReview(e).score;
     if (!existing) { state.diary.push(e); state.diary.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }); }
     save();
-    if (existing) toast('Updated and saved on this device'); else { toast('+1 coin 🪙 Saved on this device'); coinSound(); askPersist(); }
+    if (!existing) { coinSound(); askPersist(); }
     render();
     if (!existing && date === today()) go('today');
+    showReview(e, !existing);
   });
 
   function renderLog() {
@@ -598,7 +732,7 @@
     $('history').innerHTML = state.diary.length ? state.diary.slice().reverse().slice(0, 60).map(function (e) {
       var v = avg(e);
       return '<li><span class="score" style="background:' + scoreColor(v) + '">' + v + '</span><span class="txt"><b>' + nice(e.date) + '</b> <span class="meta">· ' + esc((PHASES[e.phase] || PHASES.baseline).name) +
-        (e.challenge && G[e.challenge] ? ' · ' + G[e.challenge].emoji : '') + (e.stool ? ' · stool ' + esc(e.stool) : '') + '</span>' +
+        (e.challenge && G[e.challenge] ? ' · ' + G[e.challenge].emoji : '') + (e.stool ? ' · stool ' + esc(e.stool) : '') + (e.diet != null ? ' · diet ' + e.diet : '') + '</span>' +
         (e.food ? '<div class="food">' + esc(e.food) + '</div>' : '') + '</span>' +
         '<span><button type="button" class="link" data-edit="' + e.date + '" aria-label="Edit">✎</button><button type="button" class="link" data-del="' + e.id + '" aria-label="Delete">✕</button></span></li>';
     }).join('') : '<li class="muted">No logs yet.</li>';
@@ -652,9 +786,10 @@
   function levels() {
     var p = phaseIdx(), worlds = [];
     function st(i) { return p > i ? 'done' : p === i ? 'current' : 'locked'; }
-    worlds.push({ n: 1, name: 'GET READY', phase: 'prep', levels: [{ id: 'prep', label: '1-1', icon: '🩺', state: st(0), title: 'Get ready', text: PHASES.prep.you }] });
+    var prepOk = p === 0 && state.prepDone;
+    worlds.push({ n: 1, name: 'GET READY', phase: 'prep', levels: [{ id: 'prep', label: '1-1', icon: '🩺', state: prepOk ? 'done' : st(0), title: 'Get ready', text: PHASES.prep.you }] });
     var bl = state.diary.filter(function (e) { return e.phase === 'baseline'; }).length;
-    worlds.push({ n: 2, name: 'BASELINE', phase: 'baseline', levels: [{ id: 'baseline', label: '2-1', icon: '📝', state: st(1), coins: Math.min(7, bl), title: 'Baseline week', text: 'Log 7 days of normal eating. ' + Math.min(7, bl) + ' of 7 coins collected.' }] });
+    worlds.push({ n: 2, name: 'BASELINE', phase: 'baseline', levels: [{ id: 'baseline', label: '2-1', icon: '📝', state: prepOk ? 'current' : st(1), coins: Math.min(7, bl), title: 'Baseline week', text: 'Log 7 days of normal eating. ' + Math.min(7, bl) + ' of 7 coins collected.' }] });
     var de = p === 2 ? daysIn('elimination') : p > 2 && state.starts.elimination ? diff(state.starts.elimination, state.starts.checkin || today()) : 0, el = [];
     for (var w = 1; w <= 6; w++) {
       var s = p < 2 ? 'locked' : de >= w * 7 ? 'done' : (p === 2 && de > (w - 1) * 7) ? 'current' : p > 2 ? 'skipped' : 'locked';
@@ -728,6 +863,7 @@
 
   /* ---------- celebrations and 8-bit sound ---------- */
   function celebrate(title, sub) {
+    if (reviewOpen) { queued.push([title, sub]); return; }
     var o = document.createElement('div');
     o.className = 'celebrate'; o.setAttribute('role', 'status');
     var coinsHtml = '';

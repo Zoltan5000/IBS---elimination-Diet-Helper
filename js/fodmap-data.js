@@ -159,5 +159,23 @@
     return { verdict: verdict, flags: flags };
   }
 
-  window.FODMAP = { GROUPS: GROUPS, scan: scan, judge: judge };
+  // Common low-FODMAP foods (at normal serves), used to praise good choices.
+  var GOOD = ['rice', 'brown rice', 'oats', 'oatmeal', 'porridge', 'quinoa', 'polenta', 'potato', 'potatoes', 'egg', 'eggs',
+    'chicken', 'turkey', 'beef', 'pork', 'lamb', 'fish', 'salmon', 'tuna', 'cod', 'prawns', 'shrimp', 'firm tofu', 'tofu', 'tempeh',
+    'carrot', 'zucchini', 'courgette', 'spinach', 'kale', 'lettuce', 'cucumber', 'tomato', 'bell pepper', 'capsicum', 'eggplant',
+    'green beans', 'bok choy', 'bean sprouts', 'parsnip', 'olives', 'strawberries', 'strawberry', 'blueberries', 'raspberries',
+    'orange', 'oranges', 'mandarin', 'kiwi', 'grapes', 'pineapple', 'cantaloupe', 'lactose-free', 'lactose free', 'cheddar',
+    'parmesan', 'feta', 'brie', 'swiss cheese', 'gluten-free', 'gluten free', 'spelt sourdough', 'sourdough', 'corn tortilla', 'rice noodles',
+    'rice cakes', 'maple syrup', 'peanut butter', 'peanuts', 'walnuts', 'macadamias', 'pumpkin seeds', 'chia', 'linseed', 'flaxseed',
+    'garlic-infused oil', 'garlic infused oil', 'olive oil', 'chives', 'ginger', 'basil', 'popcorn', 'almond milk', 'coconut milk'];
+  var GOOD_RE = GOOD.map(function (w) { return { w: w, re: new RegExp('(^|[^a-zà-ÿ])' + esc(w) + '(s|es)?(?![a-zà-ÿ])', 'i') }; });
+
+  /** Low-FODMAP foods mentioned in the text (longest phrases win). */
+  function scanGood(text) {
+    var t = ' ' + String(text || '').toLowerCase().replace(/sweet potato(es)?/g, ' ') + ' ';
+    var hits = GOOD_RE.filter(function (g) { return g.re.test(t); }).map(function (g) { return g.w; });
+    return hits.filter(function (h) { return !hits.some(function (o) { return o !== h && o.length > h.length && o.indexOf(h) !== -1; }); });
+  }
+
+  window.FODMAP = { GROUPS: GROUPS, scan: scan, judge: judge, scanGood: scanGood };
 })();
