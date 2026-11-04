@@ -2,7 +2,7 @@
 
 Last checked: **November 4, 2026**
 
-Every fact in IBS Domination that cites a source was checked three ways before it went into the app:
+Every citation lists all of its authors; no author lists are shortened to "et al." Every fact in IBS Domination that cites a source was checked three ways before it went into the app:
 
 1. **The record:** the source's official listing (PubMed, or the organization's own site), confirming the title, authors, journal and year.
 2. **A second listing:** the publisher's or organization's own page, confirming the record and the link the app uses.
@@ -15,7 +15,7 @@ A source or claim that failed any check was corrected or removed (see the end of
 ## Clinical guidelines
 
 ### ACG Clinical Guideline: Management of Irritable Bowel Syndrome (2021)
-Lacy BE, Pimentel M, Brenner DM, et al. *Am J Gastroenterol.* 2021;116(1):17–44. doi:10.14309/ajg.0000000000001036
+**Authors:** Lacy BE, Pimentel M, Brenner DM, Chey WD, Keefer LA, Long MD, Moshiree B. *Am J Gastroenterol.* 2021;116(1):17–44. doi:10.14309/ajg.0000000000001036
 - Record: [PubMed 33315591](https://pubmed.ncbi.nlm.nih.gov/33315591/) ✓
 - Second listing: [journal full text](https://journals.lww.com/ajg/fulltext/10.14309/ajg.0000000000001036~acg-clinical-guideline-management-of-irritable-bowel) and the January 2021 issue contents ✓
 - Claims ✓:
@@ -35,7 +35,7 @@ Lacy BE, Pimentel M, Brenner DM, et al. *Am J Gastroenterol.* 2021;116(1):17–4
   - Further diet advice, such as low FODMAP, should come from a healthcare professional with dietary expertise
 
 ### AGA Clinical Practice Update on the Role of Diet in IBS: Expert Review (2022)
-Chey WD, et al. *Gastroenterology.* 2022 (American Gastroenterological Association)
+**Authors:** Chey WD, Hashash JG, Manning L, Chang L. *Gastroenterology.* 2022;162(6):1737–1745.e5. doi:10.1053/j.gastro.2021.12.248. PMID 35337654. [PubMed](https://pubmed.ncbi.nlm.nih.gov/35337654/) (American Gastroenterological Association)
 - Record: [Gastroenterology full text](https://www.gastrojournal.org/article/S0016-5085(21)04084-1/fulltext) ✓
 - Second listing: [AGA clinical guidance summary](https://gastro.org/clinical-guidance/the-role-of-diet-in-irritable-bowel-syndrome-ibs/) and the AGA Institute IBS quality indicators, which repeat the same limit ✓
 - Claim ✓: the low FODMAP restriction phase should last "no more than 4–6 weeks", followed by reintroduction and personalisation, and patients should be told the expected length of any restrictive diet trial. (The AGA patient page says 2–4 weeks.)
@@ -46,13 +46,13 @@ Chey WD, et al. *Gastroenterology.* 2022 (American Gastroenterological Associati
 - Claim ✓: suggests a low FODMAP diet trial and advises *against* a gluten-free diet for IBS (conditional recommendation, very low-quality evidence)
 
 ### ACG Guidelines Update: Diagnosis and Management of Celiac Disease (2023)
-Rubio-Tapia A, et al. *Am J Gastroenterol.* 2023;118(1):59–76
+**Authors:** Rubio-Tapia A, Hill ID, Semrad C, Kelly CP, Greer KB, Limketkai BN, Lebwohl B. *Am J Gastroenterol.* 2023;118(1):59–76. doi:10.14309/ajg.0000000000002075
 - Record: [PubMed 36602836](https://pubmed.ncbi.nlm.nih.gov/36602836/) ✓
 - Second listing: [journal full text](https://journals.lww.com/ajg/fulltext/2023/01000/american_college_of_gastroenterology_guidelines.17.aspx) and [gi.org](http://gi.org/guideline/diagnosis-and-management-of-celiac-disease/) ✓
 - Claim ✓: diagnostic testing should be done while eating gluten. For people already gluten-free, HLA testing comes first, then a supervised gluten challenge.
 
 ### BSG guidelines on the management of IBS (2021)
-Vasant DH, Paine PA, Black CJ, et al. *Gut.* 2021;70:1214–1240. doi:10.1136/gutjnl-2021-324598
+**Authors:** Vasant DH, Paine PA, Black CJ, Houghton LA, Everitt HA, Corsetti M, Agrawal A, Aziz I, Farmer AD, Eugenicos MP, Moss-Morris R, Yiannakou Y, Ford AC. *Gut.* 2021;70:1214–1240. doi:10.1136/gutjnl-2021-324598. (The University of Manchester's record spells the seventh author "Aggarwal A"; the White Rose record and a PMC reference list spell it "Agrawal A". **To confirm against the Gut page.**)
 - Record: [PubMed 33903147](https://pubmed.ncbi.nlm.nih.gov/33903147/) ✓ (citation confirmed in several reference lists)
 - Second listing: [BSG guideline page](https://www.bsg.org.uk/clinical-resource/british-society-of-gastroenterology-guidelines) and the [Gut full text](https://gut.bmj.com/content/70/7/1214.long) ✓
 - Claims ✓: **confirmed by the project owner reading the full text on November 4, 2026:**
@@ -81,57 +81,57 @@ Vasant DH, Paine PA, Black CJ, et al. *Gut.* 2021;70:1214–1240. doi:10.1136/gu
 - Record and second listing: [Gentle FODMAP approach](https://www.monashfodmap.com/blog/gentle-fodmap-diet/) and [The FODMAP gentle diet](https://www.monashfodmap.com/blog/the-fodmap-gentle-diet/) on monashfodmap.com ✓
 - Claim ✓: a gentler, "bottom-up" approach that limits only the biggest FODMAP sources. A 2022 review states its effect "has not been formally studied", and a later Monash pilot trial is small. So the app describes it only as promising but not fully tested, and gives no response rates.
 
-### Halmos et al., *Gastroenterology* 2014 (Monash University)
-Halmos EP, Power VA, Shepherd SJ, Gibson PR, Muir JG. A diet low in FODMAPs reduces symptoms of irritable bowel syndrome. 2014;146(1):67–75
+### *Gastroenterology* 2014 trial (Monash University)
+**Authors:** Halmos EP, Power VA, Shepherd SJ, Gibson PR, Muir JG. A diet low in FODMAPs reduces symptoms of irritable bowel syndrome. *Gastroenterology.* 2014;146(1):67–75
 - Record: [PubMed 24076059](https://pubmed.ncbi.nlm.nih.gov/24076059/) ✓
 - Second listing: [Monash research portal](https://research.monash.edu/en/publications/a-diet-low-in-fodmaps-reduces-symptoms-of-irritable-bowel-syndrom/) and the [journal PDF](https://www.gastrojournal.org/article/s0016-5085(13)01407-8/pdf) ✓
 - Claim ✓: in a controlled crossover trial, overall symptom scores were lower on the low FODMAP diet than on a typical Australian diet (22.8 vs 44.9 mm, P < .001)
 
-### Staudacher et al., *J Nutr* 2012 (King's College London)
-Fermentable carbohydrate restriction reduces luminal bifidobacteria and gastrointestinal symptoms in patients with IBS. 2012;142(8):1510–1518
+### *J Nutr* 2012 trial (King's College London)
+**Authors:** Staudacher HM, Lomer MCE, Anderson JL, Barrett JS, Muir JG, Irving PM, Whelan K. Fermentable carbohydrate restriction reduces luminal bifidobacteria and gastrointestinal symptoms in patients with IBS. *J Nutr.* 2012;142(8):1510–1518. doi:10.3945/jn.112.159285
 - Record: [PubMed 22739368](https://pubmed.ncbi.nlm.nih.gov/22739368/) ✓
 - Second listing: [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0022316622027122) ✓
 - Claim ✓: 4 weeks of restriction lowered the concentration and proportion of bifidobacteria
 
-### Eswaran et al., *Clin Gastroenterol Hepatol* 2025 (University of Michigan)
-All FODMAPs Aren't Created Equal: Results of a Randomized Reintroduction Trial in Patients With IBS. 2025;23(2):351–358
+### *Clin Gastroenterol Hepatol* 2025 reintroduction trial (University of Michigan)
+**Authors:** Eswaran S, Jencks KJ, Singh P, Rifkin S, Han-Markey T, Chey WD. All FODMAPs Aren't Created Equal: Results of a Randomized Reintroduction Trial in Patients With IBS. *Clin Gastroenterol Hepatol.* 2025;23(2):351–358.e5. doi:10.1016/j.cgh.2024.03.047
 - Record: [PubMed 38729390](https://pubmed.ncbi.nlm.nih.gov/38729390/) ✓
 - Second listing: [CGH journal PDF](https://www.cghjournal.org/article/S1542-3565(24)00413-0/pdf) and [ClinicalTrials.gov NCT03052439](https://clinicaltrials.gov/study/NCT03052439) ✓
-- Claim ✓: fructans (P = .007) and GOS (P = .04) were associated with worse abdominal pain
+- Claims ✓: patients "reacted to an average of 2 FODMAPs per patient"; fructans (P = .007) and GOS (P = .04) were associated with worse abdominal pain, and fructans and GOS were the most likely to worsen pain and/or bloating. (Search snippets disagree on enrollment numbers, so the app doesn't state a sample size.)
 
-### Lewis & Heaton, *Scand J Gastroenterol* 1997 (Bristol Stool Form Scale)
-Stool form scale as a useful guide to intestinal transit time. 1997;32(9):920–924. [doi:10.3109/00365529709011203](https://doi.org/10.3109/00365529709011203)
+### *Scand J Gastroenterol* 1997: the Bristol Stool Form Scale
+**Authors:** Lewis SJ, Heaton KW. Stool form scale as a useful guide to intestinal transit time. *Scand J Gastroenterol.* 1997;32(9):920–924. [doi:10.3109/00365529709011203](https://doi.org/10.3109/00365529709011203)
 - Record and second listing: the citation and DOI were confirmed in multiple citing papers, and the scale runs from type 1 (hard lumps) to type 7 (liquid) ✓
 - Claim ✓: types 3 and 4 are generally seen as the ideal range (an NHS dietetics leaflet and peer-reviewed reviews). Note that some frameworks also count type 5 as normal.
 
 ## Independent trials and reviews (beyond Monash)
 
-### Staudacher et al., *Gastroenterology* 2017 (King's College London)
-A diet low in FODMAPs reduces symptoms in patients with IBS and a probiotic restores Bifidobacterium species. 2017;153:936–947
+### *Gastroenterology* 2017 sham-controlled trial (King's College London)
+**Authors:** Staudacher HM, Lomer MCE, Farquharson FM, Louis P, Fava F, Franciosi E, Scholz M, Tuohy KM, Lindsay JO, Irving PM, Whelan K. A diet low in FODMAPs reduces symptoms in patients with IBS and a probiotic restores Bifidobacterium species. *Gastroenterology.* 2017;153(4):936–947. doi:10.1053/j.gastro.2017.06.010
 - Record: [PubMed 28625832](https://pubmed.ncbi.nlm.nih.gov/28625832/) ✓
 - Second listing: [Gastroenterology full text](https://www.gastrojournal.org/article/S0016-5085(17)35744-X/fulltext) and the [King's College London repository](https://kclpure.kcl.ac.uk/ws/files/75711310/Diet_Low_in_FODMAPs_STAUDACHER_Publishedonline15June2017_GREEN_AAM_CC_BY_NC_ND_.pdf) ✓
 - Claim ✓: blinded, sham-diet-controlled trial. In the per-protocol analysis (people who completed the trial), 61% on low FODMAP reported adequate relief vs 39% on the sham diet (P = .042). The app says "people who completed".
 
-### Eswaran et al., *Am J Gastroenterol* 2016 (University of Michigan)
-A randomized controlled trial comparing the low FODMAP diet vs. modified NICE guidelines in US adults with IBS-D. 2016;111(12):1824–1832
+### *Am J Gastroenterol* 2016 trial (University of Michigan)
+**Authors:** Eswaran SL, Chey WD, Han-Markey T, Ball S, Jackson K. A randomized controlled trial comparing the low FODMAP diet vs. modified NICE guidelines in US adults with IBS-D. *Am J Gastroenterol.* 2016;111(12):1824–1832
 - Record: [journal abstract](https://journals.lww.com/ajg/abstract/2016/12000/a_randomized_controlled_trial_comparing_the_low.31.aspx) ✓ (the citation is also confirmed in several PubMed reference lists; the PubMed record itself didn't come up in search)
 - Second listing: [Michigan Medicine news release](https://www.michiganmedicine.org/health-lab/clinical-trial-demonstrates-success-low-fodmap-diet) ✓
 - Claim ✓: the primary composite endpoint didn't differ (P = .13); low FODMAP gave greater reductions in pain, bloating and urgency; 40–50% reported adequate relief with either diet. The news release's "20% of controls" figure wasn't confirmed, so the app doesn't use it.
 
-### Böhn et al., *Gastroenterology* 2015 (University of Gothenburg)
-Diet low in FODMAPs reduces symptoms of IBS as well as traditional dietary advice. 2015;149(6):1399–1407
+### *Gastroenterology* 2015 trial (University of Gothenburg)
+**Authors:** Böhn L, Störsrud S, Liljebo T, Collin L, Lindfors P, Törnblom H, Simrén M. Diet low in FODMAPs reduces symptoms of IBS as well as traditional dietary advice. *Gastroenterology.* 2015;149(6):1399–1407
 - Record: [PubMed 26255043](https://pubmed.ncbi.nlm.nih.gov/26255043/) ✓
 - Second listing: the [Gastroenterology issue contents](https://www.gastrojournal.org/issue/S0016-5085(15)X0012-6) and [trial registry NCT02107625](https://clinicaltrials.gov/study/NCT02107625) (Göteborg University) ✓
-- Claim ✓: 50% (low FODMAP) vs 46% (traditional advice) responded after 4 weeks (P = .72), with no evidence that low FODMAP was superior
+- Claim ✓: the abstract reports 50% (low FODMAP) vs 46% (traditional advice) responders after 4 weeks (P = .72), with no evidence that low FODMAP was superior. Note: some later meta-analyses report different responder figures for this trial (for example 57% vs 50%), probably because they used different definitions. The app uses the abstract's numbers.
 
-### Rej et al., *Clin Gastroenterol Hepatol* 2022 (University of Sheffield)
-Efficacy and acceptability of dietary therapies in non-constipated IBS: traditional dietary advice vs low FODMAP vs gluten-free. 2022;20(12):2876–2887. PMID 35240330
+### *Clin Gastroenterol Hepatol* 2022 trial (University of Sheffield)
+**Authors:** Rej A, Sanders DS, Shaw CC, Buckle R, Trott N, Agrawal A, Aziz I. Efficacy and acceptability of dietary therapies in non-constipated IBS: traditional dietary advice vs low FODMAP vs gluten-free. 2022;20(12):2876–2887. PMID 35240330
 - Record: [PubMed 35240330](https://pubmed.ncbi.nlm.nih.gov/35240330/) ✓ (PMID and DOI 10.1016/j.cgh.2022.02.045 confirmed via a PubMed reference listing)
 - Second listing: [CGH journal PDF](https://www.cghjournal.org/article/S1542-3565(22)00202-6/pdf), [White Rose repository](https://eprints.whiterose.ac.uk/id/eprint/184498/) and [ClinicalTrials.gov NCT04072991](https://clinicaltrials.gov/study/NCT04072991) ✓
 - Claim ✓: no difference in response between the three diets; traditional advice was easier and cheaper to follow (the authors' conclusion, plus a UK consensus summary)
 
-### Black, Staudacher & Ford, *Gut* 2022 (University of Leeds)
-Efficacy of a low FODMAP diet in IBS: systematic review and network meta-analysis. 2022;71(6):1117–1126
+### *Gut* 2022 network meta-analysis (University of Leeds)
+**Authors:** Black CJ, Staudacher HM, Ford AC. Efficacy of a low FODMAP diet in IBS: systematic review and network meta-analysis. *Gut.* 2022;71(6):1117–1126
 - Record: [White Rose university repository](https://eprints.whiterose.ac.uk/id/eprint/182000/) with the [accepted manuscript](https://eprints.whiterose.ac.uk/id/eprint/182000/3/gutjnl-2021-325214R2%20CLEAN.pdf) ✓
 - Second listing: the citation (Gut 2022;71:1117–1126) confirmed in several PubMed and PMC reference lists ✓
 - Claim ✓: low FODMAP ranked first for all endpoints studied, including global symptoms, abdominal pain and bloating. For bowel habit it ranked first but wasn't statistically superior, so the app mentions only symptoms, pain and bloating.
@@ -154,7 +154,7 @@ Rene Wisely, Michigan Medicine Health Lab (University of Michigan's academic med
   - This is a news article, so it's used for context and quotes, not for research findings. Its "about two weeks" of elimination describes the Michigan clinic's protocol; the app keeps Monash's 2–6 weeks.
 
 ### Considered but not included
-- **Dionne et al., *Am J Gastroenterol* 2018** (McMaster University meta-analysis of gluten-free and low FODMAP diets). The record was confirmed, but its findings were confirmed only once, so it isn't cited.
+- **Dionne J, Ford AC, Yuan Y, and co-authors (full list not verified), *Am J Gastroenterol* 2018** (McMaster University meta-analysis of gluten-free and low FODMAP diets). The record was confirmed, but its findings were confirmed only once, so it isn't cited.
 
 ## Government health information
 
@@ -169,7 +169,7 @@ Rene Wisely, Michigan Medicine Health Lab (University of Michigan's academic med
 ## Corrected or removed after checking
 | Previously in the app | What changed |
 |---|---|
-| "In a University of Michigan study, patients reacted to an average of two groups" | **Removed.** This couldn't be found in the published trial. It was replaced with the verified finding about fructans and GOS. |
+| "In a University of Michigan study, patients reacted to an average of two groups" | **Removed, then restored.** The first search didn't find it. A later search found it in the paper itself ("patients reacted to an average of 2 FODMAPs per patient"), so it now passes all three checks and is back in the app. |
 | Red flags: "symptoms that started after age 50", "fever, symptoms that wake you at night", "family history of celiac disease" | **Corrected** to the NICE and ACG lists. The age number was removed because sources disagree. |
 | NIDDK: "write down what you eat… share with your doctor" | **Removed.** That advice is on NIDDK's *gas* page, not its IBS page. |
 | NIDDK: "several smaller meals may help" | **Removed.** It came from an archived 2012 page and isn't on the current site. It was replaced with NICE's regular-meals advice. |
