@@ -48,18 +48,23 @@
   };
   var ORDER = ['prep', 'baseline', 'elimination', 'checkin', 'reintro', 'personal'];
 
-  // Example amounts commonly used for the 3-day challenge. Monash revised its
-  // challenge foods and serve sizes in 2025; the app tells users to check theirs.
+  // Serve sizes follow Monash's 3-day structure (moderate, then larger, then
+  // your usual amount). Exact amounts aren't given here: Monash revised them in
+  // 2025, so people confirm them with their dietitian. Mango as the fructose
+  // test is from Monash; the other foods are common examples.
+  var DOSES = ['a moderate serve', 'a larger serve', 'your usual-sized serve'];
   var GROUPS = [
-    { id: 'lactose', name: 'Lactose', emoji: '🥛', food: 'cow\'s milk', doses: ['½ cup (125 ml)', '1 cup (250 ml)', '1½ cups (375 ml)'] },
-    { id: 'fructose', name: 'Fructose', emoji: '🥭', food: 'mango (or honey)', doses: ['¼ mango (or 1 tsp honey)', '½ mango (or 2 tsp honey)', '1 mango (or 1 tbsp honey)'] },
-    { id: 'sorbitol', name: 'Sorbitol', emoji: '🍑', food: 'a sorbitol test food from the Monash app', doses: ['a small serve', 'a medium serve', 'a large serve'] },
-    { id: 'mannitol', name: 'Mannitol', emoji: '🍄', food: 'button mushrooms', doses: ['½ cup', '1 cup', '1½ cups'] },
-    { id: 'fructan-grain', name: 'Fructans: wheat', emoji: '🍞', food: 'wheat bread', doses: ['1 slice', '2 slices', '3 slices'] },
-    { id: 'fructan-garlic', name: 'Fructans: garlic', emoji: '🧄', food: 'garlic', doses: ['¼ clove', '½ clove', '1 clove'] },
-    { id: 'fructan-onion', name: 'Fructans: onion', emoji: '🧅', food: 'onion', doses: ['1 tbsp chopped', '¼ onion', '½ onion'] },
-    { id: 'gos', name: 'GOS (legumes)', emoji: '🫘', food: 'canned lentils or chickpeas, rinsed', doses: ['¼ cup', '½ cup', '1 cup'] }
+    { id: 'lactose', name: 'Lactose', emoji: '🥛', food: 'cow\'s milk' },
+    { id: 'fructose', name: 'Fructose', emoji: '🥭', food: 'mango' },
+    { id: 'sorbitol', name: 'Sorbitol', emoji: '🍑', food: 'a sorbitol test food your dietitian suggests' },
+    { id: 'mannitol', name: 'Mannitol', emoji: '🍄', food: 'button mushrooms' },
+    { id: 'fructan-grain', name: 'Fructans: wheat', emoji: '🍞', food: 'wheat bread' },
+    { id: 'fructan-garlic', name: 'Fructans: garlic', emoji: '🧄', food: 'garlic' },
+    { id: 'fructan-onion', name: 'Fructans: onion', emoji: '🧅', food: 'onion' },
+    { id: 'gos', name: 'GOS (legumes)', emoji: '🫘', food: 'canned lentils or chickpeas, rinsed' }
   ];
+  GROUPS.forEach(function (g) { g.doses = DOSES; });
+
   var G = {}; GROUPS.forEach(function (g) { G[g.id] = g; });
   var RESULT = { tolerated: 'Tolerated', partial: 'Small amounts OK', trigger: 'Trigger' };
   var REACT = [
@@ -373,7 +378,7 @@
       var done = CHECKS.filter(function (c) { return state.checks[c[0]]; }).length;
       html += founderHTML() +
         '<div class="welcome"><h1>Find out which foods trigger your IBS</h1>' +
-        '<p>IBS Domination coaches you through the low FODMAP elimination diet, the approach developed at Monash University and recommended in gastroenterology guidelines. It takes about 3 months, and the app tells you what to do each day.</p></div>' +
+        '<p>IBS Domination coaches you through the low FODMAP elimination diet, the approach developed at Monash University, tested by universities in the UK, US and Europe, and recommended in gastroenterology guidelines. It takes about 3 months, and the app tells you what to do each day.</p></div>' +
         '<div class="card jump-card"><h2>Already on your way?</h2><p>Maybe you\'ve been tracking your symptoms for a while, or you\'re already on a low FODMAP diet and finding it hard to stick to. You don\'t have to start over. Tell us where you are and we\'ll pick it up from there.</p>' +
         '<div class="btn-row"><button type="button" class="btn ghost" data-act="jumpin">Jump in where I am</button></div></div>' +
         '<div class="card task" id="readyCard"><div class="kicker">Step 1</div><div class="card-head"><h2>Check with your doctor first</h2><span class="muted small">' + done + ' of ' + CHECKS.length + '</span></div>' +
@@ -514,7 +519,7 @@
           REACT.map(function (r, i) { return '<button type="button" class="react" data-act="react" data-level="' + i + '"><span class="face">' + r.face + '</span>' + r.label + '</button>'; }).join('') + '</div>' +
           '<p class="muted small">Moderate or severe symptoms end the challenge early. That\'s useful information, not a failure.</p>';
       }
-      html += '<p class="muted small">Amounts are examples. Check the Monash app or your dietitian for your exact serves.</p>' +
+      html += '<p class="muted small">Ask your dietitian for the exact amount for each day. Monash updated its recommended serves in 2025. <a href="https://www.monashfodmap.com/blog/practical-tips-fodmap-reintroduction/" target="_blank" rel="noopener">Read more ↗</a></p>' +
         '<div class="btn-row"><button type="button" class="btn ghost small" data-act="cancel">Stop this challenge</button></div></div>';
       html += logCard();
       return html;
@@ -726,7 +731,7 @@
     order.forEach(function (w) {
       var fs = byWord[w], f = fs[0], names = fs.map(function (x) { return F.GROUPS[x.group].name; }).join(' and ');
       if (f.level === 'often') improve.push('“' + w + '” often contains ' + names + '. Check the label or ask how it\'s made. Swap idea: ' + F.GROUPS[f.group].swap + '.');
-      else if (f.severity === 'modify') improve.push('“' + w + '” is fine in a small serve (' + names + '). Check the amount in the Monash app.');
+      else if (f.severity === 'modify') improve.push('“' + w + '” is fine in a small serve (' + names + '). Check the amount with your dietitian.');
       else improve.push('“' + w + '” is high in ' + names + '. Try instead: ' + F.GROUPS[f.group].swap + '.');
     });
     if (!text) improve.push('Add what you ate next time to get a diet score and tips.');
@@ -899,7 +904,7 @@
     worlds.push({ n: 4, name: 'CHECK-IN', phase: 'checkin', levels: [{ id: 'checkin', label: 'BOSS', icon: '📊', state: st(3), boss: true, title: 'The check-in', text: 'Compare how you felt before and during elimination. If it helped, World 5 opens.' }] });
     worlds.push({ n: 5, name: 'REINTRODUCTION', phase: 'reintro', levels: GROUPS.map(function (g, i) {
       var c = chal(g.id), s = c.status === 'done' ? 'done' : state.active === g.id ? 'current' : p >= 4 ? 'open' : 'locked';
-      return { id: 'g:' + g.id, label: '5-' + (i + 1), icon: g.emoji, state: s, result: c.status === 'done' ? c.result : '', title: g.name + ' challenge', text: '3 days of ' + g.food + ': ' + g.doses.join(', then ') + '.', group: g.id };
+      return { id: 'g:' + g.id, label: '5-' + (i + 1), icon: g.emoji, state: s, result: c.status === 'done' ? c.result : '', title: g.name + ' challenge', text: '3 days of ' + g.food + ': a moderate serve, then a larger serve, then your usual amount.', group: g.id };
     }) });
     worlds.push({ n: 6, name: 'YOUR DIET', phase: 'personal', levels: [{ id: 'personal', label: 'GOAL', icon: '🏁', state: st(5), title: 'Your long-term diet', text: PHASES.personal.you }] });
     return worlds;

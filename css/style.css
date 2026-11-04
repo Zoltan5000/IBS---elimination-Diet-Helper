@@ -662,3 +662,5 @@ main { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16
 a.rm { display: inline-block; margin-top: 8px; font-size: .82rem; }
 .src-h { font-size: .9rem; margin: 16px 0 4px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
 .card.alert .read-more { margin-top: 6px; }
+.card.research { border-left: 5px solid var(--c-personal); }
+.card.research li { margin: 6px 0; }

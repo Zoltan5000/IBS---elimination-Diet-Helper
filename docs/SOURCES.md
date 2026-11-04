@@ -45,11 +45,18 @@ Rubio-Tapia A, et al. *Am J Gastroenterol.* 2023;118(1):59–76
 - Second listing: [journal full text](https://journals.lww.com/ajg/fulltext/2023/01000/american_college_of_gastroenterology_guidelines.17.aspx) and [gi.org](http://gi.org/guideline/diagnosis-and-management-of-celiac-disease/) ✓
 - Claim ✓: diagnostic testing should be done while eating gluten. For people already gluten-free, HLA testing comes first, then a supervised gluten challenge.
 
-### BSG guidelines on the management of IBS (2021): further reading only
-Vasant DH, Paine PA, Black CJ, et al. *Gut.* 2021;70:1214–1240
+### BSG guidelines on the management of IBS (2021)
+Vasant DH, Paine PA, Black CJ, et al. *Gut.* 2021;70:1214–1240. doi:10.1136/gutjnl-2021-324598
 - Record: [PubMed 33903147](https://pubmed.ncbi.nlm.nih.gov/33903147/) ✓ (citation confirmed in several reference lists)
-- Second listing: [BSG guideline page](https://www.bsg.org.uk/clinical-resource/british-society-of-gastroenterology-guidelines) ✓
-- Claims **not confirmed three times**: "low FODMAP is second-line and should be supervised by a trained dietitian" and "a gluten-free diet is not recommended". Only one check matched each, so the app now credits NICE and the Canadian guideline for these points. BSG is listed as further reading.
+- Second listing: [BSG guideline page](https://www.bsg.org.uk/clinical-resource/british-society-of-gastroenterology-guidelines) and the [Gut full text](https://gut.bmj.com/content/70/7/1214.long) ✓
+- Claims ✓: **confirmed by the project owner reading the full text on November 4, 2026:**
+  - "First-line dietary advice should be offered to all patients with IBS" (strong; quality of evidence weak)
+  - "Food elimination diets based on IgG antibodies are not recommended" (strong; moderate)
+  - Soluble fibre such as ispaghula is effective, while insoluble fibre (such as wheat bran) "should be avoided as it may exacerbate symptoms". Soluble fibre should start "at a low dose (3–4 g/day)" and be built up gradually (strong; moderate).
+  - Low FODMAP is "a second-line dietary therapy" whose "implementation should be supervised by a trained dietitian", with FODMAPs "reintroduced according to tolerance" (weak; very low)
+  - "A gluten-free diet is not recommended in IBS" (weak; very low). The guideline also says any benefit may come mainly from "a reduction in dietary fructan content" rather than from removing gluten.
+  - A low FODMAP diet needs close monitoring "to avoid nutritional deficiencies or the development of overly restrictive eating habits", and the guideline recommends screening high-risk patients (for example with the SCOFF questionnaire) before starting.
+  - A low FODMAP diet may reduce Bifidobacteria and total bacterial count, and "the long-term consequences of this are unknown".
 
 ## University research
 
@@ -87,6 +94,47 @@ Stool form scale as a useful guide to intestinal transit time. 1997;32(9):920–
 - Record and second listing: the citation and DOI were confirmed in multiple citing papers, and the scale runs from type 1 (hard lumps) to type 7 (liquid) ✓
 - Claim ✓: types 3 and 4 are generally seen as the ideal range (an NHS dietetics leaflet and peer-reviewed reviews). Note that some frameworks also count type 5 as normal.
 
+## Independent trials and reviews (beyond Monash)
+
+### Staudacher et al., *Gastroenterology* 2017 (King's College London)
+A diet low in FODMAPs reduces symptoms in patients with IBS and a probiotic restores Bifidobacterium species. 2017;153:936–947
+- Record: [PubMed 28625832](https://pubmed.ncbi.nlm.nih.gov/28625832/) ✓
+- Second listing: [Gastroenterology full text](https://www.gastrojournal.org/article/S0016-5085(17)35744-X/fulltext) and the [King's College London repository](https://kclpure.kcl.ac.uk/ws/files/75711310/Diet_Low_in_FODMAPs_STAUDACHER_Publishedonline15June2017_GREEN_AAM_CC_BY_NC_ND_.pdf) ✓
+- Claim ✓: blinded, sham-diet-controlled trial. In the per-protocol analysis (people who completed the trial), 61% on low FODMAP reported adequate relief vs 39% on the sham diet (P = .042). The app says "people who completed".
+
+### Eswaran et al., *Am J Gastroenterol* 2016 (University of Michigan)
+A randomized controlled trial comparing the low FODMAP diet vs. modified NICE guidelines in US adults with IBS-D. 2016;111(12):1824–1832
+- Record: [journal abstract](https://journals.lww.com/ajg/abstract/2016/12000/a_randomized_controlled_trial_comparing_the_low.31.aspx) ✓ (the citation is also confirmed in several PubMed reference lists; the PubMed record itself didn't come up in search)
+- Second listing: [Michigan Medicine news release](https://www.michiganmedicine.org/health-lab/clinical-trial-demonstrates-success-low-fodmap-diet) ✓
+- Claim ✓: the primary composite endpoint didn't differ (P = .13); low FODMAP gave greater reductions in pain, bloating and urgency; 40–50% reported adequate relief with either diet. The news release's "20% of controls" figure wasn't confirmed, so the app doesn't use it.
+
+### Böhn et al., *Gastroenterology* 2015 (University of Gothenburg)
+Diet low in FODMAPs reduces symptoms of IBS as well as traditional dietary advice. 2015;149(6):1399–1407
+- Record: [PubMed 26255043](https://pubmed.ncbi.nlm.nih.gov/26255043/) ✓
+- Second listing: the [Gastroenterology issue contents](https://www.gastrojournal.org/issue/S0016-5085(15)X0012-6) and [trial registry NCT02107625](https://clinicaltrials.gov/study/NCT02107625) (Göteborg University) ✓
+- Claim ✓: 50% (low FODMAP) vs 46% (traditional advice) responded after 4 weeks (P = .72), with no evidence that low FODMAP was superior
+
+### Rej et al., *Clin Gastroenterol Hepatol* 2022 (University of Sheffield)
+Efficacy and acceptability of dietary therapies in non-constipated IBS: traditional dietary advice vs low FODMAP vs gluten-free. 2022;20(12):2876–2887. PMID 35240330
+- Record: [PubMed 35240330](https://pubmed.ncbi.nlm.nih.gov/35240330/) ✓ (PMID and DOI 10.1016/j.cgh.2022.02.045 confirmed via a PubMed reference listing)
+- Second listing: [CGH journal PDF](https://www.cghjournal.org/article/S1542-3565(22)00202-6/pdf), [White Rose repository](https://eprints.whiterose.ac.uk/id/eprint/184498/) and [ClinicalTrials.gov NCT04072991](https://clinicaltrials.gov/study/NCT04072991) ✓
+- Claim ✓: no difference in response between the three diets; traditional advice was easier and cheaper to follow (the authors' conclusion, plus a UK consensus summary)
+
+### Black, Staudacher & Ford, *Gut* 2022 (University of Leeds)
+Efficacy of a low FODMAP diet in IBS: systematic review and network meta-analysis. 2022;71(6):1117–1126
+- Record: [White Rose university repository](https://eprints.whiterose.ac.uk/id/eprint/182000/) with the [accepted manuscript](https://eprints.whiterose.ac.uk/id/eprint/182000/3/gutjnl-2021-325214R2%20CLEAN.pdf) ✓
+- Second listing: the citation (Gut 2022;71:1117–1126) confirmed in several PubMed and PMC reference lists ✓
+- Claim ✓: low FODMAP ranked first for all endpoints studied, including global symptoms, abdominal pain and bloating. For bowel habit it ranked first but wasn't statistically superior, so the app mentions only symptoms, pain and bloating.
+
+### Michigan Medicine Health Lab: "The Low FODMAP Diet: A 'Liberating' Route to IBS Relief"
+University of Michigan's academic medical center; interview with gastroenterologist Shanti Eswaran, MD (about 2017–2018)
+- Record: [the article on michiganmedicine.org](https://www.michiganmedicine.org/health-lab/low-fodmap-diet-liberating-route-ibs-relief), found by a search of the official domain ✓
+- Second listing: the same link was supplied by the project owner, and the article describes Eswaran's US trial, which matches the verified Eswaran 2016 study above ✓
+- Claims ✓: the quote "At first, the diet is very restrictive… once patients go through the process and discover what they can and can't eat, they actually find it liberating"; the elimination phase "is restrictive and not nutritionally complete"; dietitian guidance makes it safest. This is a news article, so it's used for context and quotes, not for research findings.
+
+### Considered but not included
+- **Dionne et al., *Am J Gastroenterol* 2018** (McMaster University meta-analysis of gluten-free and low FODMAP diets). The record was confirmed, but its findings were confirmed only once, so it isn't cited.
+
 ## Government health information
 
 ### NIH / NIDDK: Eating, Diet, & Nutrition for IBS
@@ -106,7 +154,9 @@ Stool form scale as a useful guide to intestinal transit time. 1997;32(9):920–
 | NIDDK: "several smaller meals may help" | **Removed.** It came from an archived 2012 page and isn't on the current site. It was replaced with NICE's regular-meals advice. |
 | "Return to strict low FODMAP for 2–3 days" between challenges | **Corrected** to "a few days, until symptoms settle". Monash gives no fixed number. |
 | Reintroduction "8 to 12 weeks" | **Corrected** to "about 6 to 12 weeks", to cover both Monash figures. |
-| BSG credited for dietitian supervision and the gluten-free advice | **Changed** to NICE and the Canadian guideline. The BSG wording couldn't be confirmed three times. |
+| BSG credited for dietitian supervision and the gluten-free advice | **Changed** to NICE and the Canadian guideline until the BSG wording was confirmed. **BSG reinstated** after the owner checked the full text, which also added: soluble fibre starting at 3–4 g/day, avoiding wheat bran, no IgG food tests, and eating-disorder screening. |
+| Specific challenge amounts (for example "½ cup milk on Day 1") | **Removed.** They weren't from a verified source. The app now uses Monash's verified structure (moderate serve, then a larger serve, then your usual amount) and tells people to ask their dietitian for exact amounts. |
+| "Mango or honey" for the fructose test | **Changed** to mango only, which is Monash's verified example. |
 | ACG credited for "long-term restriction reduces gut bacteria" | **Changed** to Staudacher 2012, the primary study. |
 | "Fatty meals" in the NICE drinks-and-meals advice | **Removed.** It wasn't in the verified NICE text. |
 | "Spread fruit out: one serve per meal" tip | **Changed** to NICE's "about 3 portions a day". |
@@ -116,9 +166,11 @@ Stool form scale as a useful guide to intestinal transit time. 1997;32(9):920–
 | NICE first-line advice included "gradual soluble fiber" | **Removed.** It wasn't in the verified NICE text. Fiber advice is credited to ACG and NIDDK instead. |
 | BSG credited alongside ACG in several places | **Removed.** Only verified sources are cited. |
 
+## About the Monash FODMAP app
+The Monash University FODMAP Diet app is made by the Monash department that developed the diet, but it's a paid app that couldn't be checked for this project. So the app is **not used as a source of facts**. IBS Domination cites only Monash's public university web pages, which passed all three checks, and mentions the app only as an optional food guide. Exact serving sizes are left to each person's dietitian.
+
 ## Not yet verified (please review)
-- **The BSG 2021 abstract wording**, listed above as further reading.
-- **Example challenge amounts** (for example ½ cup of milk on Day 1). The app labels these as examples and tells users to check the Monash app, because Monash revised its amounts in 2025.
+- **Example test foods** other than mango (milk, mushrooms, wheat bread, garlic, onion, lentils). These are labeled as common examples, and the app tells people to confirm them with their dietitian.
 - **The food keyword lists** used by the menu checker and diet score (`js/fodmap-data.js`). These follow Monash's food groupings but weren't checked food by food.
 - **The book quotes** on the Today screen. These are from public-domain classics; check them against the original texts.
 - **Tips without a "Read more" link** (for example "hard cheeses are low in lactose"). These are general knowledge and don't cite a source.
