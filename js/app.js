@@ -76,10 +76,10 @@
   var NICE_PUB = 'https://www.nice.org.uk/guidance/cg61/ifp/chapter/managing-irritable-bowel-syndrome';
   var TIPS = [
     ['Garlic-infused oil gives garlic flavor without the FODMAPs, because fructans dissolve in water but not in oil. Remove the garlic pieces before eating.', MON_OIL],
-    ['Check labels for honey, inulin, chicory root, onion and garlic powder, and sweeteners ending in "-itol".', ''],
+    ['Check labels for honey, inulin, chicory root, glucose-fructose, onion and garlic powder, and sweeteners ending in "-ol", such as sorbitol, mannitol and xylitol.', 'https://www.albertahealthservices.ca/assets/info/nutrition/if-nfs-low-fodmap-eating-form.pdf'],
     ['Keep fresh fruit to about 3 portions a day, and spread them out.', NICE_PUB],
-    ['Hard cheeses like cheddar and parmesan are naturally low in lactose.', ''],
-    ['Use the green tops of spring onions or chives for an onion flavor.', ''],
+    ['Hard cheeses like cheddar, mozzarella, parmesan and swiss are low in lactose in normal serves.', 'https://cdhf.ca/en/understanding-the-fodmap-diet/'],
+    ['Use chives, the green tops of spring onions or the green parts of leeks for an onion flavor.', 'https://cdhf.ca/en/understanding-the-fodmap-diet/'],
     ['Eating out? Use the menu checker in Tools, and ask for sauces on the side.', ''],
     ['Choose soluble fiber, such as psyllium, over wheat bran, and add it gradually.', 'https://journals.lww.com/ajg/fulltext/10.14309/ajg.0000000000001036~acg-clinical-guideline-management-of-irritable-bowel'],
     ['Have regular meals and take your time eating. Try not to skip meals or leave long gaps.', NICE_PUB],
@@ -729,10 +729,8 @@
     var byWord = {}, order = [];
     flags.forEach(function (f) { if (!byWord[f.word]) { byWord[f.word] = []; order.push(f.word); } byWord[f.word].push(f); });
     order.forEach(function (w) {
-      var fs = byWord[w], f = fs[0], names = fs.map(function (x) { return F.GROUPS[x.group].name; }).join(' and ');
-      if (f.level === 'often') improve.push('“' + w + '” often contains ' + names + '. Check the label or ask how it\'s made. Swap idea: ' + F.GROUPS[f.group].swap + '.');
-      else if (f.severity === 'modify') improve.push('“' + w + '” is fine in a small serve (' + names + '). Check the amount with your dietitian.');
-      else improve.push('“' + w + '” is high in ' + names + '. Try instead: ' + F.GROUPS[f.group].swap + '.');
+      var fs = byWord[w], f = fs[0], names = fs.map(function (x) { return F.GROUPS[x.group].name; }).filter(function (x, i, arr) { return arr.indexOf(x) === i; }).join(' and ');
+      improve.push(F.describe(f, names) + ' Try instead: ' + F.GROUPS[f.group].swap + '.');
     });
     if (!text) improve.push('Add what you ate next time to get a diet score and tips.');
     else if (text.split(/[,.;\n+&]|\band\b|\bwith\b/).filter(function (x) { return x.trim(); }).length < 3) improve.push('Add a bit more detail, like snacks, drinks and sauces, for a more accurate score.');

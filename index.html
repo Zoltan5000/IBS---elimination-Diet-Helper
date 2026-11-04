@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=20261104h">
+  <link rel="stylesheet" href="css/style.css?v=20261104i">
 </head>
 <body>
 
@@ -96,7 +96,7 @@
       <section class="tool" id="menu">
 <h2>Restaurant menu checker</h2>
   <p>Upload a photo or PDF of a menu, or paste the menu text. The checker marks each dish as <span class="pill good">likely OK</span>, <span class="pill modify">ask or modify</span> or <span class="pill avoid">likely high FODMAP</span>. It uses your reintroduction results, so groups you tolerate aren't flagged.</p>
-  <p class="small">By default everything runs on your device: text is read from the photo or PDF and checked against a list of high-FODMAP ingredients, sauces and cooking styles. Nothing is uploaded. When this page is opened on claude.ai, you can optionally ask Claude to read the menu instead.</p>
+  <p class="small">By default everything runs on your device: text is read from the photo or PDF and checked against the app's master food list, which is built from four dietitian-written sources (CDHF, Alberta Health Services, Michigan Medicine and Monash; see Learn, step 2). Each flag says which sources list that food, or when it's the app's own guess. Nothing is uploaded. When this page is opened on claude.ai, you can optionally ask Claude to read the menu instead.</p>
   <div class="card upload">
     <label class="drop" id="menuDrop">
       <input type="file" id="menuFile" accept="image/*,application/pdf">
@@ -239,17 +239,26 @@
   <table class="groups">
     <thead><tr><th>Group</th><th>Common high sources</th><th>Typical lower-FODMAP swaps</th></tr></thead>
     <tbody>
-      <tr><td><strong>Fructose</strong> <span class="tag">monosaccharide</span></td><td>Honey, mango, apples, pears, agave, high-fructose corn syrup</td><td>Oranges, strawberries, blueberries, kiwi, maple syrup</td></tr>
-      <tr><td><strong>Lactose</strong> <span class="tag">disaccharide</span></td><td>Milk, yogurt, ice cream, soft cheeses like ricotta and cottage cheese</td><td>Lactose-free milk and yogurt, hard cheeses like cheddar and parmesan</td></tr>
-      <tr><td><strong>Fructans</strong> <span class="tag">oligosaccharide</span></td><td>Wheat, rye and barley breads and pasta, onion, garlic, inulin or chicory root</td><td>Rice, oats, quinoa, spelt sourdough, garlic-infused oil, chives, green tops of spring onion</td></tr>
-      <tr><td><strong>GOS</strong> <span class="tag">oligosaccharide</span></td><td>Chickpeas, lentils, kidney beans, cashews, pistachios</td><td>Small serves of canned, rinsed lentils or chickpeas, firm tofu, peanuts, walnuts</td></tr>
-      <tr><td><strong>Sorbitol</strong> <span class="tag">polyol</span></td><td>Stone fruit (apricot, peach, plum), blackberries, sugar-free gum and mints (E420)</td><td>Grapes, pineapple, citrus; check labels for "-itol" sweeteners</td></tr>
-      <tr><td><strong>Mannitol</strong> <span class="tag">polyol</span></td><td>Mushrooms, cauliflower, snow peas, some sweet potato serves (E421)</td><td>Carrot, zucchini, bell pepper, green beans, potato</td></tr>
+      <tr><td><strong>Fructose</strong> <span class="tag">monosaccharide</span></td><td>Honey, mango, apples, pears, cherries, grapes, agave, high-fructose corn syrup<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td><td>Oranges, strawberries, blueberries, kiwi, pineapple, maple syrup<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td></tr>
+      <tr><td><strong>Lactose</strong> <span class="tag">disaccharide</span></td><td>Milk, yogurt, ice cream, custard, soft cheeses like ricotta, cream cheese and mascarpone<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td><td>Lactose-free milk, yogurt and ice cream; almond milk; hard cheeses like cheddar, mozzarella, parmesan and swiss<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td></tr>
+      <tr><td><strong>Fructans</strong> <span class="tag">oligosaccharide</span></td><td>Wheat, rye, barley and couscous; onion, garlic, leek and shallots; artichoke, watermelon, grapefruit, persimmon and dried fruit; inulin or chicory root<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td><td>Rice, oats, quinoa, millet, sourdough, spelt or gluten-free bread; garlic-infused oil; chives, green tops of spring onions and green parts of leeks<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td></tr>
+      <tr><td><strong>GOS</strong> <span class="tag">oligosaccharide</span></td><td>Baked, black and kidney beans, boiled lentils, split peas, soybeans, soy milk, silken tofu, cashews, pistachios<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td><td>Small serves of canned, rinsed lentils or chickpeas; firm tofu; tempeh; peanuts, walnuts or macadamias<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td></tr>
+      <tr><td><strong>Sorbitol</strong> <span class="tag">polyol</span></td><td>Apples, pears, stone fruit (apricots, peaches, plums, nectarines), cherries, blackberries, lychees, prunes; sugar-free gum and syrup<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td><td>Oranges, kiwi, pineapple, strawberries, blueberries; check labels for sweeteners ending in "-ol", such as sorbitol, xylitol and maltitol<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td></tr>
+      <tr><td><strong>Mannitol</strong> <span class="tag">polyol</span></td><td>Mushrooms, cauliflower, snow peas, larger serves of sweet potato, celery and corn<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td><td>Carrot, zucchini, eggplant, green beans, potato, green bell pepper<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></td></tr>
     </tbody>
   </table>
   </div>
   <p class="small"><strong>Portion size matters.</strong> Many foods are low FODMAP in a small serve and high in a large one. Monash retests foods regularly and updated many serving sizes in 2025, so ask your dietitian for exact amounts rather than relying on any fixed list, including this one.<sup><a href="#src-monash-serve">[Monash]</a> <a href="#src-monash-reintro">[Monash]</a></sup></p>
-  <p class="small">Foods that are naturally free of FODMAPs include plain meat, fish, eggs, firm tofu, most oils, rice, oats, potatoes, carrots, spinach, tomatoes and cucumber.</p></div>
+  <p class="small">Plain meat, poultry, fish, seafood and eggs, and fats like oil, butter and ghee, contain no FODMAPs.<sup><a href="#src-cdhf">[CDHF]</a> <a href="#src-ahs">[AHS]</a></sup></p>
+  <div class="card tip"><h3>Where the food lists come from</h3>
+    <p>The foods in this guide, the menu checker and the diet score come from a master list built from four dietitian-written sources. Each food shows which sources list it:</p>
+    <ul>
+      <li><strong>Canadian Digestive Health Foundation</strong>, a national charity: written by registered dietitians Kelsey Moore and Andrea Senchuk, updated June 2026.</li>
+      <li><strong>Alberta Health Services</strong>, a Canadian public health authority: a handout by its registered dietitians, from December 2017.</li>
+      <li><strong>Michigan Medicine</strong> (University of Michigan) and <strong>Monash University</strong>: these lists were only partly checked.</li>
+    </ul>
+    <p>Where the sources disagree, for example on grapes, asparagus or red bell pepper, the app says "amount matters" instead of picking one. Dishes like gravy or pasta aren't on any list, so the app labels those flags as its own guess. Food lists can go out of date as foods are retested, so check current amounts with your dietitian.</p>
+    <p class="read-more"><span>Read more:</span> <a href="https://cdhf.ca/en/understanding-the-fodmap-diet/" target="_blank" rel="noopener">CDHF: Understanding the low FODMAP diet ↗</a> <a href="https://www.albertahealthservices.ca/assets/info/nutrition/if-nfs-low-fodmap-eating-form.pdf" target="_blank" rel="noopener">AHS: Low FODMAP Eating (PDF) ↗</a> <a href="https://myginutrition.com/" target="_blank" rel="noopener">Michigan Medicine: MyGINutrition ↗</a> <a href="https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/" target="_blank" rel="noopener">Monash: high and low FODMAP foods ↗</a> <a href="https://github.com/Zoltan5000/IBS---elimination-Diet-Helper/blob/main/docs/FOOD_LIST.md" target="_blank" rel="noopener">The full master list ↗</a></p></div></div>
 </details>
 <details class="lesson">
 <summary><span class="lesson-num">3</span><span>Track a baseline week</span></summary>
@@ -283,7 +292,7 @@
         <li>Check labels for honey, inulin, chicory root, high-fructose corn syrup, onion and garlic powder, and sweeteners ending in "-itol"</li>
         <li>Use garlic-infused oil: fructans don't dissolve in oil, so it carries the flavor without the FODMAPs<sup><a href="#src-monash-oil">[Monash]</a></sup></li>
         <li>Keep fresh fruit to about 3 portions a day, spread out<sup><a href="#src-nice">[NICE]</a></sup></li>
-        <li>Keep up fiber from oats, potatoes with skin, kiwi, chia, linseed and allowed vegetables</li>
+        <li>Keep up fiber with low-FODMAP sources such as chia seeds, flax seeds, quinoa, canned lentils, brown rice, oats and oat bran<sup><a href="#src-ahs">[AHS]</a></sup></li>
         <li>Keep logging symptoms daily</li>
       </ul>
     </div>
@@ -448,6 +457,13 @@
     <li id="src-myginutrition">Michigan Medicine (University of Michigan) Division of Gastroenterology. <em>MyGINutrition: low FODMAP patient resource.</em> <a href="https://myginutrition.com/" target="_blank" rel="noopener">myginutrition.com ↗</a> · <a href="https://www.uofmhealth.org/conditions-treatments/digestive-and-liver-health/gi-nutrition-therapy" target="_blank" rel="noopener">Listed by Michigan Medicine ↗</a></li>
     <li id="src-michigan-lab">Wisely R. <em>The Low FODMAP Diet: A 'Liberating' Route to IBS Relief.</em> Michigan Medicine Health Lab (University of Michigan), February 26, 2018. Interview with gastroenterologist Shanti Eswaran, MD. <a href="https://www.michiganmedicine.org/health-lab/low-fodmap-diet-liberating-route-ibs-relief" target="_blank" rel="noopener">michiganmedicine.org ↗</a></li>
 </ol>
+<h3 class="src-h">Food lists</h3>
+<ol>
+    <li id="src-cdhf">Moore K, Senchuk A. <em>Understanding the Low FODMAP Diet: Foods, Phases and Tips for Managing IBS.</em> Canadian Digestive Health Foundation. Updated June 10, 2026. <a href="https://cdhf.ca/en/understanding-the-fodmap-diet/" target="_blank" rel="noopener">cdhf.ca ↗</a></li>
+    <li id="src-ahs">Alberta Health Services Nutrition Services (registered dietitians). <em>Low FODMAP Eating</em> (404120-NFS). December 2017. <a href="https://www.albertahealthservices.ca/assets/info/nutrition/if-nfs-low-fodmap-eating-form.pdf" target="_blank" rel="noopener">albertahealthservices.ca (PDF) ↗</a></li>
+    <li id="src-monash-hl">Monash University. <em>High and low FODMAP foods.</em> <a href="https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/" target="_blank" rel="noopener">monashfodmap.com ↗</a></li>
+    <li id="src-foodlist">The app's master food list, with every food's sources: <a href="https://github.com/Zoltan5000/IBS---elimination-Diet-Helper/blob/main/docs/FOOD_LIST.md" target="_blank" rel="noopener">docs/FOOD_LIST.md ↗</a></li>
+</ol>
 <h3 class="src-h">Government health information</h3>
 <ol>
     <li id="src-niddk">National Institute of Diabetes and Digestive and Kidney Diseases (NIH). <em>Eating, Diet, &amp; Nutrition for Irritable Bowel Syndrome.</em> <a href="https://www.niddk.nih.gov/health-information/digestive-diseases/irritable-bowel-syndrome/eating-diet-nutrition" target="_blank" rel="noopener">niddk.nih.gov ↗</a></li>
@@ -499,8 +515,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/fodmap-data.js?v=20261104h"></script>
-<script src="js/app.js?v=20261104h"></script>
-<script src="js/features.js?v=20261104h"></script>
+<script src="js/fodmap-data.js?v=20261104i"></script>
+<script src="js/app.js?v=20261104i"></script>
+<script src="js/features.js?v=20261104i"></script>
 </body>
 </html>

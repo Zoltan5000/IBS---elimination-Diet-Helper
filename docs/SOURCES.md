@@ -156,6 +156,35 @@ Rene Wisely, Michigan Medicine Health Lab (University of Michigan's academic med
 ### Considered but not included
 - **Dionne J, Ford AC, Yuan Y, and co-authors (full list not verified), *Am J Gastroenterol* 2018** (McMaster University meta-analysis of gluten-free and low FODMAP diets). The record was confirmed, but its findings were confirmed only once, so it isn't cited.
 
+## Food lists (used by the menu checker, diet score and meal ideas)
+
+The app's master food list (241 flagged words and 129 low-FODMAP words) is in [docs/FOOD_LIST.md](FOOD_LIST.md), with the sources for every food. It's generated from `js/fodmap-data.js` by `scripts/build-food-list.js`, so the document always matches the app.
+
+### Canadian Digestive Health Foundation (C)
+**Authors:** Moore K (BSc, RD), Senchuk A (RD). *Understanding the Low FODMAP Diet: Foods, Phases and Tips for Managing IBS.* Canadian Digestive Health Foundation. Updated June 10, 2026. [cdhf.ca](https://cdhf.ca/en/understanding-the-fodmap-diet/)
+- What it is: a national charity's patient guide, written by registered dietitians. Not a university or journal source.
+- How it was checked: the **full text was supplied by the project owner on November 4, 2026** and read in full. Every food tagged C comes from its Table 1 (high FODMAP) or Table 2 (low FODMAP, with serving sizes).
+
+### Alberta Health Services (A)
+**Authors:** Alberta Health Services Nutrition Services registered dietitians (no individual authors named). *Low FODMAP Eating* (404120-NFS). December 2017. [albertahealthservices.ca (PDF)](https://www.albertahealthservices.ca/assets/info/nutrition/if-nfs-low-fodmap-eating-form.pdf)
+- What it is: a patient handout from a Canadian provincial public health authority, written by registered dietitians. Not a university or journal source.
+- How it was checked: the **full PDF was supplied by the project owner on November 4, 2026** and read in full. The same handout is on AHS's own site at the link above (confirmed by a search of albertahealthservices.ca). Every food tagged A comes from its "Foods to Choose" (with serving sizes) or "Foods to Avoid" tables.
+- Note: it's from 2017, before Monash's 2025 retesting.
+
+### Michigan Medicine, MyGINutrition food lists (M): partial
+- The [High FODMAP](https://myginutrition.com/downloads/High_FODMAP_foods.pdf) and [Low FODMAP](https://myginutrition.com/downloads/Low_FODMAP_foods.pdf) food lists couldn't be opened from the build environment. Only foods named in searches of myginutrition.com are tagged M, so a food without an M tag may still be on these lists.
+- These lists appear to be about 10 years old.
+
+### Monash University, "High and low FODMAP foods" (N): partial
+- [monashfodmap.com page](https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/). Only foods named in searches of monashfodmap.com are tagged N.
+- Monash says internet food lists, including sample lists like this one, can be inaccurate, and that its app is the authoritative source.
+
+### What changed in the app after building the master list
+- **Corrected:** grapes had been praised as a low-FODMAP food and suggested as a swap, but CDHF and AHS list them as high. Mozzarella was flagged, but CDHF, AHS and Monash list hard cheeses including mozzarella as low.
+- **Removed (no source lists them):** sun-dried tomato, ketchup, taco, burrata, olives, popcorn, polenta, coconut milk, ginger, basil and "asafoetida" as an onion swap.
+- **Labelled as the app's own inference:** dish and product words (bread, pasta, pizza, gravy, curry, salsa and so on). The menu checker says "app's guess" for these.
+- **Amount matters:** 35 foods where a source gives a low-FODMAP serving or the sources disagree (for example asparagus, grapes, red bell pepper, milk and yogurt). These are flagged "ask or modify" with the serving sizes shown.
+
 ## Government health information
 
 ### NIH / NIDDK: Eating, Diet, & Nutrition for IBS
@@ -193,6 +222,6 @@ The Monash University FODMAP Diet app is made by the Monash department that deve
 
 ## Not yet verified (please review)
 - **Example test foods** other than mango (milk, mushrooms, wheat bread, garlic, onion, lentils). These are labeled as common examples, and the app tells people to confirm them with their dietitian.
-- **The food keyword lists** used by the menu checker and diet score (`js/fodmap-data.js`). These follow Monash's food groupings but weren't checked food by food.
+- **Michigan and Monash food tags** are partial (see "Food lists" above). CDHF and AHS were read in full.
 - **The book quotes** on the Today screen. These are from public-domain classics; check them against the original texts.
 - **Tips without a "Read more" link** (for example "hard cheeses are low in lactose"). These are general knowledge and don't cite a source.

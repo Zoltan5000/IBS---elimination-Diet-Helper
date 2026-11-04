@@ -31,7 +31,7 @@
     return t;
   }
   function toleranceText() {
-    var t = tolerance(), labels = { tolerated: 'tolerated', partial: 'tolerated in small amounts', trigger: 'TRIGGER', '': 'not tested yet' };
+    var t = F.deriveTolerance(tolerance()), labels = { tolerated: 'tolerated', partial: 'tolerated in small amounts', trigger: 'TRIGGER', '': 'not tested yet' };
     return Object.keys(F.GROUPS).map(function (g) { return '- ' + F.GROUPS[g].name + ' [' + g + ']: ' + labels[t[g]]; }).join('\n');
   }
 
@@ -183,14 +183,20 @@
         section: it.section,
         verdict: j.verdict,
         groups: uniq(j.flags.map(function (f) { return f.group; })),
-        reason: j.flags.length ? j.flags.map(function (f) {
-          return '"' + f.word + '" (' + F.GROUPS[f.group].name +
-            (f.level === 'often' ? ', often contains' : f.level === 'portion' ? ', portion-dependent' : '') +
-            (f.tested === 'partial' ? ', small amounts OK for you' : '') + ')';
-        }).join('; ') : 'No common high-FODMAP ingredients spotted in the description.',
+        reason: j.flags.length ? explain(j.flags) : 'No high-FODMAP foods from the app\'s food list were spotted in the description.',
         ask: askFor(j.flags)
       };
     });
+  }
+
+  // One sentence per food (not per FODMAP group), naming the sources.
+  function explain(flags) {
+    var by = {}, order = [];
+    flags.forEach(function (f) { if (!by[f.word]) { by[f.word] = []; order.push(f.word); } by[f.word].push(f); });
+    return order.map(function (w) {
+      var fs = by[w], names = uniq(fs.map(function (x) { return F.GROUPS[x.group].name; })).join(' and ');
+      return F.describe(fs[0], names) + (fs[0].tested === 'partial' ? ' Small amounts were OK in your challenge.' : '');
+    }).join(' ');
   }
 
   function askFor(flags) {
@@ -200,7 +206,7 @@
     if (g.indexOf('lactose') !== -1) tips.push('ask for a dairy-free or lactose-free option');
     if (g.indexOf('fructan-grain') !== -1) tips.push('ask for a gluten-free bun, bread or pasta, or swap for rice or potatoes');
     if (g.indexOf('gos') !== -1) tips.push('ask to swap the beans or legumes for another vegetable');
-    if (g.indexOf('mannitol') !== -1) tips.push('ask to leave out the mushrooms or cauliflower');
+    if (g.indexOf('mannitol') !== -1 || g.indexOf('polyol') !== -1) tips.push('ask to leave out the mushrooms, cauliflower or other high-polyol vegetables');
     return tips.join('; ');
   }
   function uniq(a) { return a.filter(function (x, i) { return a.indexOf(x) === i; }); }
