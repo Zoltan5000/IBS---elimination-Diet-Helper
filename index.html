@@ -11,10 +11,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="IBS Domination">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=20261104i">
+  <link rel="stylesheet" href="css/style.css?v=20261104k">
 </head>
 <body>
 
@@ -126,28 +123,60 @@
       </section>
       <section class="tool" id="meals" hidden>
 <h2>Meal ideas</h2>
-  <p>Get suggestions when you're stuck. It searches an online recipe database (<a href="https://www.themealdb.com/">TheMealDB</a>) and checks each recipe's ingredients against your triggers, with suggested swaps.</p>
+  <p>Find recipes anywhere on the web with an advanced search built for your diet. The app adds "low FODMAP" to your search and excludes your trigger foods. It then opens the search in your search engine. When you find a recipe, paste its ingredients below to check them.</p>
   <div class="card">
+    <h3>1. Build your search</h3>
     <div class="row meal-form">
       <label>Main ingredient
-        <input id="mealIng" list="ingList" placeholder="e.g. chicken, salmon, rice, eggs">
-        <datalist id="ingList"><option>chicken</option><option>salmon</option><option>beef</option><option>pork</option><option>eggs</option><option>rice</option><option>potatoes</option><option>tofu</option><option>prawns</option><option>lamb</option></datalist>
+        <input id="mealIng" list="ingList" placeholder="e.g. chicken, salmon, tofu">
+        <datalist id="ingList"><option>chicken</option><option>salmon</option><option>beef</option><option>pork</option><option>eggs</option><option>firm tofu</option><option>shrimp</option><option>rice</option><option>potato</option><option>quinoa</option><option>oats</option></datalist>
       </label>
       <label>Meal
-        <select id="mealType"><option value="">Any</option><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select>
+        <select id="mealType"><option value="">Any</option><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option><option>Dessert</option></select>
+      </label>
+      <label>Ready in
+        <select id="mealTime"><option value="">Any time</option><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">1 hour</option></select>
+      </label>
+      <label>Diet
+        <select id="mealDiet"><option value="">No preference</option><option>vegetarian</option><option>vegan</option><option>dairy-free</option><option>gluten-free</option><option>high protein</option></select>
+      </label>
+      <label>Cuisine
+        <input id="mealCuisine" placeholder="e.g. Italian, Thai, Mexican">
+      </label>
+      <label>Search engine
+        <select id="mealEngine"><option value="google">Google</option><option value="duckduckgo">DuckDuckGo</option><option value="bing">Bing</option></select>
       </label>
     </div>
-    <label class="full">Anything else? (optional)
-      <input id="mealNotes" placeholder="e.g. quick, vegetarian, under 30 minutes, what's in my fridge">
+    <label class="full">Other keywords (optional)
+      <input id="mealNotes" placeholder="e.g. one pan, slow cooker, meal prep, what's in my fridge">
     </label>
+    <fieldset class="exclude">
+      <legend>Leave out these foods <span class="muted small">(from your results; tap to change)</span></legend>
+      <div id="mealExcludeChips" class="chips"></div>
+      <label class="full">Also leave out (optional, separate with commas)
+        <input id="mealExcludeExtra" placeholder="e.g. cilantro, spicy">
+      </label>
+    </fieldset>
+    <label class="check-line"><input type="checkbox" id="mealTrusted"><span>Only search trusted low-FODMAP sources (Monash University, Michigan Medicine and the Canadian Digestive Health Foundation)</span></label>
+    <p class="small"><strong>Your search:</strong> <code id="mealQuery" class="query"></code></p>
     <div class="actions">
-      <button type="button" id="mealSearch">Find recipes online</button>
+      <button type="button" id="mealSearch">Search the web ↗</button>
+      <button type="button" id="mealCopy" class="secondary">Copy search</button>
       <button type="button" id="mealAsk" class="secondary" hidden>Ask Claude for ideas</button>
     </div>
+    <p class="muted small">This opens your search engine in a new tab. Your search terms go to that search engine, not to us. Results come from all over the web and aren't checked, so check each recipe below.</p>
     <p id="mealStatus" class="small" aria-live="polite"></p>
   </div>
+  <div class="card">
+    <h3>2. Check a recipe you found</h3>
+    <label class="full">Paste the ingredient list
+      <textarea id="recipeText" rows="6" placeholder="2 chicken breasts&#10;1 tbsp garlic-infused oil&#10;1 cup basmati rice&#10;1 red bell pepper&#10;2 tbsp honey"></textarea>
+    </label>
+    <div class="actions"><button type="button" id="recipeCheck">Check ingredients</button></div>
+    <div id="recipeResults" class="meal-results"></div>
+  </div>
   <div id="mealResults" class="meal-results"></div>
-      </section>
+</section>
     </section>
 
     <!-- LEARN -->
@@ -471,10 +500,10 @@
 <h3 class="src-h">App data</h3>
 <ol>
     <li id="src-webkit">Safari's 7-day storage limit and home-screen exemption: WebKit, <a href="https://webkit.org/blog/10218/full-third-party-cookie-blocking-and-more/" target="_blank" rel="noopener">Full Third-Party Cookie Blocking and More ↗</a> · <a href="https://webkit.org/tracking-prevention/" target="_blank" rel="noopener">Tracking Prevention in WebKit ↗</a></li>
-    <li id="src-mealdb">Recipe suggestions: <a href="https://www.themealdb.com/" target="_blank" rel="noopener">TheMealDB ↗</a> free recipe API. These recipes aren't designed for low FODMAP; the app flags ingredients and suggests swaps.</li>
 </ol>
 <p class="small">Food FODMAP content and recommended serving sizes change as foods are retested, so check current serving sizes with your dietitian. Information here is educational and doesn't replace advice from your clinician or dietitian.</p>
 </div>
+          <p class="legal-links"><a href="privacy.html">Privacy Policy</a> · <a href="consumer-health-data.html">Consumer Health Data Privacy Policy</a> · <a href="terms.html">Terms of Use</a> <span class="muted">(drafts)</span></p>
     </section>
   </main>
 
@@ -509,14 +538,15 @@
       <button type="button" class="btn ghost block" id="jumpBtn">Jump in where you are (already tracking or on the diet)</button>
       <button type="button" class="btn ghost block" id="backPhase">Go back one phase</button>
       <button type="button" class="btn danger block" id="resetBtn">Start over (erase everything)</button>
+      <p class="legal-links"><a href="privacy.html">Privacy Policy</a> · <a href="consumer-health-data.html">Consumer Health Data Privacy Policy</a> · <a href="terms.html">Terms of Use</a> <span class="muted">(drafts)</span></p>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/fodmap-data.js?v=20261104i"></script>
-<script src="js/app.js?v=20261104i"></script>
-<script src="js/features.js?v=20261104i"></script>
+<script src="js/fodmap-data.js?v=20261104k"></script>
+<script src="js/app.js?v=20261104k"></script>
+<script src="js/features.js?v=20261104k"></script>
 </body>
 </html>

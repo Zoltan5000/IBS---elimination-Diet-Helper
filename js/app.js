@@ -85,7 +85,7 @@
     ['Have regular meals and take your time eating. Try not to skip meals or leave long gaps.', NICE_PUB],
     ['Limit tea and coffee to 3 cups a day, and drink about 8 cups of fluid, mostly water.', NICE_PUB],
     ['Stress and poor sleep can flare IBS too. Note them in your log.', ''],
-    ['Stuck for dinner ideas? Try Meal ideas in Tools.', ''],
+    ['Stuck for dinner ideas? Meal ideas in Tools builds a web search that leaves out your trigger foods.', ''],
     ['Portion size matters: many foods are fine in a small serve.', 'https://www.monashfodmap.com/blog/serving-size-and-fodmaps-why-it-so-important/'],
     ['A slip-up isn\'t a failure. Note it and carry on.', '']
   ];
@@ -245,7 +245,7 @@
   function toolCards() {
     return '<div class="features">' +
       feature('🍽️', 'Eating out?', 'Check a menu photo or PDF', 'tools', 'menu') +
-      feature('🥘', 'Meal ideas', 'Recipes without your triggers', 'tools', 'meals') + '</div>';
+      feature('🥘', 'Meal ideas', 'Search the web without your triggers', 'tools', 'meals') + '</div>';
   }
   function feature(icon, title, text, tab, sub) {
     return '<button type="button" class="feature" data-goto="' + tab + '"' + (sub ? ' data-sub="' + sub + '"' : '') + '>' +
@@ -349,7 +349,7 @@
       feature('🗺️', 'Quest map', 'Retro map of your progress, coins and badges', 'plan') +
       feature('🧪', 'Challenge coach', 'Food, amount and check-in for each test day', 'plan') +
       feature('🍽️', 'Menu checker', 'Upload a menu photo or PDF to see what fits', 'tools', 'menu') +
-      feature('🥘', 'Meal ideas', 'Online recipes filtered for your triggers', 'tools', 'meals') +
+      feature('🥘', 'Meal ideas', 'Advanced web search that leaves out your triggers', 'tools', 'meals') +
       feature('📚', 'The guide', 'Step-by-step lessons with medical sources', 'learn') +
       feature('💾', 'Backup and install', 'Add to your home screen; move to a new phone', 'settings') +
       '</div>';
@@ -390,7 +390,8 @@
         '<div class="btn-row"><button type="button" class="btn ghost" data-act="prepdone">✓ Done: I\'ll start later</button></div>' +
         '<p class="muted small">Confirming hides this checklist so it doesn\'t come back every day.</p></div>' +
         '<h2 class="section-title">Your journey at a glance</h2>' + journeyHTML() +
-        '<h2 class="section-title">How the app helps</h2>' + featuresHTML() + quoteCard('start');
+        '<h2 class="section-title">How the app helps</h2>' + featuresHTML() + quoteCard('start') +
+        '<p class="legal-links"><a href="privacy.html">Privacy Policy</a> · <a href="consumer-health-data.html">Consumer Health Data Privacy Policy</a> · <a href="terms.html">Terms of Use</a></p>';
     } else if (p === 'baseline') {
       var d = daysIn('baseline'), logs = state.diary.filter(function (e) { return e.phase === 'baseline'; }).length;
       html += hero(p, 'World 2 · Baseline week', 'Day ' + Math.min(d, 7) + ' of 7', 'Eat as you normally do. Just log how you feel.', ring(Math.min(d, 7), 7, Math.min(d, 7) + '/7', 'days'));

@@ -6,7 +6,8 @@
  *    and can suggest meals (window.claude "sample" capability).
  *  - Opened anywhere else (a local file, GitHub Pages): menus are read on the
  *    device with pdf.js and Tesseract OCR, then screened with the keyword
- *    rules in fodmap-data.js; meal ideas come from TheMealDB's free API.
+ *    rules in fodmap-data.js. Meal ideas build an advanced web search (opened
+ *    in the user's chosen search engine) and check pasted recipes.
  */
 (function () {
   'use strict';
@@ -16,7 +17,6 @@
   var PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
   var PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   var TESSERACT = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
-  var MEALDB = 'https://www.themealdb.com/api/json/v1/1/';
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -326,88 +326,105 @@
     }).then(function () { btn.disabled = false; $('menuStop').hidden = true; });
   });
 
-  /* ---------- meal ideas ---------- */
+  /* ---------- meal ideas: advanced web search + recipe checker ---------- */
   function mstatus(m) { $('mealStatus').textContent = m; }
 
-  function getJSON(url) {
-    return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
-  }
+  // Words to leave out of a web search, per FODMAP group (well-known foods from the master list)
+  var EXCLUDE_WORDS = {
+    'fructan-garlic': ['garlic'], 'fructan-onion': ['onion', 'shallot'], 'fructan-grain': ['wheat'],
+    'lactose': ['milk', 'cream'], 'gos': ['beans', 'lentils'], 'fructose': ['honey', 'mango'],
+    'sorbitol': ['avocado', 'apple'], 'mannitol': ['mushroom', 'cauliflower']
+  };
+  var TRUSTED = ['monashfodmap.com', 'myginutrition.com', 'cdhf.ca'];
+  var ENGINES = {
+    google: 'https://www.google.com/search?q=', duckduckgo: 'https://duckduckgo.com/?q=', bing: 'https://www.bing.com/search?q='
+  };
+  var excludeOff = {};
 
-  function shuffle(a) {
-    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
-    return a;
-  }
-
-  function mealIngredients(m) {
-    var out = [];
-    for (var i = 1; i <= 20; i++) {
-      var ing = (m['strIngredient' + i] || '').trim();
-      if (ing) out.push({ name: ing, measure: (m['strMeasure' + i] || '').trim() });
-    }
+  // Foods to leave out: every word for trigger groups; the main food only for groups
+  // not tested yet (keeps searches short). Tolerated or "small amounts OK" groups add nothing.
+  function suggestedExcludes() {
+    var t = tolerance(), out = [];
+    Object.keys(EXCLUDE_WORDS).forEach(function (g) {
+      var words = t[g] === 'trigger' ? EXCLUDE_WORDS[g] : t[g] === '' ? EXCLUDE_WORDS[g].slice(0, 1) : [];
+      words.forEach(function (w) { if (out.indexOf(w) === -1) out.push(w); });
+    });
     return out;
   }
+  function renderExcludeChips() {
+    var words = suggestedExcludes();
+    $('mealExcludeChips').innerHTML = words.length ? words.map(function (w) {
+      return '<button type="button" class="chip' + (excludeOff[w] ? ' off' : '') + '" data-word="' + esc(w) + '" aria-pressed="' + (!excludeOff[w]) + '">' + (excludeOff[w] ? '+ ' : '✕ ') + esc(w) + '</button>';
+    }).join('') : '<span class="muted small">Nothing to leave out: you tolerated every group you tested.</span>';
+  }
+  function buildQuery() {
+    var v = function (id) { return ($(id).value || '').trim(); };
+    var parts = ['low FODMAP'];
+    if (v('mealDiet')) parts.push(v('mealDiet'));
+    if (v('mealCuisine')) parts.push(v('mealCuisine'));
+    if (v('mealIng')) parts.push(v('mealIng'));
+    parts.push(v('mealType') ? v('mealType').toLowerCase() + ' recipe' : 'recipe');
+    if (v('mealTime')) parts.push('under ' + v('mealTime') + ' minutes');
+    if (v('mealNotes')) parts.push(v('mealNotes'));
+    var ex = suggestedExcludes().filter(function (w) { return !excludeOff[w]; });
+    v('mealExcludeExtra').split(',').forEach(function (w) { w = w.trim(); if (w && ex.indexOf(w) === -1) ex.push(w); });
+    ex.forEach(function (w) { parts.push('-' + (/\s/.test(w) ? '"' + w + '"' : w)); });
+    if ($('mealTrusted').checked) parts.push('(' + TRUSTED.map(function (d) { return 'site:' + d; }).join(' OR ') + ')');
+    return parts.join(' ');
+  }
+  function updateQuery() { $('mealQuery').textContent = buildQuery(); }
+
+  try { var savedEngine = localStorage.getItem('ibs-search-engine'); if (savedEngine && ENGINES[savedEngine]) $('mealEngine').value = savedEngine; } catch (e) { /* storage blocked */ }
+  ['mealIng', 'mealType', 'mealTime', 'mealDiet', 'mealCuisine', 'mealNotes', 'mealExcludeExtra', 'mealTrusted', 'mealEngine'].forEach(function (id) {
+    $(id).addEventListener('input', updateQuery); $(id).addEventListener('change', updateQuery);
+  });
+  $('mealEngine').addEventListener('change', function () { try { localStorage.setItem('ibs-search-engine', this.value); } catch (e) { /* ignore */ } });
+  $('mealExcludeChips').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-word]'); if (!b) return;
+    var w = b.getAttribute('data-word'); excludeOff[w] = !excludeOff[w];
+    renderExcludeChips(); updateQuery();
+  });
+  // Refresh the suggestions whenever the Tools tab is opened (results may have changed)
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-tab="tools"],[data-subtab="meals"],[data-goto="tools"]')) setTimeout(function () { renderExcludeChips(); updateQuery(); }, 0);
+  });
+  renderExcludeChips(); updateQuery();
 
   $('mealSearch').addEventListener('click', function () {
-    var btn = this, ing = $('mealIng').value.trim().toLowerCase(), type = $('mealType').value;
-    var notes = $('mealNotes').value.trim().toLowerCase();
-    btn.disabled = true;
-    mstatus('Searching recipes online…');
-    $('mealResults').innerHTML = '';
-    var url = ing ? MEALDB + 'filter.php?i=' + encodeURIComponent(ing.replace(/\s+/g, '_'))
-      : type === 'Breakfast' ? MEALDB + 'filter.php?c=Breakfast'
-      : MEALDB + 'filter.php?c=' + (/vegetarian|vegan/.test(notes) ? 'Vegetarian' : 'Chicken');
-    getJSON(url).then(function (d) {
-      var list = (d && d.meals) || [];
-      if (!list.length && ing) return getJSON(MEALDB + 'search.php?s=' + encodeURIComponent(ing)).then(function (d2) { return (d2 && d2.meals) || []; });
-      return list;
-    }).then(function (list) {
-      if (!list.length) throw new Error('none');
-      var pick = shuffle(list.slice()).slice(0, 12);
-      mstatus('Checking ' + pick.length + ' recipes against your triggers…');
-      return Promise.all(pick.map(function (m) {
-        return m.strInstructions ? m : getJSON(MEALDB + 'lookup.php?i=' + m.idMeal).then(function (x) { return x.meals && x.meals[0]; }).catch(function () { return null; });
-      }));
-    }).then(function (meals) {
-      var tol = tolerance();
-      var scored = meals.filter(Boolean).map(function (m) {
-        var ings = mealIngredients(m);
-        var flagged = [];
-        ings.forEach(function (i) {
-          var j = F.judge(F.scan(i.name), tol);
-          if (j.flags.length) flagged.push({ ing: i, flags: j.flags, verdict: j.verdict });
-        });
-        var avoid = flagged.filter(function (f) { return f.verdict === 'avoid'; }).length;
-        return { meal: m, ings: ings, flagged: flagged, score: avoid * 2 + (flagged.length - avoid) };
-      }).sort(function (a, b) { return a.score - b.score; }).slice(0, 6);
-      renderMeals(scored);
-      mstatus(scored.length ? 'Recipes with the fewest triggers are shown first. Swaps are suggested for flagged ingredients.' : 'No recipes found.');
-    }).catch(function (e) {
-      if (e && e.message === 'none') mstatus('No recipes found for "' + ing + '". Try a simpler ingredient, like chicken or rice.');
-      else mstatus('Couldn\'t reach the recipe site from here' + (sample ? '. Try "Ask Claude for ideas" instead.' : '. Check your internet connection and try again.'));
-    }).then(function () { btn.disabled = false; });
+    var url = ENGINES[$('mealEngine').value] + encodeURIComponent(buildQuery());
+    var w = window.open(url, '_blank');
+    if (w) { try { w.opener = null; } catch (e) { /* ignore */ } }
+    mstatus(!w ? 'Your browser blocked the new tab. Copy the search instead.' : 'Opened in a new tab. Found a recipe? Paste its ingredients below to check them.');
+  });
+  $('mealCopy').addEventListener('click', function () {
+    var q = buildQuery();
+    (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(q) : Promise.reject())
+      .then(function () { mstatus('Search copied.'); }, function () { mstatus('Copy this search: ' + q); });
   });
 
-  function renderMeals(items) {
-    $('mealResults').innerHTML = items.map(function (x) {
-      var m = x.meal;
-      var flaggedNames = x.flagged.map(function (f) { return f.ing.name; });
-      var swaps = uniq([].concat.apply([], x.flagged.map(function (f) { return f.flags.map(function (fl) { return fl.group; }); })))
-        .map(function (g) { return '<li><strong>' + esc(F.GROUPS[g].name) + ':</strong> ' + esc(F.GROUPS[g].swap) + '</li>'; }).join('');
-      var v = x.flagged.some(function (f) { return f.verdict === 'avoid'; }) ? 'modify' : x.flagged.length ? 'modify' : 'good';
-      return '<article class="meal card">' +
-        (m.strMealThumb ? '<img src="' + esc(m.strMealThumb) + '/preview" alt="" loading="lazy">' : '') +
-        '<div><header><h3>' + esc(m.strMeal) + '</h3><span class="pill ' + v + '">' + (v === 'good' ? 'No triggers spotted' : x.flagged.length + ' to swap') + '</span></header>' +
-        '<p class="small">' + esc([m.strArea, m.strCategory].filter(Boolean).join(' · ')) + '</p>' +
-        '<details><summary>Ingredients</summary><ul class="ings">' + x.ings.map(function (i) {
-          var bad = flaggedNames.indexOf(i.name) !== -1;
-          return '<li' + (bad ? ' class="flag"' : '') + '>' + esc(i.measure + ' ' + i.name) + (bad ? ' ⚠' : '') + '</li>';
-        }).join('') + '</ul></details>' +
-        (swaps ? '<p class="small"><strong>Swaps:</strong></p><ul class="small">' + swaps + '</ul>' : '') +
-        '<p class="small"><a href="https://www.themealdb.com/meal/' + esc(m.idMeal) + '" target="_blank" rel="noopener">Full recipe on TheMealDB</a>' +
-        (m.strSource ? ' · <a href="' + esc(m.strSource) + '" target="_blank" rel="noopener">original source</a>' : '') + '</p>' +
-        '</div></article>';
-    }).join('');
-  }
+  // Check a pasted ingredient list against the master food list
+  $('recipeCheck').addEventListener('click', function () {
+    var lines = $('recipeText').value.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(function (l) { return /[a-z]{3}/i.test(l); });
+    if (!lines.length) { $('recipeResults').innerHTML = '<p class="small">Paste the recipe\'s ingredient list first, one ingredient per line.</p>'; return; }
+    var tol = tolerance(), flagged = [], good = [];
+    lines.forEach(function (l) {
+      var j = F.judge(F.scan(l), tol);
+      if (j.flags.length) flagged.push({ line: l, j: j }); else good.push(l);
+    });
+    var avoid = flagged.filter(function (x) { return x.j.verdict === 'avoid'; }).length;
+    var verdict = avoid ? 'avoid' : flagged.length ? 'modify' : 'good';
+    var check = flagged.length - avoid;
+    var head = verdict === 'good' ? 'No high-FODMAP ingredients spotted'
+      : [avoid ? avoid + ' ingredient' + (avoid === 1 ? '' : 's') + ' to swap' : '', check ? check + ' to check the amount' : ''].filter(Boolean).join(' · ');
+    var groups = uniq([].concat.apply([], flagged.map(function (x) { return x.j.flags.map(function (f) { return f.group; }); })));
+    $('recipeResults').innerHTML = '<article class="dish ' + verdict + '"><header><h3>' + esc(head) + '</h3><span class="pill ' + verdict + '">' + VERDICT[verdict] + '</span></header>' +
+      (flagged.length ? '<ul class="rv-list warn">' + flagged.map(function (x) {
+        return '<li><strong>' + esc(x.line) + '</strong><br>' + esc(explain(x.j.flags)) + '</li>';
+      }).join('') + '</ul>' : '') +
+      (groups.length ? '<p class="small"><strong>Swap ideas:</strong></p><ul class="small">' + groups.map(function (g) { return '<li><strong>' + esc(F.GROUPS[g].name) + ':</strong> ' + esc(F.GROUPS[g].swap) + '</li>'; }).join('') + '</ul>' : '') +
+      (good.length ? '<p class="small"><strong>Looks fine:</strong> ' + good.map(esc).join(' · ') + '</p>' : '') +
+      '<p class="muted small">Checked against the app\'s master food list (CDHF, Alberta Health Services, Michigan Medicine, Monash). Amounts and brands matter, so check with your dietitian.</p></article>';
+  });
 
   var mealCtl = null;
   $('mealAsk').addEventListener('click', function () {

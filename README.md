@@ -13,7 +13,7 @@ An installable web app that coaches someone with IBS through the three-phase **l
 | **Today** | Your coach. Shows exactly where you are ("Week 2 · Day 4 of elimination", "Lactose challenge, day 2: drink 1 cup of milk"), what to do today, and the next step. New users get a welcome screen with the journey at a glance, everything the app can do, and a readiness checklist. |
 | **Quest** | The gamified part: a retro pixel-art quest map. Each phase is a world and each week or food challenge is a level. You earn a coin for every day logged and a star for every challenge finished, a pixel buddy shows where you are, and there are badges, "LEVEL CLEAR!" celebrations and optional 8-bit sounds. |
 | **Log** | Rate bloating, pain, gas, urgency and stress in about 30 seconds, plus stool type, food and notes. Includes a 4-week bar chart colored by phase, history, and a CSV export for your dietitian. |
-| **Tools** | **Menu checker:** upload a menu photo or PDF, or paste the text, and each dish is marked likely OK, ask or modify, or likely high FODMAP, using *your* results. **Meal ideas:** online recipes (TheMealDB) checked against your triggers, with swaps. |
+| **Tools** | **Menu checker:** upload a menu photo or PDF, or paste the text, and each dish is marked likely OK, ask or modify, or likely high FODMAP, using *your* results. **Meal ideas:** an advanced web search builder (ingredient, meal, time, diet, cuisine, trusted sites only) that leaves out your trigger foods and opens on Google, DuckDuckGo or Bing, plus a checker for recipes you paste in. |
 | **Learn** | The journey at a glance, the 7-step guide, 12 diet guidelines and every source. |
 
 ### The program
@@ -32,7 +32,7 @@ Everything is saved on the device (`localStorage`), and nothing is uploaded. **S
 - `css/style.css`: app styles (light and dark modes, responsive phone, tablet and desktop layouts, retro quest map)
 - `js/app.js`: program logic, Today coach, quest map, log, badges, backup
 - `js/fodmap-data.js`: FODMAP keyword rules used by the menu checker and meal ideas
-- `js/features.js`: menu checker (pdf.js, Tesseract OCR) and meal ideas (TheMealDB)
+- `js/features.js`: menu checker (pdf.js, Tesseract OCR), meal search builder and recipe checker
 - `manifest.webmanifest`, `sw.js`, `icons/`: install-as-app and offline support
 
 ## Sources
