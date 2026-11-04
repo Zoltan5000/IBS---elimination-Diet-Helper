@@ -654,3 +654,11 @@ main { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16
 .check-line input { width: 20px; height: 20px; accent-color: var(--primary); flex: none; margin-top: 2px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .jump-sheet { z-index: 65; }
+
+/* read more links */
+.read-more { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; font-size: .82rem; margin: 10px 0 0; }
+.read-more span { color: var(--muted); font-weight: 700; }
+.read-more a, a.rm { font-weight: 700; text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--primary) 40%, transparent); }
+a.rm { display: inline-block; margin-top: 8px; font-size: .82rem; }
+.src-h { font-size: .9rem; margin: 16px 0 4px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.card.alert .read-more { margin-top: 6px; }

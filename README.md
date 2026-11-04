@@ -36,6 +36,6 @@ Everything is saved on the device (`localStorage`), and nothing is uploaded. **S
 - `manifest.webmanifest`, `sw.js`, `icons/`: install-as-app and offline support
 
 ## Sources
-Monash University Department of Gastroenterology; ACG Clinical Guideline: Management of IBS (2021); British Society of Gastroenterology IBS guidelines (2021); NICE CG61; NIH/NIDDK; University of Michigan FODMAP reintroduction trial; ACG celiac guideline (2023). Full citations are in the app's Learn tab.
+Monash University; ACG IBS guideline (2021); NICE CG61; Canadian Association of Gastroenterology IBS guideline; ACG celiac guideline (2023); Halmos et al. 2014; Staudacher et al. 2012; Eswaran et al. (University of Michigan); Lewis & Heaton 1997; NIH/NIDDK. Each fact links to its source with "Read more", and every source was checked three times; see [docs/SOURCES.md](docs/SOURCES.md).
 
 > Educational only. Not a substitute for care from a clinician or a FODMAP-trained registered dietitian.

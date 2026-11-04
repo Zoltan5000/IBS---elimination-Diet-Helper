@@ -39,7 +39,7 @@
     checkin:     { name: 'Check-in', icon: '📊', color: 'var(--c-prep)', dur: '1 day',
                    you: 'See whether your symptoms have improved enough to move on.',
                    app: ['Before and after comparison', 'Clear next step'] },
-    reintro:     { name: 'Reintroduction', icon: '🧪', color: 'var(--c-reintro)', dur: '8–12 weeks',
+    reintro:     { name: 'Reintroduction', icon: '🧪', color: 'var(--c-reintro)', dur: '6–12 weeks',
                    you: 'Test one FODMAP group at a time: 3 challenge days, then a few days\' break.',
                    app: ['Day-by-day challenge coach', 'Reaction check-ins', 'Washout timer', 'Results'] },
     personal:    { name: 'Your diet', icon: '⭐', color: 'var(--c-personal)', dur: 'Long term',
@@ -66,19 +66,23 @@
     { face: '😀', label: 'None' }, { face: '🙂', label: 'Mild' },
     { face: '😣', label: 'Moderate' }, { face: '😫', label: 'Severe' }
   ];
+  // [tip, source URL or ''] — sources verified (see docs/SOURCES.md)
+  var MON_OIL = 'https://www.monashfodmap.com/blog/all-about-onion-garlic-and-infused-oils-on-the-low-fodmap-diet/';
+  var NICE_PUB = 'https://www.nice.org.uk/guidance/cg61/ifp/chapter/managing-irritable-bowel-syndrome';
   var TIPS = [
-    'Garlic-infused oil gives garlic flavor without the FODMAPs, because fructans don\'t dissolve in oil.',
-    'Check labels for honey, inulin, chicory root, onion and garlic powder, and sweeteners ending in "-itol".',
-    'Spread fruit out: about one serve per meal or snack.',
-    'Hard cheeses like cheddar and parmesan are naturally low in lactose.',
-    'Use the green tops of spring onions or chives for an onion flavor.',
-    'Eating out? Use the menu checker in Tools, and ask for sauces on the side.',
-    'Keep up fiber with oats, potatoes with skin, kiwi, chia and linseed.',
-    'Regular meals help. Try not to skip meals or leave long gaps.',
-    'Stress and poor sleep can flare IBS too. Note them in your log.',
-    'Stuck for dinner ideas? Try Meal ideas in Tools.',
-    'Portion size matters: many foods are fine in a small serve.',
-    'A slip-up isn\'t a failure. Note it and carry on.'
+    ['Garlic-infused oil gives garlic flavor without the FODMAPs, because fructans dissolve in water but not in oil. Remove the garlic pieces before eating.', MON_OIL],
+    ['Check labels for honey, inulin, chicory root, onion and garlic powder, and sweeteners ending in "-itol".', ''],
+    ['Keep fresh fruit to about 3 portions a day, and spread them out.', NICE_PUB],
+    ['Hard cheeses like cheddar and parmesan are naturally low in lactose.', ''],
+    ['Use the green tops of spring onions or chives for an onion flavor.', ''],
+    ['Eating out? Use the menu checker in Tools, and ask for sauces on the side.', ''],
+    ['Choose soluble fiber, such as psyllium, over wheat bran, and add it gradually.', 'https://journals.lww.com/ajg/fulltext/10.14309/ajg.0000000000001036~acg-clinical-guideline-management-of-irritable-bowel'],
+    ['Have regular meals and take your time eating. Try not to skip meals or leave long gaps.', NICE_PUB],
+    ['Limit tea and coffee to 3 cups a day, and drink about 8 cups of fluid, mostly water.', NICE_PUB],
+    ['Stress and poor sleep can flare IBS too. Note them in your log.', ''],
+    ['Stuck for dinner ideas? Try Meal ideas in Tools.', ''],
+    ['Portion size matters: many foods are fine in a small serve.', 'https://www.monashfodmap.com/blog/serving-size-and-fodmaps-why-it-so-important/'],
+    ['A slip-up isn\'t a failure. Note it and carry on.', '']
   ];
 
   // Encouragement from public-domain books (quoted from the original texts).
@@ -229,7 +233,9 @@
   }
   function tipCard() {
     var i = (daysIn(state.phase) + state.diary.length) % TIPS.length;
-    return '<div class="card tip"><div class="card-head"><h2>💡 Tip</h2></div><p>' + esc(TIPS[i]) + '</p></div>';
+    var t = TIPS[i];
+    return '<div class="card tip"><div class="card-head"><h2>💡 Tip</h2></div><p>' + esc(t[0]) + '</p>' +
+      (t[1] ? '<p class="read-more"><a href="' + esc(t[1]) + '" target="_blank" rel="noopener">Read more ↗</a></p>' : '') + '</div>';
   }
   function toolCards() {
     return '<div class="features">' +
@@ -467,7 +473,7 @@
         steps = '<p>Open your browser menu <span class="kbd">⋮</span> and tap <b>Install app</b> or <b>Add to Home screen</b>.</p>';
       }
       out += '<div class="card tip nudge"><h2>📲 Add the app to your home screen</h2>' +
-        '<p>It opens full-screen like a normal app' + (isIOS() ? ', and it protects your data: Safari can delete data from websites you haven\'t opened for 7 days, but home-screen apps are exempt.' : ' and keeps your data safer.') + '</p>' + steps +
+        '<p>It opens full-screen like a normal app' + (isIOS() ? ', and it protects your data: Safari can delete data from websites you haven\'t opened for 7 days, but home-screen apps are exempt. <a href="https://webkit.org/tracking-prevention/" target="_blank" rel="noopener">Read more ↗</a>' : ' and keeps your data safer.') + '</p>' + steps +
         '<div class="btn-row"><button type="button" class="btn ghost small" data-act="snooze-install">Later</button><button type="button" class="btn ghost small" data-act="never-install">Don\'t show again</button></div></div>';
     }
     return out;
@@ -517,7 +523,7 @@
       var left = diff(today(), state.washoutUntil);
       html += hero('reintro', 'World 5 · Washout', left + ' day' + (left === 1 ? '' : 's') + ' to go', 'Back to strict low FODMAP so your gut settles before the next test.', ring(3 - left, 3, String(left), 'left'));
       html += hud() + logCard();
-      html += '<div class="card"><h2>Feeling back to normal?</h2><p>Wait until your symptoms are back to baseline before the next test. Usually that\'s 2 to 3 days.</p>' +
+      html += '<div class="card"><h2>Feeling back to normal?</h2><p>Wait until your symptoms are back to baseline before the next test. Monash suggests a few days back on strict low FODMAP between challenges.</p>' +
         '<div class="btn-row"><button type="button" class="btn ghost" data-act="endwashout">I\'m back to normal, choose next test</button></div></div>';
       html += resultsCard();
       return html;
