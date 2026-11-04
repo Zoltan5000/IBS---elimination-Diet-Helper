@@ -127,10 +127,16 @@ Efficacy of a low FODMAP diet in IBS: systematic review and network meta-analysi
 - Claim ✓: low FODMAP ranked first for all endpoints studied, including global symptoms, abdominal pain and bloating. For bowel habit it ranked first but wasn't statistically superior, so the app mentions only symptoms, pain and bloating.
 
 ### Michigan Medicine Health Lab: "The Low FODMAP Diet: A 'Liberating' Route to IBS Relief"
-University of Michigan's academic medical center; interview with gastroenterologist Shanti Eswaran, MD (about 2017–2018)
+Rene Wisely, Michigan Medicine Health Lab (University of Michigan's academic medical center), **February 26, 2018**. Interview with gastroenterologist Shanti Eswaran, MD
 - Record: [the article on michiganmedicine.org](https://www.michiganmedicine.org/health-lab/low-fodmap-diet-liberating-route-ibs-relief), found by a search of the official domain ✓
-- Second listing: the same link was supplied by the project owner, and the article describes Eswaran's US trial, which matches the verified Eswaran 2016 study above ✓
-- Claims ✓: the quote "At first, the diet is very restrictive… once patients go through the process and discover what they can and can't eat, they actually find it liberating"; the elimination phase "is restrictive and not nutritionally complete"; dietitian guidance makes it safest. This is a news article, so it's used for context and quotes, not for research findings.
+- Second listing: the article describes Eswaran's US trial, which matches the verified Eswaran 2016 study above ✓
+- Full text: **supplied by the project owner on November 4, 2026**, and every quote below was checked against it word for word ✓
+- Claims ✓:
+  - "At first, the diet is very restrictive… but once patients go through the process and discover what they can and can't eat, they actually find it liberating. That's because they are then able to eat without fear of their meal causing unwanted symptoms." (The app joins the two halves around the article's "says Shanti Eswaran, M.D." attribution.)
+  - "The elimination part of the diet is restrictive and not nutritionally complete… Furthermore, it can change the gut flora in ways that we don't completely understand."
+  - "Patients like this approach because they get control of their symptoms and they like that it's not a medication-based treatment."
+  - The diet is "safest — and most likely to be successful — with guidance from a dietitian".
+  - This is a news article, so it's used for context and quotes, not for research findings. Its "about two weeks" of elimination describes the Michigan clinic's protocol; the app keeps Monash's 2–6 weeks.
 
 ### Considered but not included
 - **Dionne et al., *Am J Gastroenterol* 2018** (McMaster University meta-analysis of gluten-free and low FODMAP diets). The record was confirmed, but its findings were confirmed only once, so it isn't cited.
