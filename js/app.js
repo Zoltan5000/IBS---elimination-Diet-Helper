@@ -413,7 +413,7 @@
       html += hero(p, 'World 3 · Elimination', 'Week ' + wk + ' · Day ' + dow, 'Strict low FODMAP. Aim for 2 to 6 weeks.', ring(Math.min(de, 28), 28, String(de), de === 1 ? 'day' : 'days'), meter);
       html += hud() + logCard();
       if (de >= 14) {
-        html += '<div class="card good"><h2>Ready for your check-in?</h2><p>You\'ve done ' + de + ' days. Most people know whether it\'s helping by 2 to 4 weeks. Stop at 6 weeks either way.</p>' +
+        html += '<div class="card good"><h2>Ready for your check-in?</h2><p>You\'ve done ' + de + ' days. You can check in now, or keep going a little longer. Guidelines say to keep this phase to no more than 4–6 weeks. <a href="https://www.gastrojournal.org/article/S0016-5085(21)04084-1/fulltext" target="_blank" rel="noopener">Read more ↗</a></p>' +
           '<div class="btn-row"><button type="button" class="btn primary" data-act="phase" data-to="checkin">Do my check-in</button></div></div>';
       } else {
         html += '<div class="card"><h2>Keep going 💪</h2><p>' + (14 - de) + ' more day' + (14 - de === 1 ? '' : 's') + ' until your first check-in.</p></div>';

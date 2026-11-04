@@ -664,3 +664,5 @@ a.rm { display: inline-block; margin-top: 8px; font-size: .82rem; }
 .card.alert .read-more { margin-top: 6px; }
 .card.research { border-left: 5px solid var(--c-personal); }
 .card.research li { margin: 6px 0; }
+.card.changed { border-left: 5px solid var(--warn); }
+.card.changed li { margin: 6px 0; }

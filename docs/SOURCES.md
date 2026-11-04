@@ -34,6 +34,12 @@ Lacy BE, Pimentel M, Brenner DM, et al. *Am J Gastroenterol.* 2021;116(1):17–4
   - Diet and lifestyle advice: regular meals, take time to eat, don't skip meals, at least 8 cups of fluid a day, tea and coffee limited to 3 cups, less alcohol and fewer fizzy drinks, fresh fruit limited to 3 portions a day
   - Further diet advice, such as low FODMAP, should come from a healthcare professional with dietary expertise
 
+### AGA Clinical Practice Update on the Role of Diet in IBS: Expert Review (2022)
+Chey WD, et al. *Gastroenterology.* 2022 (American Gastroenterological Association)
+- Record: [Gastroenterology full text](https://www.gastrojournal.org/article/S0016-5085(21)04084-1/fulltext) ✓
+- Second listing: [AGA clinical guidance summary](https://gastro.org/clinical-guidance/the-role-of-diet-in-irritable-bowel-syndrome-ibs/) and the AGA Institute IBS quality indicators, which repeat the same limit ✓
+- Claim ✓: the low FODMAP restriction phase should last "no more than 4–6 weeks", followed by reintroduction and personalisation, and patients should be told the expected length of any restrictive diet trial. (The AGA patient page says 2–4 weeks.)
+
 ### Canadian Association of Gastroenterology IBS guideline
 - Record: [PubMed 31294724](https://pubmed.ncbi.nlm.nih.gov/31294724/) ✓
 - Second listing: [PMC full text](https://pmc.ncbi.nlm.nih.gov/articles/PMC6507291/) ✓
@@ -70,6 +76,10 @@ Vasant DH, Paine PA, Black CJ, et al. *Gut.* 2021;70:1214–1240. doi:10.1136/gu
 | [Garlic and onion infused oils](https://www.monashfodmap.com/blog/all-about-onion-garlic-and-infused-oils-on-the-low-fodmap-diet/) + [FAQ](http://www.monashfodmap.com/about-fodmap-and-ibs/frequently-asked-questions/) + Monash recipes | Fructans dissolve in water but not in fat, so infused oil is low FODMAP; remove the garlic pieces |
 | [About FODMAPs and IBS](https://www.monashfodmap.com/about-fodmap-and-ibs/) + [Monash research page](https://monashfodmap.com/about-fodmap-and-ibs/research-monash-university/) | FODMAPs are poorly absorbed, draw water into the bowel, and are fermented by gut bacteria into gas, which stretches the bowel and triggers symptoms |
 | [Not a lifetime diet](https://www.monashfodmap.com/blog/low-fodmap-diet-not-lifetime-diet/) | Strict low FODMAP isn't meant to be followed long-term |
+
+### Monash: the "FODMAP gentle" approach
+- Record and second listing: [Gentle FODMAP approach](https://www.monashfodmap.com/blog/gentle-fodmap-diet/) and [The FODMAP gentle diet](https://www.monashfodmap.com/blog/the-fodmap-gentle-diet/) on monashfodmap.com ✓
+- Claim ✓: a gentler, "bottom-up" approach that limits only the biggest FODMAP sources. A 2022 review states its effect "has not been formally studied", and a later Monash pilot trial is small. So the app describes it only as promising but not fully tested, and gives no response rates.
 
 ### Halmos et al., *Gastroenterology* 2014 (Monash University)
 Halmos EP, Power VA, Shepherd SJ, Gibson PR, Muir JG. A diet low in FODMAPs reduces symptoms of irritable bowel syndrome. 2014;146(1):67–75
@@ -126,6 +136,11 @@ Efficacy of a low FODMAP diet in IBS: systematic review and network meta-analysi
 - Second listing: the citation (Gut 2022;71:1117–1126) confirmed in several PubMed and PMC reference lists ✓
 - Claim ✓: low FODMAP ranked first for all endpoints studied, including global symptoms, abdominal pain and bloating. For bowel habit it ranked first but wasn't statistically superior, so the app mentions only symptoms, pain and bloating.
 
+### MyGINutrition (Michigan Medicine patient resource)
+- Record: [myginutrition.com](https://myginutrition.com/) (tools page and low FODMAP food list) ✓
+- Second listing: [Michigan Medicine GI Nutrition Therapy page](https://www.uofmhealth.org/conditions-treatments/digestive-and-liver-health/gi-nutrition-therapy), which lists it as a patient resource ✓
+- Claim ✓: it's a Michigan Medicine low FODMAP education site (confirmed by the Feb 2018 Health Lab article and a Michigan Medicine story quoting William Chey), with food lists, recipes, label-reading tips and a tracking worksheet. The app links to it as a resource only and doesn't take facts from it.
+
 ### Michigan Medicine Health Lab: "The Low FODMAP Diet: A 'Liberating' Route to IBS Relief"
 Rene Wisely, Michigan Medicine Health Lab (University of Michigan's academic medical center), **February 26, 2018**. Interview with gastroenterologist Shanti Eswaran, MD
 - Record: [the article on michiganmedicine.org](https://www.michiganmedicine.org/health-lab/low-fodmap-diet-liberating-route-ibs-relief), found by a search of the official domain ✓
@@ -164,6 +179,7 @@ Rene Wisely, Michigan Medicine Health Lab (University of Michigan's academic med
 | Specific challenge amounts (for example "½ cup milk on Day 1") | **Removed.** They weren't from a verified source. The app now uses Monash's verified structure (moderate serve, then a larger serve, then your usual amount) and tells people to ask their dietitian for exact amounts. |
 | "Mango or honey" for the fructose test | **Changed** to mango only, which is Monash's verified example. |
 | ACG credited for "long-term restriction reduces gut bacteria" | **Changed** to Staudacher 2012, the primary study. |
+| "Most people know whether it's helping by 2 to 4 weeks" (check-in card) | **Replaced** with the AGA guidance: no more than 4–6 weeks. The original sentence had no source. |
 | "Fatty meals" in the NICE drinks-and-meals advice | **Removed.** It wasn't in the verified NICE text. |
 | "Spread fruit out: one serve per meal" tip | **Changed** to NICE's "about 3 portions a day". |
 | "Spread fruit out" in Learn, Phase 1 | **Changed** to NICE's "about 3 portions a day". |
