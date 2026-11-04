@@ -261,7 +261,7 @@
   }
 
   /* ---------- jump in where you are (skip baseline etc.) ---------- */
-  function openJumpIn() {
+  function openJumpIn(preselect) {
     function opt(v, icon, title, sub) {
       return '<label class="choice-card"><input type="radio" name="sit" value="' + v + '"><span><b>' + icon + ' ' + esc(title) + '</b><small>' + esc(sub) + '</small></span></label>';
     }
@@ -306,6 +306,10 @@
       f.querySelector('[type=submit]').disabled = false;
       f.querySelector('[type=submit]').textContent = { baseline: 'Save and start elimination', elimination: 'Save and continue my elimination', reintro: 'Save and continue reintroduction' }[v];
     });
+    if (preselect) {
+      var radio = f.querySelector('input[name=sit][value="' + preselect + '"]');
+      if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
+    }
     f.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var sit = (f.querySelector('input[name=sit]:checked') || {}).value;
@@ -650,7 +654,7 @@
     } else if (a === 'level') {
       showLevel(el.dataset.level);
     } else if (a === 'jumpin') {
-      openJumpIn();
+      openJumpIn(el.dataset.sit);
     } else if (a === 'prepdone') {
       ['prep-dx', 'prep-flags', 'prep-celiac'].forEach(function (k) { state.checks[k] = true; });
       state.prepDone = today(); save();
@@ -942,7 +946,9 @@
           (l.coins != null ? '<span class="t-coins">' + new Array(8).join('.').split('').map(function (_, i) { return '<i class="px-coin' + (i < l.coins ? '' : ' off') + '"></i>'; }).join('') + '</span>' : '') +
           '</button>';
       });
-      html += '</div><div class="ground"></div></section>';
+      html += '</div><div class="ground"></div>';
+      if (w.n === 2 && phaseIdx() <= 1) html += '<button type="button" class="px-skip" data-act="jumpin" data-sit="baseline">ALREADY TRACKED YOUR SYMPTOMS? SKIP ▶</button>';
+      html += '</section>';
     });
     html += '<div class="px-box" id="levelInfo" aria-live="polite"><p>TAP A LEVEL TO SEE WHAT\'S INSIDE.</p></div>';
     html += '<h2 class="px-title">BADGES</h2><div class="badges">' + BADGES.map(function (b) {
@@ -960,6 +966,8 @@
     var action = '';
     if (l.group && l.state === 'open' && state.phase === 'reintro' && !state.active) action = '<button type="button" class="px-btn" data-act="start" data-g="' + l.group + '">START LEVEL ▶</button>';
     if (l.state === 'current') action = '<button type="button" class="px-btn" data-goto="today">GO TO TODAY ▶</button>';
+    if (l.id === 'baseline' && phaseIdx() <= 1) action += '<button type="button" class="px-btn alt" data-act="jumpin" data-sit="baseline">SKIP: ENTER MY BASELINE ▶</button>' +
+      '<p>Already tracked how your gut behaves on your normal diet? Enter your typical symptom levels and go straight to elimination. A full week of logs gives the most accurate comparison, but your best estimate is fine.</p>';
     $('levelInfo').innerHTML = '<p class="px-small">' + esc(l.label) + ' · ' + status + (l.result ? ' · ' + esc(RESULT[l.result]).toUpperCase() : '') + '</p>' +
       '<h3>' + l.icon + ' ' + esc(l.title) + '</h3><p>' + esc(l.text) + '</p>' + action;
     blip();

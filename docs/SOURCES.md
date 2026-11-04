@@ -158,7 +158,7 @@ Rene Wisely, Michigan Medicine Health Lab (University of Michigan's academic med
 
 ## Food lists (used by the menu checker, diet score and meal ideas)
 
-The app's master food list (241 flagged words and 129 low-FODMAP words) is in [docs/FOOD_LIST.md](FOOD_LIST.md), with the sources for every food. It's generated from `js/fodmap-data.js` by `scripts/build-food-list.js`, so the document always matches the app.
+The app's master food list (265 flagged words and 182 low-FODMAP words) is in [docs/FOOD_LIST.md](FOOD_LIST.md), with the sources for every food. It's generated from `js/fodmap-data.js` by `scripts/build-food-list.js`, so the document always matches the app.
 
 ### Canadian Digestive Health Foundation (C)
 **Authors:** Moore K (BSc, RD), Senchuk A (RD). *Understanding the Low FODMAP Diet: Foods, Phases and Tips for Managing IBS.* Canadian Digestive Health Foundation. Updated June 10, 2026. [cdhf.ca](https://cdhf.ca/en/understanding-the-fodmap-diet/)
@@ -171,13 +171,24 @@ The app's master food list (241 flagged words and 129 low-FODMAP words) is in [d
 - How it was checked: the **full PDF was supplied by the project owner on November 4, 2026** and read in full. The same handout is on AHS's own site at the link above (confirmed by a search of albertahealthservices.ca). Every food tagged A comes from its "Foods to Choose" (with serving sizes) or "Foods to Avoid" tables.
 - Note: it's from 2017, before Monash's 2025 retesting.
 
-### Michigan Medicine, MyGINutrition food lists (M): partial
-- The [High FODMAP](https://myginutrition.com/downloads/High_FODMAP_foods.pdf) and [Low FODMAP](https://myginutrition.com/downloads/Low_FODMAP_foods.pdf) food lists couldn't be opened from the build environment. Only foods named in searches of myginutrition.com are tagged M, so a food without an M tag may still be on these lists.
-- These lists appear to be about 10 years old.
+### Michigan Medicine, MyGINutrition food lists (M)
+- [High FODMAP Foods (PDF)](https://myginutrition.com/downloads/High_FODMAP_foods.pdf) and [Low FODMAP Foods (PDF)](https://myginutrition.com/downloads/Low_FODMAP_foods.pdf). **Both were downloaded and read in full on November 4, 2026**, after myginutrition.com was allowed in the build environment.
+- The PDFs mark each food's FODMAP group with graphics that can't be read as text, so foods tagged M take their group from the other sources.
+- The lists are undated and look roughly 10 years old.
 
-### Monash University, "High and low FODMAP foods" (N): partial
-- [monashfodmap.com page](https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/). Only foods named in searches of monashfodmap.com are tagged N.
-- Monash says internet food lists, including sample lists like this one, can be inaccurate, and that its app is the authoritative source.
+### Monash University, "High and low FODMAP foods" (N)
+- [monashfodmap.com page](https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/) (page copyright 2019). **Downloaded and read in full on November 4, 2026.** It names the main FODMAP group in each food group (for example, celery is rich in mannitol).
+- Monash says internet food lists can be inaccurate, and that its app is the authoritative source.
+
+### Changes after reading Michigan and Monash in full
+- **Added 26 flagged foods and 56 low-FODMAP foods.** The flagged additions include boysenberry, custard apple, savoy cabbage, tomato paste, carob, textured vegetable protein and vegetarian mince, sausage and salami, and sweeteners such as lactitol, glycerol, polydextrose and fruit juice concentrate.
+- **Restored, now sourced (Michigan or Monash):** olives, polenta, canned coconut milk, basil, ginger and other herbs, and asafoetida as an onion swap.
+- **Moved from "good" to "amount matters":** almonds and hazelnuts (Michigan: more than 10 is high) and molasses (sources disagree).
+- **No longer flagged:** barbecue sauce (Monash lists it as low; the app had guessed it was often made with onion).
+- **Reclassified as "amount matters", because the sources disagree:** corn syrup, molasses, rice milk, soy milk (whole soybean vs soy protein), pumpkin, raisins, dried fruit, erythritol, cola, chamomile and oolong tea.
+- **Moved from the app's guess to sourced:** falafel (Monash: high in GOS), gravy and marinades (Monash), biscuits and crackers (Monash), gelato (Michigan).
+- **Corrected group:** celery is mannitol (Monash), not an unspecified polyol.
+- **Not used:** Michigan lists "chia tea", which may be a typo for chai. Because it's unclear, chai keeps only its CDHF source.
 
 ### What changed in the app after building the master list
 - **Corrected:** grapes had been praised as a low-FODMAP food and suggested as a swap, but CDHF and AHS list them as high. Mozzarella was flagged, but CDHF, AHS and Monash list hard cheeses including mozzarella as low.
@@ -222,6 +233,5 @@ The Monash University FODMAP Diet app is made by the Monash department that deve
 
 ## Not yet verified (please review)
 - **Example test foods** other than mango (milk, mushrooms, wheat bread, garlic, onion, lentils). These are labeled as common examples, and the app tells people to confirm them with their dietitian.
-- **Michigan and Monash food tags** are partial (see "Food lists" above). CDHF and AHS were read in full.
 - **The book quotes** on the Today screen. These are from public-domain classics; check them against the original texts.
 - **Tips without a "Read more" link** (for example "hard cheeses are low in lactose"). These are general knowledge and don't cite a source.

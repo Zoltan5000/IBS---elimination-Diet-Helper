@@ -38,13 +38,14 @@ out.push('| Tag | Source | Who wrote it | Date | How it was checked |');
 out.push('|---|---|---|---|---|');
 out.push('| **C** | Canadian Digestive Health Foundation, [Understanding the Low FODMAP Diet: Foods, Phases and Tips for Managing IBS](https://cdhf.ca/en/understanding-the-fodmap-diet/) | Kelsey Moore, BSc, RD, and Andrea Senchuk, RD (registered dietitians) | Updated June 10, 2026 | Full text supplied by the project owner and read in full |');
 out.push('| **A** | Alberta Health Services, [Low FODMAP Eating](https://www.albertahealthservices.ca/assets/info/nutrition/if-nfs-low-fodmap-eating-form.pdf) (handout 404120-NFS) | AHS Nutrition Services registered dietitians | December 2017 | Full PDF supplied by the project owner and read in full |');
-out.push('| **M** | Michigan Medicine, [MyGINutrition](https://myginutrition.com/) high- and low-FODMAP food lists | University of Michigan gastroenterology team | Older; the lists look roughly 10 years old | **Partial.** The site couldn\'t be opened from the build environment; only foods named in searches of myginutrition.com are tagged |');
-out.push('| **N** | Monash University, [High and low FODMAP foods](https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/) | Monash University Department of Gastroenterology | Web page, date not shown | **Partial.** Only foods named in searches of monashfodmap.com are tagged |');
+out.push('| **M** | Michigan Medicine, MyGINutrition [High FODMAP Foods](https://myginutrition.com/downloads/High_FODMAP_foods.pdf) and [Low FODMAP Foods](https://myginutrition.com/downloads/Low_FODMAP_foods.pdf) | University of Michigan gastroenterology team | Undated; probably roughly 10 years old | Both PDFs downloaded and read in full (November 4, 2026). Their FODMAP-group columns are graphics, so the groups come from the other sources |');
+out.push('| **N** | Monash University, [High and low FODMAP foods](https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/) | Monash University Department of Gastroenterology | Page copyright 2019 | Page downloaded and read in full (November 4, 2026). It names the main FODMAP group for each food group |');
 out.push('');
 out.push('**Honesty notes**');
-out.push('- **C** and **A** are the main sources, because their full text was read. **M** and **N** only add confirmation where a search showed the food on their lists. A food *without* an M or N tag may still be on those lists; it just wasn\'t confirmed.');
+out.push('- All four sources were read in full. A food is tagged with every source that lists it. Serving sizes are as each source gives them.');
 out.push('- None of these are university research papers or journals. CDHF is a national charity, AHS is a provincial public health authority, and Michigan Medicine and Monash are university health organizations. All four are written by registered dietitians or university clinicians for patients.');
-out.push('- The AHS handout is from 2017, and Monash retested many foods in 2025. CDHF and AHS both say the Monash FODMAP app has the most current data.');
+out.push('- The sources are different ages: CDHF was updated in 2026, AHS is from 2017, the Monash page is from 2019, and the Michigan lists are undated (probably older). Monash retested many foods in 2025. CDHF, AHS and Monash all say the Monash FODMAP app has the most current data.');
+out.push('- A food is shown as a good choice, with its amount, when every source that lists it gives a low-FODMAP serving, even if one source says *more* than that is high (for example broccoli: Michigan says more than ½ cup is high). It is flagged "amount matters" when a source lists it as high without a serving size, or the sources disagree.');
 out.push('- **App inference** means no source lists that word. These are dishes or products the app flags because they are *usually* or *often* made with an ingredient the sources list as high (for example, bread is usually made with wheat). The app always labels these as its own guess.');
 out.push('- **Amount matters** means a source gives a low-FODMAP serving, or the sources disagree. The note explains which.');
 out.push('');
@@ -88,7 +89,16 @@ out.push('|---|---|---|');
  ['Sweet potato', 'AHS: high in mannitol. CDHF: ⅓ cup is low.', 'Amount matters'],
  ['Potato', 'All list it as low, but CDHF says ¼ cup and AHS says 1 cup.', 'Praised as a good choice; both serving sizes shown'],
  ['Blueberries', 'All list them as low, but AHS says ⅓ cup and CDHF says 1 cup.', 'Praised as a good choice; both serving sizes shown'],
- ['Seitan', 'Made from wheat. AHS: 2 Tbsp is low. Michigan lists it as a protein source.', 'Amount matters']
+ ['Seitan', 'Made from wheat. AHS: 2 Tbsp is low. Michigan lists it as a protein source.', 'Amount matters'],
+ ['Corn syrup', 'CDHF: high in fructans. Michigan: low.', 'Amount matters'],
+ ['Molasses', 'Michigan: high. AHS: 1 Tbsp is low.', 'Amount matters'],
+ ['Rice milk', 'Michigan: high. Monash: low.', 'Amount matters'],
+ ['Soy milk', 'Made from whole soybeans: high (CDHF, Michigan, Monash). Made from soy protein: low (Monash).', 'Amount matters, with both explained'],
+ ['Red bell pepper (update)', 'CDHF and Monash: high. Michigan and AHS (1 cup): low.', 'Amount matters'],
+ ['Pumpkin', 'CDHF: high. Michigan: less than ½ cup canned is low.', 'Amount matters'],
+ ['Erythritol', 'Michigan lists it on both its high and low lists. Monash names it among the sugar polyols.', 'Amount matters'],
+ ['Soda / cola', 'CDHF: regular and diet cola are high. AHS: glucose-fructose sodas are high. Michigan: 8 oz diet or sugar-sweetened soda is low.', 'Amount matters'],
+ ['Barbecue sauce', 'Monash: low. (The app used to guess it was often made with onion.)', 'No longer flagged; praised as a low choice']
 ].forEach(function (r) { out.push('| ' + r.join(' | ') + ' |'); });
 out.push('');
 fs.writeFileSync(path.join(__dirname, '..', 'docs', 'FOOD_LIST.md'), out.join('\n'));

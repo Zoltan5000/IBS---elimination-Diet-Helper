@@ -694,3 +694,7 @@ a.rm { display: inline-block; margin-top: 8px; font-size: .82rem; }
 .tool .chips button.chip.off { background: transparent; color: var(--muted); border-color: var(--border); text-decoration: line-through; }
 code.query { display: block; margin-top: 4px; padding: 8px 10px; background: var(--surface-2); border-radius: 10px; font-size: .82rem; white-space: pre-wrap; word-break: break-word; }
 .card h3 { margin-top: 0; }
+.px-skip { display: block; margin: 8px 4px 0; font-family: var(--px-font); font-size: 8px; line-height: 1.8; color: #ffd23f; background: none; border: 2px dashed rgba(255,210,63,.6); border-radius: 4px; padding: 8px 10px; cursor: pointer; text-align: left; }
+.px-skip:hover { border-style: solid; }
+.px-btn.alt { background: #4ade80; box-shadow: inset -3px -3px 0 #16a34a, 0 4px 0 #14532d; margin-left: 0; margin-right: 8px; }
+.px-box .px-btn + .px-btn { margin-left: 8px; }
