@@ -10,6 +10,8 @@ Every citation lists all of its authors; no author lists are shortened to "et al
 
 A source or claim that failed any check was corrected or removed (see the end of this file).
 
+> **Direct reads (November 4, 2026):** after more sites were allowed, the Michigan and Monash food lists, NICE CG61 and the NIDDK page were downloaded and read directly; see their entries. **PubMed** returned a browser-check page instead of article records, and NCBI's official E-utilities API (`eutils.ncbi.nlm.nih.gov`) isn't allowed yet, so journal records are still verified through searches.
+>
 > **How the checks were done:** the build environment couldn't open these sites directly, so each check used web searches restricted to the official domain (for example `pubmed.ncbi.nlm.nih.gov`, `journals.lww.com`, `nice.org.uk`, `monashfodmap.com`). Before publishing widely, someone should open each "Read more" link and confirm it once more by hand.
 
 ## Clinical guidelines
@@ -27,6 +29,8 @@ A source or claim that failed any check was corrected or removed (see the end of
   - Alarm features: rectal bleeding, unintentional weight loss, iron-deficiency anemia, and a family history of colorectal cancer, IBD or celiac disease. Sources disagree on the age cut-off for "new symptoms at an older age" (45 or 50), so the app says "later in life" without a number.
 
 ### NICE CG61: Irritable bowel syndrome in adults (last updated 2017)
+- **Read directly on nice.org.uk on November 4, 2026** (the Recommendations chapter), after the site was allowed. Confirmed word for word: the red-flag wording (assess for "signs and symptoms of cancer in line with the NICE guideline on suspected cancer" and "inflammatory markers for inflammatory bowel disease"); "Have regular meals and take time to eat"; "at least 8 cups of fluid per day"; "Restrict tea and coffee to 3 cups per day"; "Reduce intake of alcohol and fizzy drinks"; "Limit fresh fruit to 3 portions per day"; low FODMAP advice "only… by a healthcare professional with expertise in dietary management"; "discouraged from eating insoluble fibre (for example, bran)", and soluble fibre "such as ispaghula powder" or oats.
+- **Added after the direct read:** NICE 1.2.1.6 (2008), which says people who choose to try probiotics should take one for at least 4 weeks while monitoring the effect. The app now shows this next to the ACG's 2021 advice against probiotics.
 - Record: [nice.org.uk/guidance/cg61](https://www.nice.org.uk/guidance/cg61) ✓
 - Second listing: [Recommendations chapter](https://www.nice.org.uk/guidance/cg61/chapter/Recommendations), [public information page](https://www.nice.org.uk/guidance/cg61/ifp/chapter/managing-irritable-bowel-syndrome), and the NCBI Bookshelf addendum ✓
 - Claims ✓:
@@ -199,6 +203,8 @@ The app's master food list (265 flagged words and 182 low-FODMAP words) is in [d
 ## Government health information
 
 ### NIH / NIDDK: Eating, Diet, & Nutrition for IBS
+- **Read directly on niddk.nih.gov on November 4, 2026.** Confirmed: "Adding fiber to your diet slowly, by 2 to 3 grams a day, may help prevent gas and bloating"; "soluble fiber is more helpful"; trying the low FODMAP diet "for a few weeks", then "slowly adding foods that contain FODMAPs back".
+- **Added after the direct read:** NIDDK lists "avoid gluten" as an option a doctor may recommend. The app now notes that this differs from the BSG and Canadian guidelines, rather than presenting one view.
 - Record: [niddk.nih.gov page](https://www.niddk.nih.gov/health-information/digestive-diseases/irritable-bowel-syndrome/eating-diet-nutrition) ✓
 - Second listing: the NIDDK [IBS overview](https://www.niddk.nih.gov/health-information/digestive-diseases/irritable-bowel-syndrome) and [treatment](https://www.niddk.nih.gov/health-information/digestive-diseases/irritable-bowel-syndrome/treatment) pages ✓
 - Claims ✓: add fiber slowly, 2 to 3 grams a day, to prevent gas and bloating; a doctor may suggest trying a low FODMAP diet for a few weeks
