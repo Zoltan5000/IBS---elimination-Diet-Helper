@@ -52,7 +52,7 @@ A source or claim that failed any check was corrected or removed (see the end of
 - Claim ✓: diagnostic testing should be done while eating gluten. For people already gluten-free, HLA testing comes first, then a supervised gluten challenge.
 
 ### BSG guidelines on the management of IBS (2021)
-**Authors:** Vasant DH, Paine PA, Black CJ, Houghton LA, Everitt HA, Corsetti M, Agrawal A, Aziz I, Farmer AD, Eugenicos MP, Moss-Morris R, Yiannakou Y, Ford AC. *Gut.* 2021;70:1214–1240. doi:10.1136/gutjnl-2021-324598. (The University of Manchester's record spells the seventh author "Aggarwal A"; the White Rose record and a PMC reference list spell it "Agrawal A". **To confirm against the Gut page.**)
+**Authors:** Vasant DH, Paine PA, Black CJ, Houghton LA, Everitt HA, Corsetti M, Agrawal A, Aziz I, Farmer AD, Eugenicos MP, Moss-Morris R, Yiannakou Y, Ford AC. *Gut.* 2021;70:1214–1240. doi:10.1136/gutjnl-2021-324598. (All 13 authors and their order were **confirmed against the Gut article page by the project owner on November 4, 2026**. The seventh author is Anurag Agrawal, so "Agrawal A" is correct; the University of Manchester record's "Aggarwal A" is a misspelling.)
 - Record: [PubMed 33903147](https://pubmed.ncbi.nlm.nih.gov/33903147/) ✓ (citation confirmed in several reference lists)
 - Second listing: [BSG guideline page](https://www.bsg.org.uk/clinical-resource/british-society-of-gastroenterology-guidelines) and the [Gut full text](https://gut.bmj.com/content/70/7/1214.long) ✓
 - Claims ✓: **confirmed by the project owner reading the full text on November 4, 2026:**
