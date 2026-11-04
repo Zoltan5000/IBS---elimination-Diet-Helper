@@ -1,6 +1,6 @@
 {
-  "name": "IBS Diet Helper",
-  "short_name": "Diet Helper",
+  "name": "IBS Domination",
+  "short_name": "IBS Domination",
   "description": "Step-by-step low FODMAP elimination diet coach for IBS.",
   "start_url": "./#today",
   "scope": "./",

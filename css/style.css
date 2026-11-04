@@ -628,3 +628,29 @@ main { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16
 .quote-card .quote { margin-bottom: 0; }
 .fold summary { font-weight: 700; }
 .fold[open] summary { margin-bottom: 8px; }
+
+/* founder message */
+.founder { border: 2px solid var(--accent); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, var(--surface)), var(--surface)); }
+.founder-head { display: flex; gap: 12px; align-items: center; }
+.founder-head .buddy { flex: none; background: #23204f; border-radius: 12px; padding: 4px; width: 52px; height: 52px; }
+.founder-head b { display: block; font-size: .95rem; line-height: 1.3; }
+.founder-msg { margin: 14px 0 6px; font-size: 1.15rem; line-height: 1.5; font-weight: 600; }
+.founder-sig { margin: 0; font-weight: 800; color: var(--accent); text-align: right; }
+#learnFounder .founder { margin-top: 12px; }
+
+/* jump in */
+.jump-card { border-style: dashed; border-width: 2px; }
+.choices { border: 0; padding: 0; margin: 12px 0; display: grid; gap: 8px; }
+.choice-card { display: block; cursor: pointer; position: relative; }
+.choice-card input { position: absolute; opacity: 0; }
+.choice-card > span { display: block; padding: 12px 14px; border-radius: 14px; border: 2px solid var(--border); background: var(--surface); }
+.choice-card b { display: block; }
+.choice-card small { display: block; color: var(--muted); margin-top: 2px; font-size: .85rem; }
+.choice-card input:checked + span { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--surface)); }
+.choice-card input:focus-visible + span { outline: 2px solid var(--primary); outline-offset: 2px; }
+.j-sec { margin: 14px 0; }
+.j-sec h3 { margin: 4px 0; }
+.check-line { display: flex; gap: 10px; align-items: flex-start; font-size: .92rem; margin-top: 8px; }
+.check-line input { width: 20px; height: 20px; accent-color: var(--primary); flex: none; margin-top: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.jump-sheet { z-index: 65; }

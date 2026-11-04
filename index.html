@@ -3,24 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>IBS Diet Helper</title>
+  <title>IBS Domination</title>
   <meta name="description" content="Your step-by-step low FODMAP elimination diet coach for IBS: a week-by-week plan, symptom log, reintroduction challenges, menu checker and meal ideas.">
   <meta name="theme-color" content="#0f8f6c">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Diet Helper">
+  <meta name="apple-mobile-web-app-title" content="IBS Domination">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=20261103d">
+  <link rel="stylesheet" href="css/style.css?v=20261104a">
 </head>
 <body>
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><img src="icons/icon.svg" alt="" width="28" height="28"><span>IBS Diet Helper</span></div>
+    <div class="brand"><img src="icons/icon.svg" alt="" width="28" height="28"><span>IBS Domination</span></div>
     <div class="top-actions">
     <button type="button" class="saved-chip" id="savedChip" aria-label="Your data is saved on this device. Open data settings">✓ Saved</button>
     <button type="button" class="icon-btn" id="openSettings" aria-label="Settings and backup">
@@ -153,6 +153,7 @@
     <!-- LEARN -->
     <section class="view" id="view-learn" aria-label="Learn" hidden>
       <h1 class="view-title">Learn</h1>
+      <div id="learnFounder"></div>
       <div class="disclaimer" role="note">
         <strong>This is education, not medical advice.</strong> IBS should be diagnosed by a clinician, and guidelines recommend doing this diet with a FODMAP-trained registered dietitian. Talk to your doctor before you start, especially if you are pregnant, have diabetes, are underweight, or have a history of disordered eating.
       </div>
@@ -409,6 +410,7 @@
       <hr>
       <label class="switch"><span><b>8-bit sounds</b><br><span class="muted small">Coin and level-clear sounds</span></span><input type="checkbox" id="soundToggle"></label>
       <hr>
+      <button type="button" class="btn ghost block" id="jumpBtn">Jump in where you are (already tracking or on the diet)</button>
       <button type="button" class="btn ghost block" id="backPhase">Go back one phase</button>
       <button type="button" class="btn danger block" id="resetBtn">Start over (erase everything)</button>
     </div>
@@ -417,8 +419,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/fodmap-data.js?v=20261103d"></script>
-<script src="js/app.js?v=20261103d"></script>
-<script src="js/features.js?v=20261103d"></script>
+<script src="js/fodmap-data.js?v=20261104a"></script>
+<script src="js/app.js?v=20261104a"></script>
+<script src="js/features.js?v=20261104a"></script>
 </body>
 </html>

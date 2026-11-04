@@ -1,4 +1,6 @@
-# IBS Diet Helper
+# IBS Domination
+
+> *"Let’s go on a journey to get you more control and understanding of your diagnosis and maybe even have some fun along the way. This p**p doesn’t define you! You define it! Ok! Let’s go!!"* — Zoltan, founder
 
 An installable web app that coaches someone with IBS through the three-phase **low FODMAP elimination diet** to find their food triggers, week by week. It works on phones, tablets and desktops. Add it to the home screen and it runs full screen, like a regular app, and offline.
 

@@ -1,5 +1,5 @@
 /*
- * IBS Diet Helper: program logic.
+ * IBS Domination: program logic.
  * The app walks someone through the Monash three-phase low FODMAP diet
  * (baseline, elimination, check-in, reintroduction, personalisation),
  * keeps a symptom log, and turns progress into a retro quest map.
@@ -165,6 +165,12 @@
   function entryFor(date) { return state.diary.filter(function (e) { return e.date === date; })[0]; }
   function avg(e) { var t = 0; ['bloating', 'pain', 'gas', 'urgency'].forEach(function (k) { t += Number(e[k]) || 0; }); return Math.round(t / 4 * 10) / 10; }
   function mean(a) { return a.length ? a.reduce(function (x, y) { return x + y; }, 0) / a.length : 0; }
+  // Baseline symptom scores: real baseline logs, or the estimate entered when jumping in.
+  function baselineScores(except) {
+    var b = state.diary.filter(function (x) { return x !== except && (x.phase === 'baseline' || x.phase === 'prep'); }).map(avg);
+    if (!b.length && state.baselineSummary) b = [avg(state.baselineSummary)];
+    return b;
+  }
   function doneCount() { return GROUPS.filter(function (g) { return chal(g.id).status === 'done'; }).length; }
   function streak() {
     var set = {}; state.diary.forEach(function (e) { set[e.date] = 1; });
@@ -235,6 +241,86 @@
       '<span class="f-icon">' + icon + '</span><b>' + esc(title) + '</b><span>' + esc(text) + '</span></button>';
   }
 
+  /* ---------- founder message ---------- */
+  function founderHTML() {
+    return '<div class="card founder"><div class="founder-head">' + spriteSVG(44) +
+      '<div><div class="kicker">A message from Zoltan</div><b>Founder of IBS Domination, the app to help you on your elimination diet</b></div></div>' +
+      '<blockquote class="founder-msg">“Let’s go on a journey to get you more control and understanding of your diagnosis and maybe even have some fun along the way. This p**p doesn’t define you! You define it! Ok! Let’s go!!”</blockquote>' +
+      '<p class="founder-sig">— Zoltan</p></div>';
+  }
+
+  /* ---------- jump in where you are (skip baseline etc.) ---------- */
+  function openJumpIn() {
+    function opt(v, icon, title, sub) {
+      return '<label class="choice-card"><input type="radio" name="sit" value="' + v + '"><span><b>' + icon + ' ' + esc(title) + '</b><small>' + esc(sub) + '</small></span></label>';
+    }
+    function sl(name, label) {
+      var v = state.baselineSummary ? state.baselineSummary[name] : 5;
+      return '<label class="slider"><span>' + label + '</span><input type="range" name="' + name + '" min="0" max="10" value="' + v + '"><output>' + v + '</output></label>';
+    }
+    var o = document.createElement('div');
+    o.className = 'sheet-backdrop jump-sheet';
+    o.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="jTitle">' +
+      '<div class="sheet-head"><h2 id="jTitle">Jump in where you are</h2><button type="button" class="icon-btn" data-close aria-label="Close">✕</button></div>' +
+      '<p class="muted">No need to start from scratch. Pick what fits you best.</p>' +
+      '<form id="jumpForm"><fieldset class="choices"><legend class="sr">Where are you now?</legend>' +
+      opt('baseline', '📝', 'I\'ve already tracked my symptoms', 'I know how my gut behaves on my normal diet.') +
+      opt('elimination', '🥗', 'I\'m already on a low FODMAP diet', 'Maybe it\'s been hard to stick to. That\'s OK, this app is here for that.') +
+      opt('reintro', '🧪', 'I\'m already reintroducing foods', 'I\'ve tested some food groups already.') +
+      '</fieldset>' +
+      '<div class="j-sec" data-for="elimination reintro" hidden><label class="field">When did you start the low FODMAP diet?<input type="date" name="elimStart" max="' + today() + '" value="' + addDays(today(), -14) + '"></label></div>' +
+      '<div class="j-sec" data-for="baseline elimination reintro" hidden><h3>Your symptoms before any diet changes</h3>' +
+      '<p class="muted small">Your best estimate of a typical day, from 0 (none) to 10 (worst). Your check-in compares against this.</p>' +
+      sl('bloating', 'Bloating') + sl('pain', 'Pain') + sl('gas', 'Gas') + sl('urgency', 'Urgency') +
+      '<div class="card tip"><p class="small"><strong>Why a thorough baseline helps:</strong> about 7 days of real logs gives the most accurate before-and-after picture. If you have notes from before, you can add past days any time in the Log tab by changing the date. An estimate is completely fine to get going.</p></div></div>' +
+      '<div class="j-sec" data-for="reintro" hidden><h3>Groups you\'ve already tested</h3><div class="results">' + GROUPS.map(function (g) {
+        var c = chal(g.id);
+        return '<div class="result-row"><span class="emoji">' + g.emoji + '</span><span class="name">' + esc(g.name) + '</span><select data-jg="' + g.id + '" style="width:auto" aria-label="' + esc(g.name) + ' result">' +
+          [['', 'Not tested yet'], ['tolerated', 'Tolerated'], ['partial', 'Small amounts OK'], ['trigger', 'Trigger']].map(function (x) {
+            return '<option value="' + x[0] + '"' + (c.status === 'done' && c.result === x[0] ? ' selected' : '') + '>' + x[1] + '</option>';
+          }).join('') + '</select></div>';
+      }).join('') + '</div></div>' +
+      '<div class="j-sec" data-for="baseline elimination reintro" hidden><label class="field">Anything else about your situation? (optional)<textarea name="notes" rows="3" placeholder="e.g. when you were diagnosed, foods you already know bother you, medications, what has been hard">' + esc((state.profile && state.profile.notes) || '') + '</textarea></label>' +
+      '<label class="check-line"><input type="checkbox" name="doctor"' + (state.prepDone ? ' checked' : '') + '><span>I\'ve checked with my doctor (IBS diagnosis, celiac test)</span></label></div>' +
+      '<div class="btn-row"><button type="submit" class="btn primary" disabled>Continue</button></div></form></div>';
+    document.body.appendChild(o);
+    var f = o.querySelector('#jumpForm');
+    function close() { o.remove(); }
+    o.addEventListener('click', function (ev) { if (ev.target === o || ev.target.closest('[data-close]')) close(); });
+    Array.prototype.forEach.call(f.querySelectorAll('input[type=range]'), function (r) { r.addEventListener('input', function () { r.nextElementSibling.textContent = r.value; }); });
+    f.addEventListener('change', function (ev) {
+      if (ev.target.name !== 'sit') return;
+      var v = ev.target.value;
+      Array.prototype.forEach.call(f.querySelectorAll('.j-sec'), function (sec) { sec.hidden = sec.dataset.for.split(' ').indexOf(v) === -1; });
+      f.querySelector('[type=submit]').disabled = false;
+      f.querySelector('[type=submit]').textContent = { baseline: 'Save and start elimination', elimination: 'Save and continue my elimination', reintro: 'Save and continue reintroduction' }[v];
+    });
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var sit = (f.querySelector('input[name=sit]:checked') || {}).value;
+      if (!sit) return;
+      state.baselineSummary = { bloating: +f.bloating.value, pain: +f.pain.value, gas: +f.gas.value, urgency: +f.urgency.value, date: today(), source: 'estimate' };
+      state.profile = { situation: sit, notes: f.notes.value, date: today() };
+      if (f.doctor.checked) { ['prep-dx', 'prep-flags', 'prep-celiac'].forEach(function (k) { state.checks[k] = true; }); state.prepDone = state.prepDone || today(); }
+      var start = f.elimStart.value && f.elimStart.value <= today() ? f.elimStart.value : today();
+      state.starts.baseline = state.starts.baseline || today();
+      if (sit === 'baseline') { state.starts.elimination = today(); }
+      else { state.starts.elimination = start; }
+      if (sit === 'reintro') {
+        state.starts.checkin = today(); state.starts.reintro = today();
+        Array.prototype.forEach.call(f.querySelectorAll('[data-jg]'), function (s2) {
+          var c = chal(s2.dataset.jg);
+          if (s2.value) { c.status = 'done'; c.result = s2.value; c.end = c.end || today(); }
+          else if (c.status === 'done') { c.status = 'pending'; c.result = ''; }
+        });
+      }
+      state.phase = sit === 'baseline' ? 'elimination' : sit;
+      state.outcome = ''; state.active = state.phase === 'reintro' ? state.active : '';
+      save(); close(); render(); go('today');
+      celebrate('LEVEL SKIP!', { baseline: 'Baseline saved. On to elimination!', elimination: 'Welcome back to elimination. Let\'s keep it going!', reintro: 'Reintroduction picked up where you left off' }[sit]);
+    });
+  }
+
   /* ---------- journey at a glance (welcome + learn) ---------- */
   function journeyHTML() {
     return '<div class="journey">' + ORDER.map(function (p, i) {
@@ -279,8 +365,11 @@
       html += quoteCard('start');
     } else if (p === 'prep') {
       var done = CHECKS.filter(function (c) { return state.checks[c[0]]; }).length;
-      html += '<div class="welcome"><p class="muted">Welcome 👋</p><h1>Find out which foods trigger your IBS</h1>' +
-        '<p>This app coaches you through the low FODMAP elimination diet, the approach developed at Monash University and recommended in gastroenterology guidelines. It takes about 3 months, and the app tells you what to do each day.</p></div>' +
+      html += founderHTML() +
+        '<div class="welcome"><h1>Find out which foods trigger your IBS</h1>' +
+        '<p>IBS Domination coaches you through the low FODMAP elimination diet, the approach developed at Monash University and recommended in gastroenterology guidelines. It takes about 3 months, and the app tells you what to do each day.</p></div>' +
+        '<div class="card jump-card"><h2>Already on your way?</h2><p>Maybe you\'ve been tracking your symptoms for a while, or you\'re already on a low FODMAP diet and finding it hard to stick to. You don\'t have to start over. Tell us where you are and we\'ll pick it up from there.</p>' +
+        '<div class="btn-row"><button type="button" class="btn ghost" data-act="jumpin">Jump in where I am</button></div></div>' +
         '<div class="card task" id="readyCard"><div class="kicker">Step 1</div><div class="card-head"><h2>Check with your doctor first</h2><span class="muted small">' + done + ' of ' + CHECKS.length + '</span></div>' +
         '<p class="muted small">Other conditions can cause the same symptoms, and celiac tests only work while you\'re still eating gluten. See <a href="#learn" data-goto="learn">Learn, step 1</a> for the red-flag symptoms.</p>' +
         '<div class="checks">' + CHECKS.map(function (c) {
@@ -301,7 +390,9 @@
           '<div class="btn-row"><button type="button" class="btn primary" data-act="phase" data-to="elimination">Start elimination</button></div></div>';
       } else {
         html += '<div class="card"><h2>What\'s next</h2><p>In ' + (7 - d) + ' day' + (7 - d === 1 ? '' : 's') + ' you\'ll start the elimination phase. Use this week to read the guide and stock up on low-FODMAP basics.</p>' +
-          '<div class="btn-row"><a class="btn ghost" href="#learn" data-goto="learn">Read the guide</a><button type="button" class="btn ghost" data-act="phase" data-to="elimination" data-early="1">Start elimination early</button></div></div>';
+          '<div class="btn-row"><a class="btn ghost" href="#learn" data-goto="learn">Read the guide</a></div></div>' +
+          '<div class="card jump-card"><h2>Already tracked your baseline?</h2><p>If you\'ve been keeping track of your symptoms before finding the app, enter your typical levels and move straight on. A full week of logs gives the most accurate comparison, but your best estimate is fine.</p>' +
+          '<div class="btn-row"><button type="button" class="btn ghost" data-act="jumpin">Enter my baseline and skip ahead</button></div></div>';
       }
       html += tipCard();
     } else if (p === 'elimination') {
@@ -319,15 +410,16 @@
       html += tipCard() + toolCards();
     } else if (p === 'checkin') {
       html += hero(p, 'World 4 · Check-in', 'Did it help?', 'Here\'s how you felt before and during elimination.');
-      var base = state.diary.filter(function (e) { return e.phase === 'baseline' || e.phase === 'prep'; }).map(avg);
+      var base = baselineScores();
       var elim = state.diary.filter(function (e) { return e.phase === 'elimination'; }).slice(-7).map(avg);
       if (base.length && elim.length) {
         var b = mean(base), r = mean(elim), pct = b > 0 ? Math.round((b - r) / b * 100) : 0;
         html += '<div class="card"><h2>Average symptom score</h2><div class="compare">' +
-          '<div class="row"><span>Baseline</span><span class="bar"><i style="width:' + (b * 10) + '%;background:var(--c-baseline)"></i></span><span>' + b.toFixed(1) + '</span></div>' +
+          '<div class="row"><span>Baseline' + (state.baselineSummary && !state.diary.some(function (x) { return x.phase === 'baseline'; }) ? '*' : '') + '</span><span class="bar"><i style="width:' + (b * 10) + '%;background:var(--c-baseline)"></i></span><span>' + b.toFixed(1) + '</span></div>' +
           '<div class="row"><span>Last 7 days</span><span class="bar"><i style="width:' + (r * 10) + '%;background:var(--c-elimination)"></i></span><span>' + r.toFixed(1) + '</span></div></div>' +
           '<p><strong>' + (pct > 0 ? pct + '% better.' : 'No improvement.') + '</strong> ' +
-          (pct >= 30 ? 'That suggests FODMAPs play a role in your symptoms.' : pct > 0 ? 'A small change. Think about how you feel overall, too.' : 'FODMAPs may not be your main trigger.') + '</p></div>';
+          (pct >= 30 ? 'That suggests FODMAPs play a role in your symptoms.' : pct > 0 ? 'A small change. Think about how you feel overall, too.' : 'FODMAPs may not be your main trigger.') + '</p>' +
+          (state.baselineSummary && !state.diary.some(function (x) { return x.phase === 'baseline'; }) ? '<p class="muted small">* From the estimate you entered when you jumped in.</p>' : '') + '</div>';
       } else {
         html += '<div class="card warn"><p>There aren\'t enough baseline and elimination logs to compare. Go by how you feel overall.</p></div>';
       }
@@ -382,12 +474,12 @@
   }
 
   function doBackup() {
-    var name = 'ibs-diet-helper-backup-' + today() + '.json', text = JSON.stringify(state, null, 1);
+    var name = 'ibs-domination-backup-' + today() + '.json', text = JSON.stringify(state, null, 1);
     function done() { state.lastBackup = today(); state.backupNudge = ''; state.backupSnooze = ''; save(); render(); toast('Backup saved 💾'); }
     try {
       var file = new File([text], name, { type: 'application/json' });
       if (navigator.canShare && navigator.canShare({ files: [file] }) && /android|iphone|ipad|ipod/i.test(navigator.userAgent + (isIOS() ? 'ipad' : ''))) {
-        navigator.share({ files: [file], title: 'IBS Diet Helper backup' }).then(done).catch(function (e) { if (e && e.name !== 'AbortError') { download(name, text, 'application/json'); done(); } });
+        navigator.share({ files: [file], title: 'IBS Domination backup' }).then(done).catch(function (e) { if (e && e.name !== 'AbortError') { download(name, text, 'application/json'); done(); } });
         return;
       }
     } catch (e) { /* fall back to a download */ }
@@ -545,6 +637,8 @@
       state.phase = 'reintro'; state.washoutUntil = ''; save(); toast('Added back to your challenges'); render(); go('today');
     } else if (a === 'level') {
       showLevel(el.dataset.level);
+    } else if (a === 'jumpin') {
+      openJumpIn();
     } else if (a === 'prepdone') {
       ['prep-dx', 'prep-flags', 'prep-celiac'].forEach(function (k) { state.checks[k] = true; });
       state.prepDone = today(); save();
@@ -619,8 +713,8 @@
     if (text && !flags.length) well.push(practice ? 'Nothing high-FODMAP spotted.' : 'No common high-FODMAP foods spotted. Nicely done!');
     if (active) well.push(G[active].emoji + ' Your ' + G[active].name.toLowerCase() + ' test food doesn\'t count against you. It\'s part of the challenge.');
     if (e.stool === '3' || e.stool === '4') well.push('Stool type ' + e.stool + ' is in the typical range.');
-    var base = state.diary.filter(function (x) { return x !== e && (x.phase === 'baseline' || x.phase === 'prep'); }).map(avg);
-    if (!practice && base.length >= 3 && avg(e) < mean(base) - 0.5) well.push('Symptoms today (' + avg(e) + ') are below your baseline average (' + mean(base).toFixed(1) + ').');
+    var base = baselineScores(e);
+    if (!practice && (base.length >= 3 || (state.baselineSummary && base.length)) && avg(e) < mean(base) - 0.5) well.push('Symptoms today (' + avg(e) + ') are below your baseline average (' + mean(base).toFixed(1) + ').');
     var byWord = {}, order = [];
     flags.forEach(function (f) { if (!byWord[f.word]) { byWord[f.word] = []; order.push(f.word); } byWord[f.word].push(f); });
     order.forEach(function (w) {
@@ -972,6 +1066,8 @@
     checkBadges();
     renderToday(); renderPlan(); renderLog();
   }
+  $('learnFounder').innerHTML = founderHTML();
+  $('jumpBtn').addEventListener('click', function () { $('settings').hidden = true; openJumpIn(); });
   $('learnJourney').innerHTML = journeyHTML() + '<h2 class="section-title">Everything the app can do</h2>' + featuresHTML();
   checkBadges(true);
   save();
