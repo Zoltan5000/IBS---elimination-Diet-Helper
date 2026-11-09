@@ -713,7 +713,8 @@
     });
     var good = text ? F.scanGood(text) : [];
     var score = null, worst = {};
-    if (text) {
+    var recognised = flags.length || good.length;
+    if (text && recognised) {
       // One penalty per food (its worst flag): high -12, "often contains" -5, portion-dependent -3
       flags.forEach(function (f) {
         var pts = f.severity === 'avoid' ? 12 : f.level === 'often' ? 5 : 3;
@@ -738,11 +739,12 @@
       improve.push(F.describe(f, names) + ' Try instead: ' + F.GROUPS[f.group].swap + '.');
     });
     if (!text) improve.push('Add what you ate next time to get a diet score and tips.');
+    else if (!recognised) improve.push('The app didn\'t recognise any of the foods you listed, so it can\'t score them. That doesn\'t mean they\'re low FODMAP: check them with the Learn food tables or your dietitian.');
     else if (text.split(/[,.;\n+&]|\band\b|\bwith\b/).filter(function (x) { return x.trim(); }).length < 3) improve.push('Add a bit more detail, like snacks, drinks and sauces, for a more accurate score.');
     if (Number(e.stress) >= 7) improve.push('Stress was high today, and stress alone can flare IBS. A short walk or a few slow breaths may help.');
     if (!practice && avg(e) >= 6 && flags.length) improve.push('Your symptoms were higher today. The foods above may be part of the reason.');
     var nFoods = Object.keys(worst || {}).length;
-    var label = score == null ? 'No score yet'
+    var label = score == null ? (text ? 'Foods not recognised' : 'No score yet')
       : practice ? (nFoods ? 'Preview: ' + nFoods + ' food' + (nFoods === 1 ? '' : 's') + ' to swap later' : 'Already low-FODMAP friendly!')
       : score >= 90 ? 'Right on track!' : score >= 70 ? 'Mostly on track' : score >= 50 ? 'A few swaps needed' : 'Tough day. Tomorrow\'s a fresh start';
     return { score: score, label: label, well: well, improve: improve, practice: practice, personal: ph === 'personal' };

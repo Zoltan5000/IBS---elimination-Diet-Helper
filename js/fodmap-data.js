@@ -131,7 +131,7 @@
     ['tempura', 'fructan-grain', 'usually', 'app', 'usually wheat flour batter'],
     ['panko', 'fructan-grain', 'usually', 'app', 'usually wheat breadcrumbs'],
     ['pastry', 'fructan-grain', 'usually', 'app', 'usually wheat flour'],
-    ['pie', 'fructan-grain', 'usually', 'app', 'usually a wheat crust'],
+    ['pie', 'fructan-grain', 'usually', 'app', 'usually a wheat crust', ['shepherd\'s pie', 'cottage pie']],
     ['croissant', 'fructan-grain', 'usually', 'app', 'usually wheat flour'],
     ['cake', 'fructan-grain', 'usually', 'app', 'usually wheat flour', ['rice cake', 'rice cakes']],
     ['cookie', 'fructan-grain', 'usually', 'app', 'usually wheat flour'],
@@ -176,7 +176,7 @@
     ['dhal', 'gos', 'usually', 'app', 'usually made from lentils or split peas'],
     // ---- lactose ----
     ['milk', 'lactose', 'serve', 'CAMN', 'cow\'s milk is high (CDHF, Michigan, Monash); AHS says ¼ cup is low',
-      ['almond milk', 'soy milk', 'oat milk', 'rice milk', 'coconut milk', 'lactose-free milk', 'lactose free milk', 'milk chocolate']],
+      ['almond milk', 'soy milk', 'oat milk', 'rice milk', 'coconut milk', 'hemp milk', 'lactose-free milk', 'lactose free milk']],
     ['condensed milk', 'lactose', 'high', 'CN'],
     ['evaporated milk', 'lactose', 'serve', 'CAN', 'CDHF lists it as high; AHS says 2½ Tbsp is low'],
     ['powdered milk', 'lactose', 'high', 'C'],
@@ -324,7 +324,68 @@
     ['glycerin', 'polyol', 'high', 'M'],
     ['polydextrose', 'unspecified', 'high', 'M'],
     ['molasses', 'unspecified', 'serve', 'AM', 'sources disagree: Michigan lists molasses as high, AHS says 1 Tbsp is low'],
-    ['milk solids', 'lactose', 'high', 'M', 'dry milk solids']
+    ['milk solids', 'lactose', 'high', 'M', 'dry milk solids'],
+    // ---- added Nov 2026 after testing: common foods missing from the sources' lists (app inference unless tagged) ----
+    ['pretzel', 'fructan-grain', 'usually', 'app', 'usually made with wheat flour'],
+    ['cereal', 'fructan-grain', 'usually', 'N', 'often made with wheat; Monash lists breakfast cereals as high. Some, like cornflakes (AHS) and gluten-free cereals (Michigan), are low', ['rice cereal']],
+    ['scone', 'fructan-grain', 'usually', 'app', 'usually made with wheat flour'],
+    ['donut', 'fructan-grain', 'usually', 'app', 'usually made with wheat flour'],
+    ['doughnut', 'fructan-grain', 'usually', 'app', 'usually made with wheat flour'],
+    ['brownie', 'fructan-grain', 'usually', 'app', 'usually made with wheat flour'],
+    ['churro', 'fructan-grain', 'usually', 'app', 'usually made with wheat flour'],
+    ['crepe', 'fructan-grain|lactose', 'usually', 'app', 'usually made with wheat flour and milk'],
+    ['strudel', 'fructan-grain', 'usually', 'app', 'usually wheat pastry'],
+    ['danish', 'fructan-grain', 'usually', 'app', 'usually wheat pastry'],
+    ['dinner roll', 'fructan-grain', 'usually', 'app', 'usually made with wheat'],
+    ['bread roll', 'fructan-grain', 'usually', 'app', 'usually made with wheat'],
+    ['hot dog', 'fructan-grain|fructan-garlic|fructan-onion', 'usually', 'N', 'usually a wheat bun and a processed sausage, which often contains garlic or onion (Monash lists processed meats as high)'],
+    ['spring roll', 'fructan-grain|fructan-garlic', 'usually', 'app', 'usually a wheat wrapper, often with garlic', ['rice paper spring roll', 'fresh spring roll']],
+    ['egg roll', 'fructan-grain|fructan-garlic', 'usually', 'app', 'usually a wheat wrapper, often with garlic or onion'],
+    ['wonton', 'fructan-grain|fructan-garlic', 'usually', 'app', 'usually a wheat wrapper, often with garlic or spring onion'],
+    ['gyoza', 'fructan-grain|fructan-garlic', 'usually', 'app', 'usually a wheat wrapper, often with garlic'],
+    ['samosa', 'fructan-grain|fructan-onion|gos', 'usually', 'app', 'usually wheat pastry with onion and often peas'],
+    ['empanada', 'fructan-grain|fructan-onion', 'usually', 'app', 'usually wheat pastry, often with onion'],
+    ['pierogi', 'fructan-grain|fructan-onion', 'usually', 'app', 'usually a wheat dough, often with onion'],
+    ['quesadilla', 'fructan-grain', 'usually', 'app', 'usually a wheat flour tortilla; corn tortillas are low (CDHF)', ['corn quesadilla']],
+    ['enchilada', 'fructan-onion|fructan-garlic', 'often', 'app', 'the sauce is often made with onion and garlic'],
+    ['fajita', 'fructan-onion|fructan-grain', 'often', 'app', 'often cooked with onion and served in wheat tortillas'],
+    ['stuffing', 'fructan-grain|fructan-onion', 'usually', 'app', 'usually bread with onion'],
+    ['meatloaf', 'fructan-onion|fructan-grain', 'usually', 'app', 'usually made with onion and breadcrumbs'],
+    ['cheesecake', 'lactose|fructan-grain', 'usually', 'app', 'usually made with cream cheese and a wheat biscuit base'],
+    ['pudding', 'lactose', 'often', 'app', 'often made with milk'],
+    ['mousse', 'lactose', 'often', 'app', 'often made with cream'],
+    ['milk chocolate', 'lactose', 'often', 'app', 'contains milk; Monash lists dark chocolate as low'],
+    ['cheese sauce', 'lactose|fructan-grain', 'usually', 'app', 'usually made with milk and wheat flour'],
+    ['fondue', 'lactose|fructan-garlic', 'often', 'app', 'often made with garlic'],
+    ['smoothie', 'fructose|lactose', 'often', 'app', 'often made with high-FODMAP fruit, juice, yogurt or milk'],
+    ['protein bar', 'fructan-other|polyol', 'often', 'A', 'often contain inulin, chicory root or sugar alcohols, which AHS tells you to check labels for'],
+    ['energy bar', 'fructan-other|polyol', 'often', 'A', 'often contain inulin, dried fruit or sugar alcohols (AHS label list)'],
+    ['fruit juice', 'fructose', 'often', 'CA', 'apple, orange and grape juices are listed as high (CDHF, AHS); cranberry juice is low (CDHF)'],
+    ['onion ring', 'fructan-onion|fructan-grain', 'usually', 'app', 'onion in a wheat batter'],
+    ['hot sauce', 'fructan-garlic', 'often', 'N', 'often made with garlic; Monash says sauces can contain garlic and onion'],
+    ['sriracha', 'fructan-garlic', 'usually', 'app', 'usually made with garlic'],
+    ['teriyaki', 'fructan-garlic|fructan-onion', 'often', 'N', 'often made with garlic or onion; Monash says sauces and marinades can contain them'],
+    ['hoisin', 'fructan-garlic', 'often', 'N', 'often made with garlic; Monash says sauces can contain it'],
+    ['stir fry', 'fructan-garlic|fructan-onion', 'often', 'app', 'often cooked with garlic, onion or a garlic-based sauce'],
+    ['stir-fry', 'fructan-garlic|fructan-onion', 'often', 'app', 'often cooked with garlic, onion or a garlic-based sauce'],
+    ['pad thai', 'fructan-garlic|fructan-onion', 'usually', 'app', 'usually made with garlic and shallots'],
+    ['fried rice', 'fructan-garlic|fructan-onion', 'often', 'app', 'often made with onion, spring onion or garlic'],
+    ['risotto', 'fructan-onion|fructan-garlic', 'often', 'app', 'often made with onion and stock'],
+    ['paella', 'fructan-onion|fructan-garlic', 'often', 'app', 'often made with onion and garlic'],
+    ['pho', 'fructan-onion', 'often', 'app', 'the broth is often made with onion'],
+    ['biryani', 'fructan-onion|fructan-garlic', 'usually', 'app', 'usually made with onion and garlic'],
+    ['masala', 'fructan-onion|fructan-garlic', 'often', 'app', 'the sauce is often made with onion and garlic'],
+    ['korma', 'fructan-onion|lactose|gos', 'often', 'app', 'often made with onion, cream and cashews'],
+    ['shawarma', 'fructan-garlic', 'often', 'app', 'often marinated with garlic and served with garlic sauce'],
+    ['gyro', 'fructan-onion|fructan-garlic|fructan-grain', 'often', 'app', 'often served with onion, tzatziki and pita'],
+    ['kebab', 'fructan-onion|fructan-garlic', 'often', 'N', 'often marinated; Monash lists marinated meats as high'],
+    ['baba ganoush', 'fructan-garlic', 'usually', 'app', 'usually made with garlic'],
+    ['shepherd\'s pie', 'fructan-onion', 'often', 'app', 'the filling is often made with onion and stock'],
+    ['cottage pie', 'fructan-onion', 'often', 'app', 'the filling is often made with onion and stock'],
+    ['sauce', 'fructan-garlic|fructan-onion', 'often', 'N', 'Monash says sauces can contain garlic and onion, so ask; soy sauce, barbecue sauce and mayonnaise are low (Monash)',
+      ['soy sauce', 'bbq sauce', 'barbecue sauce', 'tomato sauce', 'cheese sauce', 'hot sauce', 'fish sauce', 'apple sauce']],
+    ['dressing', 'fructan-garlic|fructan-onion', 'often', 'N', 'Monash says dressings and condiments can contain garlic and onion, so ask for it on the side'],
+    ['dip', 'fructan-garlic|fructan-onion', 'often', 'N', 'Monash says dips can contain garlic and onion']
   ];
 
   // Phrases removed before matching. `suppress` clears a FODMAP group for the whole item.
@@ -351,7 +412,7 @@
   // Low-FODMAP foods, used to praise good choices. [word, serving size note, sources]
   var GOOD = [
     // proteins and fats: no FODMAPs
-    ['chicken', 'no FODMAPs', 'CAMN'], ['turkey', 'no FODMAPs', 'CAM'], ['beef', 'no FODMAPs', 'CAMN'], ['pork', 'no FODMAPs', 'CAM'],
+    ['chicken', 'no FODMAPs', 'CAMN'], ['turkey', 'no FODMAPs', 'CAM'], ['beef', 'no FODMAPs', 'CAMN'], ['steak', 'no FODMAPs (beef)', 'CAMN'], ['pork', 'no FODMAPs', 'CAM'],
     ['lamb', 'no FODMAPs', 'CA'], ['ham', 'no FODMAPs', 'A'], ['fish', 'no FODMAPs', 'CAMN'], ['salmon', 'no FODMAPs', 'CA'],
     ['tuna', 'no FODMAPs', 'CA'], ['cod', 'no FODMAPs', 'CA'], ['shrimp', 'no FODMAPs', 'CMN'], ['prawn', 'no FODMAPs', 'CMN'],
     ['seafood', 'no FODMAPs', 'CMN'], ['egg', 'no FODMAPs', 'CAMN'], ['eggs', 'no FODMAPs', 'CAMN'], ['tempeh', '1 cup (CDHF) or 100 g (AHS)', 'CAMN'],
@@ -426,7 +487,7 @@
         t = t.replace(n.re, ' ');
       }
     });
-    return { t: t, suppressed: suppressed };
+    return { t: t, suppressed: suppressed, orig: ' ' + String(text || '').toLowerCase().replace(/[’']/g, '\'') + ' ' };
   }
 
   /** Find high-FODMAP matches. Returns one entry per word and group: {word, group, level, src, note}. */
@@ -434,6 +495,8 @@
     var p = prep(text), out = [], seen = {};
     COMPILED.forEach(function (c) {
       var t = p.t;
+      // An exception phrase anywhere in the original text (e.g. "rice paper spring roll") skips this word
+      if (c.except.some(function (re) { re.lastIndex = 0; var hit = re.test(p.orig); re.lastIndex = 0; return hit && !c.re.test(p.orig.replace(re, ' ')); })) return;
       c.except.forEach(function (re) { t = t.replace(re, ' '); });
       if (!c.re.test(t)) return;
       c.groups.forEach(function (g) {
@@ -493,6 +556,18 @@
     return { verdict: verdict, flags: flags };
   }
 
+  /**
+   * Check text and say how confident the app can be:
+   * 'avoid' / 'modify' when high-FODMAP foods are found, 'good' only when the
+   * app recognises low-FODMAP foods and finds nothing high, and 'unknown' when
+   * it recognises nothing at all (not on the list does not mean safe).
+   */
+  function assess(text, tolerance) {
+    var j = judge(scan(text), tolerance), good = scanGood(text);
+    var verdict = j.flags.length ? j.verdict : good.length ? 'good' : 'unknown';
+    return { verdict: verdict, flags: j.flags, good: good };
+  }
+
   /** Names of the sources for a tag string like "CAM", or "the app's guess". */
   function sourceNames(src) {
     if (!src || src === 'app') return 'app\'s guess';
@@ -513,7 +588,7 @@
 
   window.FODMAP = {
     GROUPS: GROUPS, SOURCES: SOURCES, FOODS: FOODS, GOOD: GOOD,
-    scan: scan, scanGood: scanGood, judge: judge, deriveTolerance: deriveTolerance,
+    scan: scan, scanGood: scanGood, judge: judge, assess: assess, deriveTolerance: deriveTolerance,
     describe: describe, sourceNames: sourceNames
   };
 })();

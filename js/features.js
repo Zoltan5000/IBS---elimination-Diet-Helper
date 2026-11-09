@@ -175,7 +175,7 @@
   function localAnalyze(text) {
     var tol = tolerance();
     return splitMenu(text).map(function (it) {
-      var j = F.judge(F.scan(it.text), tol);
+      var j = F.assess(it.text, tol);
       var name = it.text.split(/\s[-–—:|]\s|\s{2,}|\.\s/)[0].replace(/[$£€]\s?\d+([.,]\d+)?/g, '').trim();
       return {
         name: name.length > 70 ? name.slice(0, 67) + '…' : name,
@@ -183,7 +183,9 @@
         section: it.section,
         verdict: j.verdict,
         groups: uniq(j.flags.map(function (f) { return f.group; })),
-        reason: j.flags.length ? explain(j.flags) : 'No high-FODMAP foods from the app\'s food list were spotted in the description.',
+        reason: j.flags.length ? explain(j.flags)
+          : j.verdict === 'good' ? 'Recognised low-FODMAP foods: ' + j.good.join(', ') + '. Nothing high-FODMAP was spotted, but the description may not list every ingredient, so ask about sauces and seasonings.'
+          : 'The app doesn\'t recognise the foods in this dish, so it can\'t say whether it\'s low FODMAP. Ask what\'s in it.',
         ask: askFor(j.flags)
       };
     });
@@ -225,18 +227,19 @@
   }
 
   /* ---------- rendering ---------- */
-  var VERDICT = { good: 'Likely OK', modify: 'Ask or modify', avoid: 'Likely high FODMAP' };
+  var VERDICT = { good: 'Likely OK', unknown: 'Not recognised: ask', modify: 'Ask or modify', avoid: 'Likely high FODMAP' };
   function renderMenu(dishes, best, source) {
-    var order = { good: 0, modify: 1, avoid: 2 };
-    var counts = { good: 0, modify: 0, avoid: 0 };
+    var order = { good: 0, unknown: 1, modify: 2, avoid: 3 };
+    var counts = { good: 0, unknown: 0, modify: 0, avoid: 0 };
     dishes.forEach(function (d) { if (!order.hasOwnProperty(d.verdict)) d.verdict = 'modify'; counts[d.verdict]++; });
     var html = '<div class="menu-summary"><span class="pill good">' + counts.good + ' likely OK</span>' +
       '<span class="pill modify">' + counts.modify + ' ask or modify</span>' +
       '<span class="pill avoid">' + counts.avoid + ' likely high</span>' +
+      (counts.unknown ? '<span class="pill unknown">' + counts.unknown + ' not recognised</span>' : '') +
       '<span class="small">Checked by ' + esc(source) + '</span></div>';
     if (best && best.length) html += '<p><strong>Best picks:</strong> ' + best.map(esc).join(', ') + '</p>';
     html += '<div class="filter" role="group" aria-label="Filter dishes">' +
-      ['all', 'good', 'modify', 'avoid'].map(function (k) {
+      ['all', 'good', 'modify', 'avoid', 'unknown'].map(function (k) {
         return '<button type="button" class="secondary small-btn" data-filter="' + k + '">' + (k === 'all' ? 'All' : VERDICT[k]) + '</button>';
       }).join('') + '</div>';
     html += '<div class="dish-list">' + dishes.slice().sort(function (a, b) { return order[a.verdict] - order[b.verdict]; }).map(function (d) {
@@ -406,23 +409,25 @@
   $('recipeCheck').addEventListener('click', function () {
     var lines = $('recipeText').value.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(function (l) { return /[a-z]{3}/i.test(l); });
     if (!lines.length) { $('recipeResults').innerHTML = '<p class="small">Paste the recipe\'s ingredient list first, one ingredient per line.</p>'; return; }
-    var tol = tolerance(), flagged = [], good = [];
+    var tol = tolerance(), flagged = [], good = [], unknown = [];
     lines.forEach(function (l) {
-      var j = F.judge(F.scan(l), tol);
-      if (j.flags.length) flagged.push({ line: l, j: j }); else good.push(l);
+      var a = F.assess(l, tol);
+      if (a.flags.length) flagged.push({ line: l, j: a }); else if (a.verdict === 'good') good.push(l); else unknown.push(l);
     });
     var avoid = flagged.filter(function (x) { return x.j.verdict === 'avoid'; }).length;
-    var verdict = avoid ? 'avoid' : flagged.length ? 'modify' : 'good';
+    var verdict = avoid ? 'avoid' : flagged.length ? 'modify' : unknown.length ? 'unknown' : 'good';
     var check = flagged.length - avoid;
-    var head = verdict === 'good' ? 'No high-FODMAP ingredients spotted'
-      : [avoid ? avoid + ' ingredient' + (avoid === 1 ? '' : 's') + ' to swap' : '', check ? check + ' to check the amount' : ''].filter(Boolean).join(' · ');
+    var head = verdict === 'good' ? 'All ingredients recognised as low FODMAP'
+      : [avoid ? avoid + ' ingredient' + (avoid === 1 ? '' : 's') + ' to swap' : '', check ? check + ' to check the amount' : '',
+         unknown.length ? unknown.length + ' not recognised' : ''].filter(Boolean).join(' · ');
     var groups = uniq([].concat.apply([], flagged.map(function (x) { return x.j.flags.map(function (f) { return f.group; }); })));
     $('recipeResults').innerHTML = '<article class="dish ' + verdict + '"><header><h3>' + esc(head) + '</h3><span class="pill ' + verdict + '">' + VERDICT[verdict] + '</span></header>' +
       (flagged.length ? '<ul class="rv-list warn">' + flagged.map(function (x) {
         return '<li><strong>' + esc(x.line) + '</strong><br>' + esc(explain(x.j.flags)) + '</li>';
       }).join('') + '</ul>' : '') +
       (groups.length ? '<p class="small"><strong>Swap ideas:</strong></p><ul class="small">' + groups.map(function (g) { return '<li><strong>' + esc(F.GROUPS[g].name) + ':</strong> ' + esc(F.GROUPS[g].swap) + '</li>'; }).join('') + '</ul>' : '') +
-      (good.length ? '<p class="small"><strong>Looks fine:</strong> ' + good.map(esc).join(' · ') + '</p>' : '') +
+      (good.length ? '<p class="small"><strong>Recognised as low FODMAP:</strong> ' + good.map(esc).join(' · ') + '</p>' : '') +
+      (unknown.length ? '<p class="small"><strong>Not recognised, so check these yourself:</strong> ' + unknown.map(esc).join(' · ') + '</p>' : '') +
       '<p class="muted small">Checked against the app\'s master food list (CDHF, Alberta Health Services, Michigan Medicine, Monash). Amounts and brands matter, so check with your dietitian.</p></article>';
   });
 

@@ -184,6 +184,11 @@ The app's master food list (265 flagged words and 182 low-FODMAP words) is in [d
 - [monashfodmap.com page](https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/) (page copyright 2019). **Downloaded and read in full on November 4, 2026.** It names the main FODMAP group in each food group (for example, celery is rich in mannitol).
 - Monash says internet food lists can be inaccurate, and that its app is the authoritative source.
 
+### Accuracy fix after user testing (November 9, 2026)
+A tester found that "pretzel" was shown as fine. Two causes were fixed:
+1. **Missing foods.** 58 common foods that none of the four sources list were added as the app's inference, each labelled with its reason. They include products usually made with wheat (pretzels, scones, donuts, wontons, quesadillas), dishes usually or often made with onion or garlic (samosas, fried rice, pad thai, curries, kebabs), and sauces, dressings and dips. Monash says sauces "can contain garlic and onion", with soy sauce, barbecue sauce and mayonnaise listed as low. Cereal is tagged N, because Monash lists breakfast cereals as high.
+2. **"Not on the list" was treated as "fine".** The menu checker and recipe checker now say "Likely OK" only when they recognise low-FODMAP foods and find nothing high. If nothing is recognised, they say **"Not recognised: ask"**. The daily diet score is no longer given when none of the foods are recognised.
+
 ### Changes after reading Michigan and Monash in full
 - **Added 26 flagged foods and 56 low-FODMAP foods.** The flagged additions include boysenberry, custard apple, savoy cabbage, tomato paste, carob, textured vegetable protein and vegetarian mince, sausage and salami, and sweeteners such as lactitol, glycerol, polydextrose and fruit juice concentrate.
 - **Restored, now sourced (Michigan or Monash):** olives, polenta, canned coconut milk, basil, ginger and other herbs, and asafoetida as an onion swap.

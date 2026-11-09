@@ -698,3 +698,5 @@ code.query { display: block; margin-top: 4px; padding: 8px 10px; background: var
 .px-skip:hover { border-style: solid; }
 .px-btn.alt { background: #4ade80; box-shadow: inset -3px -3px 0 #16a34a, 0 4px 0 #14532d; margin-left: 0; margin-right: 8px; }
 .px-box .px-btn + .px-btn { margin-left: 8px; }
+.pill.unknown { background: var(--surface-2); color: var(--muted); border: 1px dashed var(--muted); }
+.dish.unknown { border-left-color: var(--muted); border-left-style: dashed; }
