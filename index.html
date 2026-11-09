@@ -11,14 +11,14 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="IBS Domination">
-  <link rel="stylesheet" href="css/frames.css?v=20261109f">
-  <link rel="stylesheet" href="css/style.css?v=20261109f">
+  <link rel="stylesheet" href="css/frames.css?v=20261109g">
+  <link rel="stylesheet" href="css/style.css?v=20261109g">
 </head>
 <body>
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><img src="icons/icon.svg" alt="" width="28" height="28"><span>IBS Domination</span></div>
+    <div class="brand"><img src="icons/icon.svg" alt="" aria-hidden="true" width="28" height="28"><span>IBS Domination</span></div>
     <div class="top-actions">
     <button type="button" class="saved-chip" id="savedChip" aria-label="Your data is saved on this device. Open data settings">✓ Saved</button>
     <button type="button" class="icon-btn" id="openSettings" aria-label="Settings and backup">
@@ -135,7 +135,7 @@
     <h3>1. Build your search</h3>
     <div class="row meal-form">
       <label>Main ingredient
-        <input id="mealIng" list="ingList" placeholder="e.g. chicken, salmon, tofu">
+        <input id="mealIng" type="text" list="ingList" placeholder="e.g. chicken, salmon, tofu">
         <datalist id="ingList"><option>chicken</option><option>salmon</option><option>beef</option><option>pork</option><option>eggs</option><option>firm tofu</option><option>shrimp</option><option>rice</option><option>potato</option><option>quinoa</option><option>oats</option></datalist>
       </label>
       <label>Meal
@@ -148,20 +148,20 @@
         <select id="mealDiet"><option value="">No preference</option><option>vegetarian</option><option>vegan</option><option>dairy-free</option><option>gluten-free</option><option>high protein</option></select>
       </label>
       <label>Cuisine
-        <input id="mealCuisine" placeholder="e.g. Italian, Thai, Mexican">
+        <input id="mealCuisine" type="text" placeholder="e.g. Italian, Thai, Mexican">
       </label>
       <label>Search engine
         <select id="mealEngine"><option value="google">Google</option><option value="duckduckgo">DuckDuckGo</option><option value="bing">Bing</option></select>
       </label>
     </div>
     <label class="full">Other keywords (optional)
-      <input id="mealNotes" placeholder="e.g. one pan, slow cooker, meal prep, what's in my fridge">
+      <input id="mealNotes" type="text" placeholder="e.g. one pan, slow cooker, meal prep, what's in my fridge">
     </label>
     <fieldset class="exclude">
       <legend>Leave out these foods <span class="muted small">(from your results; tap to change)</span></legend>
       <div id="mealExcludeChips" class="chips"></div>
       <label class="full">Also leave out (optional, separate with commas)
-        <input id="mealExcludeExtra" placeholder="e.g. cilantro, spicy">
+        <input id="mealExcludeExtra" type="text" placeholder="e.g. cilantro, spicy">
       </label>
     </fieldset>
     <label class="check-line"><input type="checkbox" id="mealTrusted"><span>Only search trusted low-FODMAP sources (Monash University, Michigan Medicine and the Canadian Digestive Health Foundation)</span></label>
@@ -553,8 +553,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/fodmap-data.js?v=20261109f"></script>
-<script src="js/app.js?v=20261109f"></script>
-<script src="js/features.js?v=20261109f"></script>
+<script src="js/fodmap-data.js?v=20261109g"></script>
+<script src="js/app.js?v=20261109g"></script>
+<script src="js/features.js?v=20261109g"></script>
 </body>
 </html>
