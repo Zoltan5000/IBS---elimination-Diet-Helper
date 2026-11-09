@@ -382,7 +382,7 @@
       var done = CHECKS.filter(function (c) { return state.checks[c[0]]; }).length;
       html += founderHTML() +
         '<div class="welcome"><h1>Find out which foods trigger your IBS</h1>' +
-        '<p>IBS Domination coaches you through the low FODMAP elimination diet, the approach developed at Monash University, tested by universities in the UK, US and Europe, and recommended in gastroenterology guidelines. It takes about 3 months, and the app tells you what to do each day.</p></div>' +
+        '<p>IBS Domination coaches you through the low FODMAP elimination diet, the approach developed at Monash University, tested by universities in the UK, US and Europe, and recommended in gastroenterology guidelines. It takes about 3 months, and the app tells you what to do each day.</p></div><!--nudge-->' +
         '<div class="card jump-card"><h2>Already on your way?</h2><p>Maybe you\'ve been tracking your symptoms for a while, or you\'re already on a low FODMAP diet and finding it hard to stick to. You don\'t have to start over. Tell us where you are and we\'ll pick it up from there.</p>' +
         '<div class="btn-row"><button type="button" class="btn ghost" data-act="jumpin">Jump in where I am</button></div></div>' +
         '<div class="card task" id="readyCard"><div class="kicker">Step 1</div><div class="card-head"><h2>Check with your doctor first</h2><span class="muted small">' + done + ' of ' + CHECKS.length + '</span></div>' +
@@ -471,7 +471,7 @@
       out += '<div class="card warn nudge"><h2>💾 Back up your progress</h2><p>' + why + ' A backup is one small file. Save it to iCloud Drive or Google Drive, or email it to yourself, and you can restore it on any device.</p>' +
         '<div class="btn-row"><button type="button" class="btn primary" data-act="backup">Save backup</button><button type="button" class="btn ghost" data-act="snooze-backup">Later</button></div></div>';
     }
-    if (!isStandalone() && state.diary.length >= 1 && !state.installNever && !(state.installSnooze > t)) {
+    if (!isStandalone() && !state.installNever && !(state.installSnooze > t)) {
       var steps;
       if (isIOS()) {
         steps = isIOSSafari()
@@ -479,6 +479,8 @@
           : '<p>Open this page in <b>Safari</b>, tap <b>Share</b> <span class="kbd">⬆︎</span>, then <b>Add to Home Screen</b>.</p>';
       } else if (deferredInstall) {
         steps = '<div class="btn-row"><button type="button" class="btn primary" data-act="install">Install app</button></div>';
+      } else if (/Macintosh/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome|Chromium|Edg|Firefox/.test(navigator.userAgent)) {
+        steps = '<p>In Safari, choose <b>File → Add to Dock</b>.</p>';
       } else {
         steps = '<p>Open your browser menu <span class="kbd">⋮</span> and tap <b>Install app</b> or <b>Add to Home screen</b>.</p>';
       }
