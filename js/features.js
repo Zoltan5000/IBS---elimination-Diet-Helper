@@ -404,7 +404,7 @@
       '<span class="small">Checked by ' + esc(source) + '</span></div>';
     if (best && best.length) html += '<p><strong>Best picks:</strong> ' + best.map(esc).join(', ') + '</p>';
     var toCheck = counts.unknown + counts.good;
-    if (toCheck) html += '<div class="bulk-lookup"><button type="button" class="secondary small-btn" id="lookupAll">🔎 Look up the ' + toCheck + ' dish' + (toCheck === 1 ? '' : 'es') + ' that aren\'t flagged</button>' +
+    if (toCheck) html += '<div class="bulk-lookup"><button type="button" class="secondary small-btn" id="lookupAll">🔎 Look up the ' + toCheck + (toCheck === 1 ? ' dish that isn\'t flagged' : ' dishes that aren\'t flagged') + '</button>' +
       '<button type="button" class="secondary small-btn" id="lookupStop" hidden>Stop</button><p class="small muted" id="lookupProgress">Checks typical ingredients one dish at a time, a few seconds apart, so the free services aren\'t overloaded.</p></div>';
     html += '<div class="filter" role="group" aria-label="Filter dishes">' +
       ['all', 'good', 'modify', 'avoid', 'unknown'].map(function (k) {
