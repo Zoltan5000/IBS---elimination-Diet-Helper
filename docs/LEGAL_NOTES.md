@@ -58,6 +58,7 @@ Each source was found by searching the official domain shown. These are official
 | Item | License | Source |
 |---|---|---|
 | Press Start 2P font | SIL Open Font License 1.1 | `fonts/OFL.txt` (from the google/fonts repository) |
+| Barlow Condensed font (headings and numbers) | SIL Open Font License 1.1 | `fonts/OFL-BarlowCondensed.txt` (from the @fontsource/barlow-condensed package; self-hosted) |
 | pdf.js | Apache License 2.0 | [mozilla/pdf.js](https://github.com/mozilla/pdf.js/); [PDF.js home](https://mozilla.github.io/pdf.js/) |
 | Tesseract.js | Apache License 2.0 | [LICENSE.md](https://github.com/naptha/tesseract.js/blob/master/LICENSE.md) |
 | Light-bulb icon (planned) | Flaticon free license: requires a credit line | Pending: flaticon.com is blocked from the build environment |

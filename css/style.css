@@ -706,3 +706,266 @@ code.query { display: block; margin-top: 4px; padding: 8px 10px; background: var
 .lookup-item { margin-top: 8px; }
 .row-inline { display: flex; gap: 8px; }
 .row-inline input { flex: 1; min-width: 0; }
+
+/* =====================================================================
+   Arcade × Run Club skin
+   The quest map's pixel world frames every page; big slanted condensed
+   numbers come from running apps. Frames are 9-slice pixel corners
+   (css/frames.css, built by scripts/build-frames.js), in three tiers:
+   paper + ink line = something to act on; soft = information; night = the
+   hero. Green means good/done, orange means "do this now", gold is a reward.
+   ===================================================================== */
+@font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("../fonts/barlow-condensed-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-style: italic; font-weight: 800; font-display: swap;
+  src: url("../fonts/barlow-condensed-latin-800-italic.woff2") format("woff2"); }
+
+:root {
+  --ink: #1d1a45; --night: #26215f; --run: #ff5b24; --run-dark: #c23d0c; --coin: #ffc933; --gut: #0e8a5f;
+  --text: #1d1a45; --muted: #5f5c7d; --border: #dcd9ee; --surface-2: #f4f3fb;
+  --primary: #3d33b8; --accent: #ff5b24; --good: #0e8a5f; --good-bg: #e6f6ee; --tip-bg: #eef0ff;
+  --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --pxf: "Press Start 2P", ui-monospace, monospace;
+  --notch: polygon(0 6px, 3px 6px, 3px 3px, 6px 3px, 6px 0, calc(100% - 6px) 0, calc(100% - 6px) 3px, calc(100% - 3px) 3px, calc(100% - 3px) 6px, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 3px) calc(100% - 6px), calc(100% - 3px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) 100%,
+    6px 100%, 6px calc(100% - 3px), 3px calc(100% - 3px), 3px calc(100% - 6px), 0 calc(100% - 6px));
+  --frame: var(--f-soft);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f0d22; --surface: #17152e; --surface-2: #1e1b3b; --ink: #c9c3ff; --text: #ecebff; --muted: #a6a3c7; --border: #2f2b57;
+    --primary: #a99bff; --primary-ink: #120f33; --tip-bg: #1f1d45; --good: #4ade80; --good-bg: #14291d;
+  }
+}
+
+/* --- type --- */
+h1, h2, .view-title, .section-title, .welcome h1 { font-family: var(--display); font-weight: 700; letter-spacing: 0; }
+.view-title { font-size: 2.4rem; line-height: 1; margin: 10px 0 6px; }
+h2 { font-size: 1.45rem; line-height: 1.1; }
+.section-title { font-size: 1.7rem; margin: 32px 0 10px; }
+.welcome h1 { font-size: 2.8rem; font-weight: 800; font-style: italic; line-height: .95; margin: 18px 0 8px; }
+.brand span { font-family: var(--display); font-weight: 800; font-style: italic; font-size: 1.35rem; letter-spacing: .01em; }
+.kicker { text-transform: none; letter-spacing: 0; font-family: var(--display); font-size: 1rem; font-weight: 700; color: var(--run); }
+
+/* --- the frame system --- */
+.card, .feature, .dish, .lesson-body .card, .tool .card, .grid-2 .card, .guide-grid .card, .stat, .node .body,
+.hud, .tabs-inline, .lookup-result, .result-row, .data-status, .choice-card > span, .disclaimer, .draft-banner, .big-food, code.query, .drop {
+  border: 6px solid transparent; border-radius: 0; background: none; box-shadow: none;
+  border-image: var(--frame) 3 fill / 6px stretch;
+}
+.card, .feature, .dish, .stat, .hud, .hero, .btn, .say-box, input, select, textarea, .seg span, .tabs-inline, .drop, .lookup-result, .result-row { image-rendering: pixelated; }
+.card { padding: 10px 12px; margin: 14px 0; }
+.card.task, .feature, .card.jump-card { --frame: var(--f-paper); }
+.card.task { filter: drop-shadow(0 4px 0 var(--ink)); margin-bottom: 18px; }
+.card.tip, .lookup-result { --frame: var(--f-tip); }
+.card.good, .card.ok { --frame: var(--f-good); }
+.card.warn, .disclaimer, .draft-banner { --frame: var(--f-warn); }
+.card.bad, .card.alert { --frame: var(--f-bad); }
+.card.research { border-left-width: 6px; --frame: var(--f-tip); }
+.card.changed { border-left-width: 6px; --frame: var(--f-warn); }
+.card.jump-card { border-style: solid; --frame: var(--f-dash); }
+.card.fold { --frame: var(--f-soft); }
+
+/* --- buttons: arcade keys --- */
+.btn, .tool button:not(.btn):not(.chip):not(.seg-btn), .px-skip {
+  font-family: var(--display); font-weight: 700; font-size: 1.15rem; letter-spacing: .01em; line-height: 1.1;
+  border: 6px solid transparent; border-radius: 0; padding: 7px 14px; min-height: 48px; color: #fff; background: none;
+  border-image: var(--f-ink) 3 fill / 6px stretch; filter: drop-shadow(0 3px 0 #120f33);
+  transition: transform .06s steps(1);
+}
+.btn:active, .tool button:not(.btn):not(.chip):not(.seg-btn):active { transform: translateY(3px); filter: none; }
+.btn.accent { border-image-source: var(--f-run); filter: drop-shadow(0 3px 0 var(--run-dark)); }
+.btn.primary { border-image-source: var(--f-ink); color: #fff; }
+.btn.ghost, .tool button.secondary { border-image-source: var(--f-paper); color: var(--ink); filter: none; }
+.btn.danger { border-image-source: var(--f-no); color: var(--bad); filter: none; }
+.btn.small { font-size: 1rem; min-height: 40px; padding: 3px 10px; }
+.btn:disabled { filter: none; }
+.btn-row { gap: 10px; margin-top: 14px; }
+.tool .filter button:not(.btn) { min-height: 36px; font-size: .95rem; padding: 2px 10px; filter: none; }
+@media (prefers-color-scheme: dark) { .btn.primary, .btn:not(.ghost):not(.accent):not(.danger) { color: #fff; } }
+
+/* --- form fields --- */
+input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea {
+  border: 6px solid transparent; border-radius: 0; background: none; padding: 6px 8px;
+  border-image: var(--f-soft) 3 fill / 6px stretch;
+}
+input:not([type=range]):not([type=checkbox]):not([type=radio]):focus, select:focus, textarea:focus { outline: none; border-image-source: var(--f-paper); }
+:focus-visible { outline: 3px solid var(--coin); outline-offset: 2px; }
+input[type=checkbox] { accent-color: var(--gut); }
+/* slider: a thick bar with a square pixel handle */
+input[type=range] { -webkit-appearance: none; appearance: none; height: 28px; background: transparent; }
+input[type=range]::-webkit-slider-runnable-track { height: 10px; background: var(--surface-2); box-shadow: inset 0 0 0 2px var(--border); }
+input[type=range]::-moz-range-track { height: 10px; background: var(--surface-2); box-shadow: inset 0 0 0 2px var(--border); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; margin-top: -6px; background: var(--night); border: 0; box-shadow: inset -3px -3px 0 #120f33, inset 3px 3px 0 #5b52c9, 0 0 0 2px #fff; cursor: pointer; }
+input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 0; background: var(--night); border: 0; box-shadow: inset -3px -3px 0 #120f33, inset 3px 3px 0 #5b52c9; cursor: pointer; }
+.slider output { font-family: var(--display); font-style: italic; font-weight: 800; font-size: 1.6rem; line-height: 1; }
+
+/* --- top bar and tab bar --- */
+.topbar { border-bottom: 0; }
+.saved-chip { border-radius: 0; clip-path: var(--notch); border: 0; padding: 6px 12px; }
+.tabbar { border-top: 2px solid var(--border); }
+.tabbar a { position: relative; font-family: var(--display); font-weight: 700; font-size: .85rem; letter-spacing: .02em; }
+.tabbar a[aria-current="page"] { color: var(--ink); }
+.tabbar a[aria-current="page"]:not(.tab-log)::before { content: ""; position: absolute; top: -2px; width: 22px; height: 4px; background: var(--run); }
+.tabbar .tab-log svg { border-radius: 0; clip-path: var(--notch); box-shadow: inset 0 -4px 0 var(--run-dark); background: var(--run); }
+.tabbar .tab-log[aria-current="page"] { color: var(--run-dark); }
+
+/* --- hero: the run screen --- */
+.hero {
+  --frame: var(--f-night); border: 6px solid transparent; border-radius: 0; border-image: var(--frame) 3 fill / 6px stretch;
+  background: none; padding: 12px 12px 10px; margin: 8px 0 0; overflow: visible;
+}
+.hero::after { display: none; }
+.hero .eyebrow { font-family: var(--pxf); font-size: 9px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--coin); opacity: 1; line-height: 1.6; }
+.hero h1 { font-family: var(--display); font-style: italic; font-weight: 800; font-size: clamp(2rem, 9vw, 2.7rem); line-height: .95; letter-spacing: 0; margin: 8px 0 6px; }
+.hero p { color: #d9d6ff; }
+.ring { --gap: #26215f; }
+.ring .track { stroke: rgba(255, 255, 255, .14); }
+.ring .bar { stroke: var(--coin); stroke-linecap: butt; }
+.ring .gaps { fill: none; stroke: var(--gap); stroke-width: 11; stroke-dashoffset: 0; transform: rotate(-90deg); transform-origin: 50% 50%; }
+.ring text { font-family: var(--display); font-style: italic; font-weight: 800; font-size: 30px; }
+.ring .ring-sub { font-family: var(--pxf); font-style: normal; font-weight: 400; font-size: 7px; fill: #d9d6ff; }
+.score-ring { --gap: var(--surface); }
+.score-ring .bar { stroke: var(--rc); }
+.score-ring text { fill: var(--text); }
+.score-ring .ring-sub { fill: var(--muted); }
+.review-sheet .ring { --gap: var(--surface); }
+/* day blocks with the buddy standing on today */
+.hero-track { position: relative; margin: 28px 0 0; }
+.ht-blocks { display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 2px; }
+.ht-blocks i { height: 10px; background: rgba(255, 255, 255, .12); }
+.ht-blocks i.on { background: #3fbf5f; box-shadow: inset 0 -3px 0 #2a8a43; }
+.ht-blocks i.at { background: var(--coin); box-shadow: inset 0 -3px 0 #c99400; }
+.ht-runner { position: absolute; bottom: 12px; transform: translateX(-50%); animation: run-hop .6s steps(2) infinite; }
+.ht-runner .buddy { display: block; width: 26px; height: 26px; filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .45)); }
+@keyframes run-hop { 50% { transform: translate(-50%, -3px); } }
+.ht-labels { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--pxf); font-size: 7px; color: #b9b4ef; }
+/* the score strip sits on the hero like a game's status bar */
+.hud { --frame: var(--f-ink); margin: 0 0 18px; padding: 8px 10px; font-size: 9px; }
+.hero + .hud { margin-top: -2px; }
+
+/* --- the buddy's dialogue box (tips) --- */
+.say { display: grid; grid-template-columns: 44px 1fr; gap: 6px; align-items: end; margin: 18px 0; }
+.say-who .buddy { width: 40px; height: 40px; background: var(--night); padding: 4px; clip-path: var(--notch); }
+.say-box { position: relative; border: 6px solid transparent; border-image: var(--f-paper) 3 fill / 6px stretch; padding: 14px 10px 6px; }
+.say-box::before { content: ""; position: absolute; left: -12px; bottom: 6px; width: 8px; height: 8px; background: var(--ink); box-shadow: 4px 0 0 var(--ink); }
+.say-name { position: absolute; top: -12px; left: 8px; font-family: var(--pxf); font-size: 8px; line-height: 1; padding: 5px 7px; background: var(--night); color: var(--coin); }
+.say-box p { margin: 2px 0 6px; }
+.say-box .read-more { margin: 0 0 4px; }
+
+/* --- quotes: no box, set like a book --- */
+.quote-card { margin: 26px 0 8px; }
+.quote { background: none; border: 0; padding: 0 0 0 30px; margin: 0; position: relative; }
+.quote::before { content: "“"; position: absolute; left: 0; top: -2px; font-family: var(--pxf); font-size: 30px; line-height: 1; color: var(--coin); text-shadow: 2px 2px 0 var(--night); }
+.quote blockquote { font-size: 1.2rem; line-height: 1.4; }
+
+/* --- founder: game dialogue with a nameplate --- */
+.card.founder { --frame: var(--f-ink); color: #fff; margin-top: 18px; padding: 16px 12px 10px; position: relative; }
+.founder-head { position: relative; }
+.founder-head .say-name { position: static; display: inline-block; margin-bottom: 6px; }
+.founder-head b { font-size: .9rem; font-weight: 600; color: #d9d6ff; }
+.founder-head .buddy { background: #120f33; border-radius: 0; clip-path: var(--notch); }
+.founder-msg { font-family: var(--display); font-weight: 700; font-size: 1.55rem; line-height: 1.15; margin: 14px 0 8px; }
+.founder-sig { color: var(--coin); font-family: var(--pxf); font-size: 10px; font-weight: 400; }
+
+/* --- step number tiles (only where the content is a real sequence) --- */
+.step-tile, .lesson-num {
+  display: inline-grid; place-items: center; width: 30px; height: 30px; margin-right: 10px; vertical-align: 2px; flex: none;
+  font-family: var(--pxf); font-size: 11px; font-weight: 400; color: var(--coin); background: var(--night); border-radius: 0; clip-path: var(--notch);
+}
+#readyCard .card-head h2 { display: flex; align-items: center; }
+
+/* --- features: game cartridges --- */
+.features { gap: 12px; }
+.feature { padding: 8px 10px 10px; }
+.feature:active { transform: translateY(2px); }
+.feature:hover { border-color: transparent; }
+.feature .f-icon { border-radius: 0; clip-path: var(--notch); background: var(--surface-2); }
+.feature b { font-family: var(--display); font-weight: 700; font-size: 1.2rem; line-height: 1.05; }
+
+/* --- journey: worlds on a dotted path --- */
+.phase-card .ph-icon { border-radius: 0; clip-path: var(--notch); }
+.phase-card:not(:last-child)::before { width: 4px; border-radius: 0; background: repeating-linear-gradient(var(--border) 0 4px, transparent 4px 8px); }
+.phase-card .ph-body { border: 0; border-image: none; box-shadow: none; background: none; padding: 4px 0 8px; border-radius: 0; }
+.phase-card h3 { font-family: var(--display); font-size: 1.35rem; font-weight: 700; }
+.phase-card .app-does span { border-radius: 0; clip-path: var(--notch); padding: 3px 10px; }
+
+/* --- nudges stay compact --- */
+.card.nudge h2 { font-size: 1.25rem; }
+.card.nudge p { font-size: .92rem; }
+details.how summary { font-family: var(--display); font-size: 1.1rem; color: var(--primary); margin: 8px 0 2px; }
+
+/* --- log --- */
+.seg span { border-radius: 0; border: 6px solid transparent; border-image: var(--f-soft) 3 fill / 6px stretch; background: none; min-height: 52px; font-family: var(--display); font-size: 1.25rem; }
+.seg input:checked + span { border-image-source: var(--f-ink); color: #fff; }
+.seg input:checked + span small { color: #d9d6ff; }
+.phase-chip { border-radius: 0; clip-path: var(--notch); font-family: var(--display); font-size: .95rem; letter-spacing: .02em; }
+.score { border-radius: 0; clip-path: var(--notch); font-family: var(--display); font-style: italic; font-weight: 800; font-size: 1.3rem; }
+.history li b, .history .day { font-family: var(--display); font-size: 1.15rem; }
+.react { border-radius: 0; border: 0; clip-path: var(--notch); background: var(--surface-2); }
+.days3 .d { border-radius: 0; clip-path: var(--notch); font-family: var(--display); font-size: 1rem; }
+
+/* --- check-in compare bars as block meters --- */
+.compare .bar, .compare .bar i { border-radius: 0; }
+.compare .bar i { background-image: repeating-linear-gradient(90deg, transparent 0 10px, var(--surface) 10px 12px) !important; background-blend-mode: normal; }
+
+/* --- learn: a level-select list rather than a stack of cards --- */
+.lessons { gap: 0; }
+.lesson { border: 0; border-radius: 0; box-shadow: none; background: none; border-bottom: 2px dotted var(--border); }
+.lesson summary { padding: 14px 2px; font-family: var(--display); font-size: 1.3rem; }
+.lesson summary::after { content: "▸"; font-family: var(--pxf); font-size: 10px; color: var(--run); }
+.lesson[open] summary::after { transform: rotate(90deg); }
+.lesson-body { padding: 0 2px 16px; }
+.src-h { text-transform: none; letter-spacing: 0; font-family: var(--display); font-size: 1.2rem; color: var(--ink); }
+.tag { border-radius: 0; }
+
+/* --- tools --- */
+.tabs-inline { padding: 2px; gap: 4px; --frame: var(--f-soft); }
+.seg-btn { border-radius: 0; font-family: var(--display); font-size: 1.15rem; min-height: 44px; }
+.seg-btn.active { box-shadow: none; background: var(--night); color: #fff; clip-path: var(--notch); }
+.drop { --frame: var(--f-dash); min-height: 120px; }
+.drop.over, .drop:hover { --frame: var(--f-paper); }
+.dish { border-left-width: 6px; padding: 8px 10px; --frame: var(--f-line); }
+.dish.good { --frame: var(--f-ok); }
+.dish.modify { --frame: var(--f-mod); }
+.dish.avoid { --frame: var(--f-no); }
+.dish.unknown { --frame: var(--f-dash); border-left-style: solid; }
+.dish h3 { font-family: var(--display); font-size: 1.25rem; font-weight: 700; }
+.pill, .badge { border-radius: 0; clip-path: var(--notch); padding: 3px 10px; }
+.pill.unknown { border: 0; }
+.tool .chips button.chip { border-radius: 0; clip-path: var(--notch); border: 0; }
+.tool .chips button.chip.off { background: var(--surface-2); }
+.result-row { padding: 6px 8px; }
+
+/* --- sheets and toast --- */
+.sheet { border-radius: 0; box-shadow: 0 -4px 0 var(--night); }
+.toast { border-radius: 0; clip-path: var(--notch); background: var(--night); color: #fff; font-family: var(--display); font-size: 1.1rem; }
+.coin-strip { border-radius: 0; clip-path: var(--notch); }
+.rv-list li { border-radius: 0; clip-path: var(--notch); }
+.stats { gap: 12px; }
+.stat b { font-family: var(--display); font-style: italic; font-weight: 800; font-size: 2rem; }
+.kbd { border-radius: 0; }
+.legal .draft-banner { border-style: solid; }
+
+/* --- dark mode: the frames already switch; fix text on dark fills --- */
+@media (prefers-color-scheme: dark) {
+  .tabbar a[aria-current="page"] { color: #fff; }
+  .say-who .buddy, .step-tile, .lesson-num, .seg-btn.active { background: #3b3490; }
+}
+
+.hero .ring { width: 84px; height: 84px; }
+.phase-card .dur { text-transform: none; letter-spacing: 0; font-family: var(--display); font-size: .95rem; font-weight: 700; }
+/* secondary actions inside the tools stay quiet; only the main action is a dark key */
+.tool button.secondary:not(.btn):not(.chip) { border-image-source: var(--f-paper); color: var(--ink); filter: none; }
+.tool button.small-btn:not(.btn):not(.chip) { font-size: 1rem; min-height: 40px; padding: 3px 10px; }
+.tool .filter button[aria-pressed="true"]:not(.btn) { border-image-source: var(--f-ink); color: #fff; }
+.dish .lookup button { font-size: .95rem; }
+@media (min-width: 900px) {
+  .tabbar { border-right: 2px solid var(--border); }
+  .tabbar a { border-radius: 0; }
+  .tabbar a[aria-current="page"] { background: var(--surface-2); clip-path: var(--notch); }
+  .tabbar a[aria-current="page"]:not(.tab-log)::before { top: 50%; left: 4px; width: 4px; height: 22px; transform: translateY(-50%); }
+  .sheet { border-radius: 0; }
+  .card.founder { max-width: 720px; }
+}
+.legal h1 { font-size: 2.4rem; } .legal h2 { font-size: 1.5rem; margin-top: 32px; }

@@ -408,7 +408,7 @@
       '<button type="button" class="secondary small-btn" id="lookupStop" hidden>Stop</button><p class="small muted" id="lookupProgress">Checks typical ingredients one dish at a time, a few seconds apart, so the free services aren\'t overloaded.</p></div>';
     html += '<div class="filter" role="group" aria-label="Filter dishes">' +
       ['all', 'good', 'modify', 'avoid', 'unknown'].map(function (k) {
-        return '<button type="button" class="secondary small-btn" data-filter="' + k + '">' + (k === 'all' ? 'All' : VERDICT[k]) + '</button>';
+        return '<button type="button" class="secondary small-btn" data-filter="' + k + '" aria-pressed="' + (k === 'all') + '">' + (k === 'all' ? 'All' : VERDICT[k]) + '</button>';
       }).join('') + '</div>';
     html += '<div class="dish-list">' + dishes.slice().sort(function (a, b) { return order[a.verdict] - order[b.verdict]; }).map(function (d) {
       return '<article class="dish ' + d.verdict + '" data-v="' + d.verdict + '"><header><h3>' + esc(d.name) + '</h3>' +
@@ -451,6 +451,7 @@
     if (lb) { runLookup(lb.getAttribute('data-lookup'), lb.nextElementSibling, lb); return; }
     var f = e.target.getAttribute('data-filter');
     if (!f) return;
+    Array.prototype.forEach.call(document.querySelectorAll('#menuResults [data-filter]'), function (b) { b.setAttribute('aria-pressed', String(b === e.target)); });
     Array.prototype.forEach.call(document.querySelectorAll('#menuResults .dish'), function (d) {
       d.hidden = f !== 'all' && d.getAttribute('data-v') !== f;
     });

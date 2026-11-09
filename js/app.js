@@ -111,7 +111,7 @@
   function quoteHTML(q) {
     return '<figure class="quote"><blockquote>“' + esc(q.t) + '”</blockquote><figcaption>' + (q.who ? esc(q.who) + ', ' : '') + '<cite>' + esc(q.src) + '</cite></figcaption></figure>';
   }
-  function quoteCard(tag) { return '<div class="card quote-card"><div class="kicker">📖 A little encouragement</div>' + quoteHTML(pickQuote(tag)) + '</div>'; }
+  function quoteCard(tag) { return '<div class="quote-card">' + quoteHTML(pickQuote(tag)) + '</div>'; }
 
   /* ---------- state ---------- */
   function fresh() {
@@ -210,8 +210,17 @@
     var r = 40, c = 2 * Math.PI * r, f = Math.max(0, Math.min(1, max ? value / max : 0));
     return '<svg class="ring" viewBox="0 0 96 96" aria-hidden="true"><circle class="track" cx="48" cy="48" r="' + r + '"/>' +
       '<circle class="bar" cx="48" cy="48" r="' + r + '" stroke-dasharray="' + c + '" stroke-dashoffset="' + (c * (1 - f)) + '"/>' +
+      '<circle class="gaps" cx="48" cy="48" r="' + r + '" stroke-dasharray="2.4 ' + (c / 24 - 2.4).toFixed(2) + '"/>' +
       '<text x="48" y="' + (sub ? 44 : 48) + '">' + esc(label) + '</text>' +
       (sub ? '<text class="ring-sub" x="48" y="64">' + esc(sub) + '</text>' : '') + '</svg>';
+  }
+  // A row of day blocks with the buddy standing on today's block, like a level's ground
+  function track(done, total, labels) {
+    var n = Math.max(1, total), at = Math.max(0, Math.min(n - 1, done - 1)), b = '';
+    for (var i = 0; i < n; i++) b += '<i class="' + (i < done ? 'on' : '') + (i === at ? ' at' : '') + '"></i>';
+    return '<div class="hero-track" style="--n:' + n + '"><div class="ht-runner" style="left:calc((100% / ' + n + ') * ' + at + ' + (100% / ' + n + ') / 2)">' + spriteSVG(26) + '</div>' +
+      '<div class="ht-blocks">' + b + '</div>' +
+      (labels ? '<div class="ht-labels">' + labels.map(function (l) { return '<span>' + esc(l) + '</span>'; }).join('') + '</div>' : '') + '</div>';
   }
   function hero(p, eyebrow, title, text, ringHtml, meter) {
     return '<div class="hero" style="--phase:' + PHASES[p].color + '"><div class="hero-row"><div style="flex:1">' +
@@ -223,24 +232,24 @@
       '<span>SCORE<b>' + ('000000' + score()).slice(-6) + '</b></span>' +
       '<span><i class="px-coin"></i>×<b>' + coins() + '</b></span>' +
       '<span>★<b>' + doneCount() + '/8</b></span>' +
-      '<span>🔥<b>' + streak() + '</b></span></a><!--nudge-->';
+      '<span>🔥<b>' + streak() + '</b></span></a>';
   }
   function logCard() {
     var e = entryFor(today());
     if (e) {
-      return '<div class="card task"><div class="kicker">Today</div><h2>You logged today</h2>' +
+      return '<div class="card task"><h2>You logged today</h2>' +
         '<p class="done-today">✓ Symptom score ' + avg(e) + ' / 10' + (e.diet != null ? ' · Diet score ' + e.diet + ' / 100' : '') + '</p>' +
-        '<div class="btn-row"><button type="button" class="btn primary" data-act="review">See today\'s review</button><a class="btn ghost" href="#log" data-goto="log">Update log</a></div></div>';
+        '<div class="btn-row"><button type="button" class="btn primary" data-act="review">See today\'s review</button><a class="btn ghost" href="#log" data-goto="log">Update log</a></div></div><!--nudge-->';
     }
-    return '<div class="card task"><div class="kicker">Today</div><h2>How is your gut today?</h2>' +
+    return '<div class="card task"><h2>How is your gut today?</h2>' +
       '<p class="muted">It takes about 30 seconds and earns you a coin.</p>' +
-      '<div class="btn-row"><a class="btn accent" href="#log" data-goto="log">Log today</a></div></div>';
+      '<div class="btn-row"><a class="btn accent" href="#log" data-goto="log">Log today</a></div></div><!--nudge-->';
   }
   function tipCard() {
     var i = (daysIn(state.phase) + state.diary.length) % TIPS.length;
     var t = TIPS[i];
-    return '<div class="card tip"><div class="card-head"><h2>💡 Tip</h2></div><p>' + esc(t[0]) + '</p>' +
-      (t[1] ? '<p class="read-more"><a href="' + esc(t[1]) + '" target="_blank" rel="noopener">Read more ↗</a></p>' : '') + '</div>';
+    return '<div class="say"><div class="say-who">' + spriteSVG(40) + '</div><div class="say-box"><span class="say-name">Tip</span><p>' + esc(t[0]) + '</p>' +
+      (t[1] ? '<p class="read-more"><a href="' + esc(t[1]) + '" target="_blank" rel="noopener">Read more ↗</a></p>' : '') + '</div></div>';
   }
   function toolCards() {
     return '<div class="features">' +
@@ -255,7 +264,7 @@
   /* ---------- founder message ---------- */
   function founderHTML() {
     return '<div class="card founder"><div class="founder-head">' + spriteSVG(44) +
-      '<div><div class="kicker">A message from Zoltan</div><b>Founder of IBS Domination, the app to help you on your elimination diet</b></div></div>' +
+      '<div><span class="say-name">Zoltan</span><b>Founder of IBS Domination, the app to help you on your elimination diet</b></div></div>' +
       '<blockquote class="founder-msg">“Let’s go on a journey to get you more control and understanding of your diagnosis and maybe even have some fun along the way. This p**p doesn’t define you! You define it! Ok! Let’s go!!”</blockquote>' +
       '<p class="founder-sig">— Zoltan</p></div>';
   }
@@ -372,7 +381,7 @@
     var p = state.phase, html = '';
     if (p === 'prep' && state.prepDone) {
       html += hero('prep', 'World 1 · Get ready', 'Step 1 done ✓', 'You\'ve checked with your doctor. Start your baseline week whenever you\'re ready.', ring(1, 1, '✓', 'done'));
-      html += '<div class="card task"><div class="kicker">Next step</div><h2>Start your baseline week</h2>' +
+      html += '<div class="card task"><h2>Next: start your baseline week</h2>' +
         '<p>For 7 days, eat as you normally do and log how you feel. This gives you something to compare against later.</p>' +
         '<div class="btn-row"><button type="button" class="btn accent" data-act="phase" data-to="baseline">Start my baseline week</button></div>' +
         '<p class="muted small">Confirmed ' + esc(nice(state.prepDone)) + '. <button type="button" class="link" data-act="prepundo">Undo</button></p></div>';
@@ -385,7 +394,7 @@
         '<p>IBS Domination coaches you through the low FODMAP elimination diet, the approach developed at Monash University, tested by universities in the UK, US and Europe, and recommended in gastroenterology guidelines. It takes about 3 months, and the app tells you what to do each day.</p></div><!--nudge-->' +
         '<div class="card jump-card"><h2>Already on your way?</h2><p>Maybe you\'ve been tracking your symptoms for a while, or you\'re already on a low FODMAP diet and finding it hard to stick to. You don\'t have to start over. Tell us where you are and we\'ll pick it up from there.</p>' +
         '<div class="btn-row"><button type="button" class="btn ghost" data-act="jumpin">Jump in where I am</button></div></div>' +
-        '<div class="card task" id="readyCard"><div class="kicker">Step 1</div><div class="card-head"><h2>Check with your doctor first</h2><span class="muted small">' + done + ' of ' + CHECKS.length + '</span></div>' +
+        '<div class="card task" id="readyCard"><div class="card-head"><h2><span class="step-tile" aria-label="Step 1">1</span>Check with your doctor first</h2><span class="muted small">' + done + ' of ' + CHECKS.length + '</span></div>' +
         '<p class="muted small">Other conditions can cause the same symptoms, and celiac tests only work while you\'re still eating gluten. See <a href="#learn" data-goto="learn">Learn, step 1</a> for the red-flag symptoms.</p>' +
         '<div class="checks">' + CHECKS.map(function (c) {
           return '<label><input type="checkbox" data-check="' + c[0] + '"' + (state.checks[c[0]] ? ' checked' : '') + '><span>' + esc(c[1]) + '</span></label>';
@@ -398,7 +407,7 @@
         '<p class="legal-links"><a href="privacy.html">Privacy Policy</a> · <a href="consumer-health-data.html">Consumer Health Data Privacy Policy</a> · <a href="terms.html">Terms of Use</a></p>';
     } else if (p === 'baseline') {
       var d = daysIn('baseline'), logs = state.diary.filter(function (e) { return e.phase === 'baseline'; }).length;
-      html += hero(p, 'World 2 · Baseline week', 'Day ' + Math.min(d, 7) + ' of 7', 'Eat as you normally do. Just log how you feel.', ring(Math.min(d, 7), 7, Math.min(d, 7) + '/7', 'days'));
+      html += hero(p, 'World 2 · Baseline week', 'Day ' + Math.min(d, 7) + ' of 7', 'Eat as you normally do. Just log how you feel.', ring(Math.min(d, 7), 7, Math.min(d, 7) + '/7', 'days'), track(Math.min(d, 7), 7, ['Day 1', 'Day 7']));
       html += hud() + logCard();
       if (d >= 7 || logs >= 7) {
         html += '<div class="card good"><h2>Baseline complete 🎉</h2><p>You have ' + logs + ' days logged. Next: the elimination phase.</p>' +
@@ -413,8 +422,7 @@
       html += tipCard();
     } else if (p === 'elimination') {
       var de = daysIn('elimination'), wk = Math.ceil(de / 7), dow = ((de - 1) % 7) + 1;
-      var meter = '<div class="hero-meter"><div class="track"><div class="fill" style="width:' + Math.min(100, de / 42 * 100) + '%"></div></div>' +
-        '<div class="labels"><span>Start</span><span>2 wks</span><span>4 wks</span><span>6 wks</span></div></div>';
+      var meter = track(Math.min(de, 42), 42, ['Start', '2 wks', '4 wks', '6 wks']);
       html += hero(p, 'World 3 · Elimination', 'Week ' + wk + ' · Day ' + dow, 'Strict low FODMAP. Aim for 2 to 6 weeks.', ring(Math.min(de, 28), 28, String(de), de === 1 ? 'day' : 'days'), meter);
       html += hud() + logCard();
       if (de >= 14) {
@@ -484,6 +492,7 @@
       } else {
         steps = '<p>Open your browser menu <span class="kbd">⋮</span> and tap <b>Install app</b> or <b>Add to Home screen</b>.</p>';
       }
+      if (!deferredInstall) steps = '<details class="how"><summary>Show me how</summary>' + steps + '</details>';
       out += '<div class="card tip nudge"><h2>📲 Add the app to your home screen</h2>' +
         '<p>It opens full-screen like a normal app' + (isIOS() ? ', and it protects your data: Safari can delete data from websites you haven\'t opened for 7 days, but home-screen apps are exempt. <a href="https://webkit.org/tracking-prevention/" target="_blank" rel="noopener">Read more ↗</a>' : ' and keeps your data safer.') + '</p>' + steps +
         '<div class="btn-row"><button type="button" class="btn ghost small" data-act="snooze-install">Later</button><button type="button" class="btn ghost small" data-act="never-install">Don\'t show again</button></div></div>';
