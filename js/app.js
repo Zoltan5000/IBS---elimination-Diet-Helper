@@ -225,7 +225,7 @@
   function hero(p, eyebrow, title, text, ringHtml, meter) {
     return '<div class="hero" style="--phase:' + PHASES[p].color + '"><div class="hero-row"><div style="flex:1">' +
       '<div class="eyebrow">' + esc(eyebrow) + '</div><h1>' + esc(title) + '</h1><p>' + esc(text) + '</p></div>' +
-      (ringHtml || '') + '</div>' + (meter || '') + '</div>';
+      (ringHtml || '') + '</div>' + (meter || '') + '</div><!--/hero-->';
   }
   function hud() {
     return '<a class="hud" href="#plan" data-goto="plan" aria-label="Open quest map">' +
@@ -378,7 +378,8 @@
   ];
 
   function renderToday() {
-    var p = state.phase, html = '';
+    // The quote and tip sit at the top, right under the header (top), not at the bottom
+    var p = state.phase, html = '', top = '';
     if (p === 'prep' && state.prepDone) {
       html += hero('prep', 'World 1 · Get ready', 'Step 1 done ✓', 'You\'ve checked with your doctor. Start your baseline week whenever you\'re ready.', ring(1, 1, '✓', 'done'));
       html += '<div class="card task"><h2>Next: start your baseline week</h2>' +
@@ -386,7 +387,7 @@
         '<div class="btn-row"><button type="button" class="btn accent" data-act="phase" data-to="baseline">Start my baseline week</button></div>' +
         '<p class="muted small">Confirmed ' + esc(nice(state.prepDone)) + '. <button type="button" class="link" data-act="prepundo">Undo</button></p></div>';
       html += '<details class="card fold"><summary>How the app works</summary>' + journeyHTML() + featuresHTML() + '</details>';
-      html += quoteCard('start');
+      top += quoteCard('start');
     } else if (p === 'prep') {
       var done = CHECKS.filter(function (c) { return state.checks[c[0]]; }).length;
       html += founderHTML() +
@@ -419,7 +420,7 @@
           '<div class="card jump-card"><h2>Already tracked your baseline?</h2><p>If you\'ve been keeping track of your symptoms before finding the app, enter your typical levels and move straight on. A full week of logs gives the most accurate comparison, but your best estimate is fine.</p>' +
           '<div class="btn-row"><button type="button" class="btn ghost" data-act="jumpin">Enter my baseline and skip ahead</button></div></div>';
       }
-      html += tipCard();
+      top += tipCard();
     } else if (p === 'elimination') {
       var de = daysIn('elimination'), wk = Math.ceil(de / 7), dow = ((de - 1) % 7) + 1;
       var meter = track(Math.min(de, 42), 42, ['Start', '2 wks', '4 wks', '6 wks']);
@@ -431,7 +432,7 @@
       } else {
         html += '<div class="card"><h2>Keep going 💪</h2><p>' + (14 - de) + ' more day' + (14 - de === 1 ? '' : 's') + ' until your first check-in.</p></div>';
       }
-      html += tipCard() + toolCards();
+      top += tipCard(); html += toolCards();
     } else if (p === 'checkin') {
       html += hero(p, 'World 4 · Check-in', 'Did it help?', 'Here\'s how you felt before and during elimination.');
       var base = baselineScores();
@@ -457,7 +458,12 @@
     }
     if (p !== 'prep') {
       var te = entryFor(today());
-      html += quoteCard(te && te.diet != null && te.diet < 60 ? 'tough' : { baseline: 'start', elimination: 'general', checkin: 'progress', reintro: 'challenge', personal: 'finish' }[p] || 'general');
+      top = quoteCard(te && te.diet != null && te.diet < 60 ? 'tough' : { baseline: 'start', elimination: 'general', checkin: 'progress', reintro: 'challenge', personal: 'finish' }[p] || 'general') + top;
+    }
+    // Put the quote and tip right under the header and its score strip
+    if (top) {
+      var m = html.match(/^<div class="hero"[\s\S]*?<!--\/hero-->(<a class="hud"[\s\S]*?<\/a>)?/);
+      html = m ? m[0] + top + html.slice(m[0].length) : top + html;
     }
     var n = nudges();
     html = html.indexOf('<!--nudge-->') !== -1 ? html.replace('<!--nudge-->', n) : n + html;
