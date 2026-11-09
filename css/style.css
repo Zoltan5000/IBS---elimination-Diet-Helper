@@ -756,7 +756,7 @@ h2 { font-size: 1.45rem; line-height: 1.1; }
 .card, .feature, .dish, .stat, .hud, .hero, .btn, .say-box, input, select, textarea, .seg span, .tabs-inline, .drop, .lookup-result, .result-row { image-rendering: pixelated; }
 .card { padding: 10px 12px; margin: 14px 0; }
 .card.task, .feature, .card.jump-card { --frame: var(--f-paper); }
-.card.task { filter: drop-shadow(0 4px 0 var(--ink)); margin-bottom: 18px; }
+.card.task { border-image: var(--f-paper-up) 3 3 5 3 fill / 6px 6px 10px 6px stretch; border-bottom-width: 10px; margin-bottom: 18px; }
 .card.tip, .lookup-result { --frame: var(--f-tip); }
 .card.good, .card.ok { --frame: var(--f-good); }
 .card.warn, .disclaimer, .draft-banner { --frame: var(--f-warn); }
@@ -770,18 +770,18 @@ h2 { font-size: 1.45rem; line-height: 1.1; }
 .btn, .tool button:not(.btn):not(.chip):not(.seg-btn), .px-skip {
   font-family: var(--display); font-weight: 700; font-size: 1.15rem; letter-spacing: .01em; line-height: 1.1;
   border: 6px solid transparent; border-radius: 0; padding: 7px 14px; min-height: 48px; color: #fff; background: none;
-  border-image: var(--f-ink) 3 fill / 6px stretch; filter: drop-shadow(0 3px 0 #120f33);
+  /* raised keys: the shadow is part of the frame image, never a filter (a filter would shadow the label too) */
+  border-image: var(--f-ink-up) 3 3 5 3 fill / 6px 6px 10px 6px stretch; border-bottom-width: 10px;
   transition: transform .06s steps(1);
 }
-.btn:active, .tool button:not(.btn):not(.chip):not(.seg-btn):active { transform: translateY(3px); filter: none; }
-.btn.accent { border-image-source: var(--f-run); filter: drop-shadow(0 3px 0 var(--run-dark)); }
-.btn.primary { border-image-source: var(--f-ink); color: #fff; }
-.btn.ghost, .tool button.secondary { border-image-source: var(--f-paper); color: var(--ink); filter: none; }
-.btn.danger { border-image-source: var(--f-no); color: var(--bad); filter: none; }
+.btn:active, .tool button:not(.btn):not(.chip):not(.seg-btn):active { transform: translateY(2px); }
+.btn.accent { border-image-source: var(--f-run-up); }
+.btn.primary { border-image-source: var(--f-ink-up); color: #fff; }
+.btn.ghost, .tool button.secondary, .btn.danger { border-image: var(--f-paper) 3 fill / 6px stretch; border-bottom-width: 6px; color: var(--ink); }
+.btn.danger { border-image-source: var(--f-no); color: var(--bad); }
 .btn.small { font-size: 1rem; min-height: 40px; padding: 3px 10px; }
-.btn:disabled { filter: none; }
 .btn-row { gap: 10px; margin-top: 14px; }
-.tool .filter button:not(.btn) { min-height: 36px; font-size: .95rem; padding: 2px 10px; filter: none; }
+.tool .filter button:not(.btn) { min-height: 36px; font-size: .95rem; padding: 2px 10px; }
 @media (prefers-color-scheme: dark) { .btn.primary, .btn:not(.ghost):not(.accent):not(.danger) { color: #fff; } }
 
 /* --- form fields --- */
@@ -956,7 +956,7 @@ details.how summary { font-family: var(--display); font-size: 1.1rem; color: var
 .hero .ring { width: 84px; height: 84px; }
 .phase-card .dur { text-transform: none; letter-spacing: 0; font-family: var(--display); font-size: .95rem; font-weight: 700; }
 /* secondary actions inside the tools stay quiet; only the main action is a dark key */
-.tool button.secondary:not(.btn):not(.chip) { border-image-source: var(--f-paper); color: var(--ink); filter: none; }
+.tool button.secondary:not(.btn):not(.chip) { border-image: var(--f-paper) 3 fill / 6px stretch; border-bottom-width: 6px; color: var(--ink); }
 .tool button.small-btn:not(.btn):not(.chip) { font-size: 1rem; min-height: 40px; padding: 3px 10px; }
 .tool .filter button[aria-pressed="true"]:not(.btn) { border-image-source: var(--f-ink); color: #fff; }
 .dish .lookup button { font-size: .95rem; }
@@ -969,3 +969,5 @@ details.how summary { font-family: var(--display); font-size: 1.1rem; color: var
   .card.founder { max-width: 720px; }
 }
 .legal h1 { font-size: 2.4rem; } .legal h2 { font-size: 1.5rem; margin-top: 32px; }
+/* the frame image draws the fill; any background would show through the cut corners */
+.btn.primary, .btn.accent, .btn.ghost, .btn.danger, .tool button:not(.chip), .card.founder { background: none; }
