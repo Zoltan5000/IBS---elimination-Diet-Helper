@@ -700,3 +700,9 @@ code.query { display: block; margin-top: 4px; padding: 8px 10px; background: var
 .px-box .px-btn + .px-btn { margin-left: 8px; }
 .pill.unknown { background: var(--surface-2); color: var(--muted); border: 1px dashed var(--muted); }
 .dish.unknown { border-left-color: var(--muted); border-left-style: dashed; }
+.lookup { margin-top: 8px; }
+.lookup-result { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
+.lookup-result ul { margin: 2px 0 6px; padding-left: 1.2em; }
+.lookup-item { margin-top: 8px; }
+.row-inline { display: flex; gap: 8px; }
+.row-inline input { flex: 1; min-width: 0; }

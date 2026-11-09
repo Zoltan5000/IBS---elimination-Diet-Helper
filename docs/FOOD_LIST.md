@@ -195,7 +195,7 @@ This is the list the app uses to check menus, score your daily food log and filt
 | yoghurt | Lactose | C, A, M, N | listed as high by CDHF, Michigan and Monash; AHS says ½ cup is low |
 | yogurt | Lactose | C, A, M, N | listed as high by CDHF, Michigan and Monash; AHS says ½ cup is low |
 
-## Usually made with a high-FODMAP ingredient (app inference) (96)
+## Usually made with a high-FODMAP ingredient (app inference) (105)
 
 | Food word | FODMAP group | Sources | Notes |
 |---|---|---|---|
@@ -207,6 +207,7 @@ This is the list the app uses to check menus, score your daily food log and filt
 | battered | Fructans (wheat, rye, barley) | App inference | usually wheat flour |
 | bechamel | Lactose | App inference | usually made with milk |
 | béchamel | Lactose | App inference | usually made with milk |
+| bhaji | GOS (legumes, some nuts); Fructans (onion) | App inference | usually onion in a gram (chickpea) flour batter |
 | biryani | Fructans (onion); Fructans (garlic) | App inference | usually made with onion and garlic |
 | biscuit | Fructans (wheat, rye, barley) | N | usually made with wheat flour; Monash lists biscuits and snack products as high |
 | bread | Fructans (wheat, rye, barley) | N | usually made with wheat; wheat, rye and barley breads are high (Monash), while sourdough, spelt and gluten-free breads are low (CDHF, AHS, Michigan, Monash) |
@@ -222,7 +223,9 @@ This is the list the app uses to check menus, score your daily food log and filt
 | cereal | Fructans (wheat, rye, barley) | N | often made with wheat; Monash lists breakfast cereals as high. Some, like cornflakes (AHS) and gluten-free cereals (Michigan), are low |
 | cheese sauce | Lactose; Fructans (wheat, rye, barley) | App inference | usually made with milk and wheat flour |
 | cheesecake | Lactose; Fructans (wheat, rye, barley) | App inference | usually made with cream cheese and a wheat biscuit base |
+| chickpea flour | GOS (legumes, some nuts) | App inference | made from ground dried chickpeas, and dried legumes are high in GOS (CDHF, AHS, Michigan, Monash) |
 | chimichurri | Fructans (garlic) | App inference | usually made with garlic |
+| chowder | Fructans (onion); Lactose | App inference | usually made with onion, and New England style with milk or cream |
 | churro | Fructans (wheat, rye, barley) | App inference | usually made with wheat flour |
 | cookie | Fructans (wheat, rye, barley) | App inference | usually wheat flour |
 | cracker | Fructans (wheat, rye, barley) | N | usually made with wheat flour; Monash lists rye crispbread and snack products as high |
@@ -244,6 +247,7 @@ This is the list the app uses to check menus, score your daily food log and filt
 | flour tortilla | Fructans (wheat, rye, barley) | App inference | usually made with wheat; corn tortillas are low (CDHF) |
 | garlic bread | Fructans (garlic); Fructans (wheat, rye, barley) | App inference | made with garlic and usually wheat bread |
 | gnocchi | Fructans (wheat, rye, barley) | App inference | usually made with wheat flour |
+| gram flour | GOS (legumes, some nuts) | App inference | made from ground dried chickpeas, and dried legumes are high in GOS (CDHF, AHS, Michigan, Monash) |
 | granola | Fructans (wheat, rye, barley); Fructose | A | often made with muesli or dried fruit; AHS lists muesli-based and fruit-filled granola bars as high |
 | gremolata | Fructans (garlic) | App inference | usually made with garlic |
 | gyoza | Fructans (wheat, rye, barley); Fructans (garlic) | App inference | usually a wheat wrapper, often with garlic |
@@ -259,9 +263,11 @@ This is the list the app uses to check menus, score your daily food log and filt
 | muffin | Fructans (wheat, rye, barley) | App inference | usually wheat flour |
 | naan | Fructans (wheat, rye, barley) | App inference | usually made with wheat |
 | noodle | Fructans (wheat, rye, barley) | App inference | usually made with wheat; rice noodles and 100% buckwheat soba are low (CDHF) |
+| obatzda | Fructans (onion); Lactose | App inference | a Bavarian cheese spread usually made with onion and soft cheese |
 | onion ring | Fructans (onion); Fructans (wheat, rye, barley) | App inference | onion in a wheat batter |
 | orzo | Fructans (wheat, rye, barley) | App inference | usually wheat pasta |
 | pad thai | Fructans (garlic); Fructans (onion) | App inference | usually made with garlic and shallots |
+| pakora | GOS (legumes, some nuts); Fructans (onion) | App inference | usually a gram (chickpea) flour batter, often with onion |
 | pancake | Fructans (wheat, rye, barley) | App inference | usually wheat flour |
 | panko | Fructans (wheat, rye, barley) | App inference | usually wheat breadcrumbs |
 | pasta | Fructans (wheat, rye, barley) | A, M, N | usually made with wheat; wheat pasta is high (AHS, Michigan, Monash), and gluten-free pasta is low (CDHF, AHS) |
@@ -283,7 +289,10 @@ This is the list the app uses to check menus, score your daily food log and filt
 | scone | Fructans (wheat, rye, barley) | App inference | usually made with wheat flour |
 | semolina | Fructans (wheat, rye, barley) | App inference | made from wheat |
 | sofrito | Fructans (onion); Fructans (garlic) | App inference | usually made with onion and garlic |
+| spaetzle | Fructans (wheat, rye, barley) | App inference | egg noodles made with wheat flour |
 | spaghetti | Fructans (wheat, rye, barley) | App inference | usually wheat pasta |
+| spatzle | Fructans (wheat, rye, barley) | App inference | egg noodles made with wheat flour |
+| spätzle | Fructans (wheat, rye, barley) | App inference | egg noodles made with wheat flour |
 | spring roll | Fructans (wheat, rye, barley); Fructans (garlic) | App inference | usually a wheat wrapper, often with garlic |
 | sriracha | Fructans (garlic) | App inference | usually made with garlic |
 | strudel | Fructans (wheat, rye, barley) | App inference | usually wheat pastry |
@@ -296,7 +305,7 @@ This is the list the app uses to check menus, score your daily food log and filt
 | wonton | Fructans (wheat, rye, barley); Fructans (garlic) | App inference | usually a wheat wrapper, often with garlic or spring onion |
 | wrap | Fructans (wheat, rye, barley) | App inference | usually a wheat tortilla |
 
-## Often made with a high-FODMAP ingredient (app inference) (62)
+## Often made with a high-FODMAP ingredient (app inference) (67)
 
 | Food word | FODMAP group | Sources | Notes |
 |---|---|---|---|
@@ -313,6 +322,7 @@ This is the list the app uses to check menus, score your daily food log and filt
 | curry | Fructans (onion); Fructans (garlic) | App inference | often made with onion and garlic |
 | dip | Fructans (garlic); Fructans (onion) | N | Monash says dips can contain garlic and onion |
 | dressing | Fructans (garlic); Fructans (onion) | N | Monash says dressings and condiments can contain garlic and onion, so ask for it on the side |
+| dry rub | Fructans (garlic); Fructans (onion) | App inference | often made with garlic or onion powder |
 | enchilada | Fructans (onion); Fructans (garlic) | App inference | the sauce is often made with onion and garlic |
 | energy bar | Fructans (other fruits and vegetables); Polyols (sugar alcohols) | A | often contain inulin, dried fruit or sugar alcohols (AHS label list) |
 | fajita | Fructans (onion); Fructans (wheat, rye, barley) | App inference | often cooked with onion and served in wheat tortillas |
@@ -337,6 +347,7 @@ This is the list the app uses to check menus, score your daily food log and filt
 | natural flavor | FODMAPs (type not given by the sources) | M | Michigan lists "natural flavor" in savory foods as high, because it can include garlic or onion |
 | paella | Fructans (onion); Fructans (garlic) | App inference | often made with onion and garlic |
 | pho | Fructans (onion) | App inference | the broth is often made with onion |
+| potato salad | Fructans (onion) | App inference | often made with onion |
 | protein bar | Fructans (other fruits and vegetables); Polyols (sugar alcohols) | A | often contain inulin, chicory root or sugar alcohols, which AHS tells you to check labels for |
 | pudding | Lactose | App inference | often made with milk |
 | ragu | Fructans (onion); Fructans (garlic) | App inference | often made with onion and garlic |
@@ -354,13 +365,16 @@ This is the list the app uses to check menus, score your daily food log and filt
 | soda | Fructose | A, M | often sweetened with glucose-fructose (high-fructose corn syrup), which AHS lists as high; Michigan says 8 oz of diet or sugar-sweetened soda is low |
 | soup | Fructans (onion); Fructans (garlic) | App inference | often made with onion and garlic |
 | spice blend | Fructans (onion); Fructans (garlic) | A | may contain garlic or onion; AHS advises avoiding mixed spice blends that may contain them |
+| spice rub | Fructans (garlic); Fructans (onion) | App inference | often made with garlic or onion powder |
 | stew | Fructans (onion); Fructans (garlic) | App inference | often made with onion and garlic |
 | stir fry | Fructans (garlic); Fructans (onion) | App inference | often cooked with garlic, onion or a garlic-based sauce |
 | stir-fry | Fructans (garlic); Fructans (onion) | App inference | often cooked with garlic, onion or a garlic-based sauce |
 | stock | Fructans (onion); Fructans (garlic) | App inference | often made with onion and garlic |
 | sugar free | Sorbitol (a polyol) | A | often sweetened with sugar alcohols; AHS lists sugar-free gum, syrup and frozen desserts as high in sorbitol |
 | sugar-free | Sorbitol (a polyol) | A | often sweetened with sugar alcohols; AHS lists sugar-free gum, syrup and frozen desserts as high in sorbitol |
+| tandoori | Fructans (garlic); Lactose | App inference | usually marinated in yogurt with garlic and spices |
 | teriyaki | Fructans (garlic); Fructans (onion) | N | often made with garlic or onion; Monash says sauces and marinades can contain them |
+| tikka | Fructans (garlic); Lactose | App inference | usually marinated in yogurt with garlic and spices |
 | tomato sauce | Fructans (onion); Fructans (garlic); Fructose | A | often made with onion and garlic; AHS lists canned pasta with tomato sauce as high in fructose |
 
 ## Low-FODMAP foods (183)

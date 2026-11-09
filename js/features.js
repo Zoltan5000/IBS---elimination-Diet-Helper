@@ -156,18 +156,51 @@
 
   /* ---------- on-device menu analysis ---------- */
   var PRICE_ONLY = /^[\s$£€¥]*\d+([.,]\d{1,2})?\s*$/;
+  var PRICE = /[$£€¥]\s?\d+([.,]\d{1,2})?/;
+  var TRAILING_PRICE = /\s\d{1,3}([.,]\d{2})?$/;
+  // Words that make up section headings ("SOUPS", "KIDS MEAL", "O12 CURRIES").
+  // A line counts as a heading only if every word is one of these, so
+  // "CAESAR SALAD" stays a dish while "SALADS" is a heading.
+  var SECTION_WORDS = ('appetizer appetizers appetiser appetisers starter starters soup soups entree entrees entrée entrées ' +
+    'main mains course courses salad salads side sides dessert desserts sweets drink drinks beverage beverages ' +
+    'pizza pizzas pasta burger burgers sandwich sandwiches kid kids kids\' children childrens children\'s meal meals menu ' +
+    'party platter platters specialty speciality special specials offer offers sausage sausages curries breakfast brunch ' +
+    'lunch dinner small large plate plates sharing shareables bowls wraps tacos noodles grill grills seafood vegetarian vegan ' +
+    'extras add-ons addons house our the and & of chef chef\'s combo combos favourites favorites classics signature signatures ' +
+    'today\'s light bites snacks').split(' ');
+  function isHeading(l) {
+    if (PRICE.test(l) || l.length > 40) return false;
+    var words = l.toLowerCase().replace(/[^a-zà-ÿ'&\s-]|\b\w*\d\w*\b/g, ' ').split(/\s+/).filter(Boolean);
+    return words.length > 0 && words.length <= 4 && words.every(function (w) { return SECTION_WORDS.indexOf(w) !== -1; });
+  }
+  // Split a pasted, OCR'd or PDF menu into dishes. Each dish is a name line
+  // plus any description lines under it, so "Fish & Chips" is judged together
+  // with "Battered fillet of cod...".
   function splitMenu(text) {
-    var raw = String(text).split(/\r?\n/).map(function (l) { return l.replace(/\s+/g, ' ').trim(); });
+    var raw = String(text).split(/\r?\n/).map(function (l) {
+      return l.replace(/\s+/g, ' ').replace(/^[\s*•·▪◦‣-]+/, '').trim();
+    });
+    var lines = raw.filter(function (l) { return l && !PRICE_ONLY.test(l) && (l.match(/[a-zà-ÿ]/gi) || []).length >= 3; });
+    // If the menu is written in capitals throughout, case can't tell names from descriptions
+    var caps = lines.filter(function (l) { return l === l.toUpperCase(); }).length;
+    var allCaps = lines.length && caps / lines.length > 0.8;
     var items = [], section = '';
-    raw.forEach(function (l) {
-      if (!l || PRICE_ONLY.test(l) || (l.match(/[a-z]/gi) || []).length < 3) return;
-      var letters = l.replace(/[^a-z]/gi, '');
-      var isHeader = l.length < 30 && letters === letters.toUpperCase() && !/\d/.test(l) && F.scan(l).length === 0;
-      if (isHeader) { section = l; return; }
+    lines.forEach(function (l) {
+      if (isHeading(l)) { section = l; return; }
       var prev = items[items.length - 1];
-      // Description lines usually start lower-case or follow a line ending in a comma
-      if (prev && (/^[a-z(,&]/.test(l) || /[,&-]$/.test(prev.text))) { prev.text += ' ' + l; return; }
-      items.push({ text: l, section: section });
+      var words = l.split(' ').length, upper = l === l.toUpperCase();
+      var priced = PRICE.test(l) || TRAILING_PRICE.test(l);
+      var looksLikeName = (upper && !allCaps && words <= 8) || (priced && words <= 8);
+      var continues = prev && (/^[a-zà-ÿ(,&]/.test(l) || /[,&-]$/.test(prev.desc || prev.name));
+      var sentence = words >= 6 && !looksLikeName;
+      // A plain line right under a priced or capitalised dish name is its description
+      var under = prev && !prev.desc && !looksLikeName && words >= 2 &&
+        (PRICE.test(prev.name) || TRAILING_PRICE.test(prev.name) || (prev.name === prev.name.toUpperCase() && !allCaps));
+      if (prev && (continues || sentence || under) && !(looksLikeName && !continues)) {
+        prev.desc = prev.desc ? prev.desc + ' ' + l : l;
+        return;
+      }
+      items.push({ name: l, desc: '', section: section });
     });
     return items;
   }
@@ -175,11 +208,15 @@
   function localAnalyze(text) {
     var tol = tolerance();
     return splitMenu(text).map(function (it) {
-      var j = F.assess(it.text, tol);
-      var name = it.text.split(/\s[-–—:|]\s|\s{2,}|\.\s/)[0].replace(/[$£€]\s?\d+([.,]\d+)?/g, '').trim();
+      var full = it.name + (it.desc ? ' ' + it.desc : '');
+      var j = F.assess(full, tol);
+      // "Name - description" on one line: keep the part before the dash as the name
+      var parts = it.name.split(/\s[-–—:|]\s/);
+      var name = parts[0].replace(/[$£€¥]\s?\d+([.,]\d+)?/g, '').replace(/\s\d+([.,]\d{1,2})?$/, '').replace(/\s{2,}/g, ' ').trim();
+      var desc = (parts.slice(1).join(' - ') + ' ' + it.desc).trim();
       return {
         name: name.length > 70 ? name.slice(0, 67) + '…' : name,
-        description: it.text,
+        description: desc,
         section: it.section,
         verdict: j.verdict,
         groups: uniq(j.flags.map(function (f) { return f.group; })),
@@ -226,6 +263,134 @@
       'Use only these group ids: ' + Object.keys(F.GROUPS).join(', ') + '. Keep reasons under 25 words. Skip drinks unless they are notable.';
   }
 
+  /* ---------- online lookup of typical ingredients ---------- */
+  // Open Food Facts (real ingredient labels from packaged foods; open data, ODbL) and
+  // Wikipedia (a short description of the dish; CC BY-SA). Only the food name is sent,
+  // and only when the person taps a lookup button.
+  var OFF_SEARCH = 'https://world.openfoodfacts.org/cgi/search.pl?search_simple=1&action=process&json=1&page_size=24&fields=product_name,ingredients_original_tags,ingredients_text_en&search_terms=';
+  var WIKI_SEARCH = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=extracts%7Cinfo&inprop=url&exintro=1&explaintext=1&generator=search&gsrlimit=1&gsrsearch=';
+  var lookupCache = {};
+  var LOOKUP_KEY = 'ibs-lookup-v1', LOOKUP_DAYS = 7;
+  function savedLookup(q) {
+    try {
+      var all = JSON.parse(localStorage.getItem(LOOKUP_KEY) || '{}'), r = all[q];
+      return r && Date.now() - r.t < LOOKUP_DAYS * 864e5 ? r.d : null;
+    } catch (e) { return null; }
+  }
+  function saveLookup(q, d) {
+    try {
+      var all = JSON.parse(localStorage.getItem(LOOKUP_KEY) || '{}');
+      all[q] = { t: Date.now(), d: d };
+      var keys = Object.keys(all);
+      if (keys.length > 300) keys.sort(function (a, b) { return all[a].t - all[b].t; }).slice(0, keys.length - 300).forEach(function (k) { delete all[k]; });
+      localStorage.setItem(LOOKUP_KEY, JSON.stringify(all));
+    } catch (e) { /* storage full or blocked: skip caching */ }
+  }
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function cleanFoodName(n) {
+    return String(n || '').replace(/[$£€]\s?\d+([.,]\d+)?/g, ' ').replace(/\(.*?\)/g, ' ')
+      .replace(/^[\d\s\/½¼¾⅓⅔.,-]+(cups?|tbsp|tsp|tablespoons?|teaspoons?|g|kg|ml|l|oz|lbs?|pounds?|grams?|cloves?|slices?|pieces?|cans?|pinch|handful)?\.?\s+(of\s+)?/i, '')
+      .replace(/(\s+[$£€]?\d+([.,]\d{1,2})?)+\s*$/, '')
+      .replace(/\s+/g, ' ').trim().slice(0, 60);
+  }
+  // Fetch JSON; if the service is busy (429/503), wait and retry once.
+  function getJSON(url, retried) {
+    return fetch(url).then(function (r) {
+      if ((r.status === 429 || r.status === 503) && !retried) {
+        var after = Math.min(15, Number(r.headers.get('Retry-After')) || 6);
+        return wait(after * 1000).then(function () { return getJSON(url, true); });
+      }
+      if (!r.ok) { var e = new Error('HTTP ' + r.status); e.busy = r.status === 429 || r.status === 503; throw e; }
+      return r.json();
+    });
+  }
+  // Open Food Facts gives each recognised ingredient a standard English tag
+  // ("en:wheat-flour"). Use those, because the free-text English field is
+  // sometimes left in another language. Fall back to the text if no tags.
+  function productText(p) {
+    var tags = (p.ingredients_original_tags || []).filter(function (t) { return /^en:/.test(t); })
+      .map(function (t) { return t.slice(3).replace(/-/g, ' '); });
+    if (tags.length) return tags.join(', ');
+    return p.ingredients_text_en || '';
+  }
+  function lookupTypical(name) {
+    var q = cleanFoodName(name);
+    if (!q) return Promise.reject(new Error('empty'));
+    if (lookupCache[q]) return lookupCache[q];
+    var tol = tolerance(), saved = savedLookup(q), errs = {};
+    var off = saved ? Promise.resolve(saved.off) : getJSON(OFF_SEARCH + encodeURIComponent(q)).catch(function (e) { errs.off = e.busy ? 'busy' : 'failed'; return null; });
+    var wiki = saved ? Promise.resolve(saved.wiki) : getJSON(WIKI_SEARCH + encodeURIComponent(q)).catch(function (e) { errs.wiki = e.busy ? 'busy' : 'failed'; return null; });
+    lookupCache[q] = Promise.all([off, wiki]).then(function (res) {
+      if (!res[0] && !res[1]) { var err = new Error('offline'); err.errs = errs; throw err; }
+      // Keep just what's needed, and remember complete answers for a week
+      var offSlim = res[0] ? { products: (res[0].products || []).map(function (p) { return { t: productText(p) }; }) } : null;
+      var wikiSlim = res[1] || null;
+      if (!saved && offSlim && wikiSlim) saveLookup(q, { off: offSlim, wiki: wikiSlim });
+      var prods = ((res[0] && res[0].products) || []).map(function (p) { return { t: p.t != null ? p.t : productText(p) }; })
+        .filter(function (p) { return p.t && p.t.length > 3; }).slice(0, 20);
+      var n = prods.length, counts = {};
+      prods.forEach(function (p) {
+        var seen = {};
+        F.assess(p.t, tol).flags.forEach(function (f) {
+          if (seen[f.word]) return; seen[f.word] = 1;
+          (counts[f.word] = counts[f.word] || { flags: [], n: 0 }).n++;
+          counts[f.word].flags = counts[f.word].flags.concat(f);
+        });
+        // keep each word's flags unique by group
+      });
+      var all = Object.keys(counts).map(function (w) { var c = counts[w]; c.word = w; c.share = c.n / n; return c; })
+        .sort(function (a, b) { return b.n - a.n; });
+      var common = all.filter(function (c) { return c.share >= 0.5; }), some = all.filter(function (c) { return c.share >= 0.2 && c.share < 0.5; });
+      var pages = res[1] && res[1].query && res[1].query.pages, wp = pages ? pages[Object.keys(pages)[0]] : null;
+      var wikiFlags = wp ? F.assess(wp.extract || '', tol).flags : [];
+      var verdict;
+      if (n >= 3) {
+        verdict = common.some(function (c) { return c.flags.some(function (f) { return f.severity === 'avoid'; }); }) ? 'avoid'
+          : (common.length || some.length) ? 'modify' : 'good';
+      } else verdict = wikiFlags.length ? 'modify' : 'unknown';
+      return { query: q, n: n, common: common, some: some, wiki: wp, wikiFlags: wikiFlags, verdict: verdict, errs: errs, cached: !!saved };
+    });
+    lookupCache[q].catch(function () { delete lookupCache[q]; });
+    return lookupCache[q];
+  }
+  function lookupHTML(r) {
+    function row(c) {
+      var names = uniq(c.flags.map(function (f) { return F.GROUPS[f.group].name; })).join(' and ');
+      return '<li><strong>' + esc(c.word) + '</strong>: in ' + c.n + ' of ' + r.n + ' products <span class="muted">(' + esc(names) + ')</span></li>';
+    }
+    var head = { avoid: 'Usually contains high-FODMAP ingredients', modify: 'Sometimes contains high-FODMAP ingredients', good: 'Typical ingredients look low FODMAP', unknown: 'Not enough information found' }[r.verdict];
+    var html = '<div class="lookup-result ' + r.verdict + '"><p><span class="pill ' + r.verdict + '">' + esc(head) + '</span></p>';
+    if (r.n) {
+      html += '<p class="small">Checked the ingredient lists of ' + r.n + ' packaged “' + esc(r.query) + '” products on Open Food Facts against the app\'s food list.</p>';
+      if (r.common.length) html += '<p class="small"><strong>Usually contains:</strong></p><ul class="small">' + r.common.map(row).join('') + '</ul>';
+      if (r.some.length) html += '<p class="small"><strong>Sometimes contains:</strong></p><ul class="small">' + r.some.map(row).join('') + '</ul>';
+      if (!r.common.length && !r.some.length) html += '<p class="small">None of the high-FODMAP foods on the app\'s list appeared in at least 1 in 5 of these products.</p>';
+    } else if (r.errs.off) {
+      html += '<p class="small">Open Food Facts was ' + (r.errs.off === 'busy' ? 'busy' : 'unavailable') + ', so no product ingredient lists were checked. Try again in a minute.</p>';
+    } else {
+      html += '<p class="small">No packaged products with English ingredient lists were found on Open Food Facts.</p>';
+    }
+    if (!r.wiki && r.errs.wiki) html += '<p class="small">Wikipedia was ' + (r.errs.wiki === 'busy' ? 'busy' : 'unavailable') + '.</p>';
+    if (r.wiki) {
+      var ex = String(r.wiki.extract || '').replace(/\s+/g, ' ').slice(0, 260);
+      html += '<p class="small"><strong>Wikipedia, “' + esc(r.wiki.title) + '”:</strong> ' + esc(ex) + (ex.length >= 260 ? '…' : '') +
+        (r.wikiFlags.length ? ' <em>Mentions: ' + esc(uniq(r.wikiFlags.map(function (f) { return f.word; })).join(', ')) + '.</em>' : '') +
+        ' <a href="' + esc(r.wiki.fullurl || ('https://en.wikipedia.org/wiki/' + encodeURIComponent(r.wiki.title))) + '" target="_blank" rel="noopener">Read more ↗</a></p>';
+    }
+    html += '<p class="muted small">These are typical ingredients found online, not this restaurant\'s or brand\'s recipe. Ask how it\'s made. ' +
+      'Product data from <a href="https://world.openfoodfacts.org/" target="_blank" rel="noopener">Open Food Facts</a> (ODbL); description from Wikipedia (CC BY-SA).</p></div>';
+    return html;
+  }
+  function runLookup(name, out, btn) {
+    if (btn) btn.disabled = true;
+    out.innerHTML = '<p class="small">Looking up typical ingredients for “' + esc(cleanFoodName(name)) + '”…</p>';
+    return lookupTypical(name).then(function (r) { out.innerHTML = lookupHTML(r); return r; }, function (e) {
+      var busy = e && e.errs && (e.errs.off === 'busy' || e.errs.wiki === 'busy');
+      out.innerHTML = '<p class="small">' + (busy ? 'Open Food Facts and Wikipedia are busy right now. Try again in a minute.' : 'Couldn\'t reach Open Food Facts or Wikipedia. Check your internet connection and try again.') + '</p>';
+      return null;
+    }).then(function (r) { if (btn) btn.disabled = false; return r; });
+  }
+
   /* ---------- rendering ---------- */
   var VERDICT = { good: 'Likely OK', unknown: 'Not recognised: ask', modify: 'Ask or modify', avoid: 'Likely high FODMAP' };
   function renderMenu(dishes, best, source) {
@@ -238,6 +403,9 @@
       (counts.unknown ? '<span class="pill unknown">' + counts.unknown + ' not recognised</span>' : '') +
       '<span class="small">Checked by ' + esc(source) + '</span></div>';
     if (best && best.length) html += '<p><strong>Best picks:</strong> ' + best.map(esc).join(', ') + '</p>';
+    var toCheck = counts.unknown + counts.good;
+    if (toCheck) html += '<div class="bulk-lookup"><button type="button" class="secondary small-btn" id="lookupAll">🔎 Look up the ' + toCheck + ' dish' + (toCheck === 1 ? '' : 'es') + ' that aren\'t flagged</button>' +
+      '<button type="button" class="secondary small-btn" id="lookupStop" hidden>Stop</button><p class="small muted" id="lookupProgress">Checks typical ingredients one dish at a time, a few seconds apart, so the free services aren\'t overloaded.</p></div>';
     html += '<div class="filter" role="group" aria-label="Filter dishes">' +
       ['all', 'good', 'modify', 'avoid', 'unknown'].map(function (k) {
         return '<button type="button" class="secondary small-btn" data-filter="' + k + '">' + (k === 'all' ? 'All' : VERDICT[k]) + '</button>';
@@ -250,13 +418,37 @@
         '<p>' + esc(d.reason || '') + '</p>' +
         ((d.groups || []).length ? '<p class="small">Groups: ' + d.groups.map(function (g) { return esc((F.GROUPS[g] || { name: g }).name); }).join(', ') + '</p>' : '') +
         (d.ask ? '<p class="ask"><strong>Ask:</strong> ' + esc(d.ask) + '</p>' : '') +
+        '<div class="lookup"><button type="button" class="secondary small-btn" data-lookup="' + esc(d.name) + '">🔎 Look up typical ingredients online</button><div class="lookup-out"></div></div>' +
         '</article>';
     }).join('') + '</div>';
     if (!dishes.length) html = '<p class="small">No dishes found. Try a clearer photo, or paste the menu text.</p>';
     $('menuResults').innerHTML = html;
   }
 
+  var bulkStop = false;
+  function lookupAll() {
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#menuResults .dish[data-v="unknown"], #menuResults .dish[data-v="good"]')).slice(0, 30);
+    var go = $('lookupAll'), stop = $('lookupStop'), prog = $('lookupProgress');
+    bulkStop = false; go.disabled = true; stop.hidden = false;
+    var i = 0;
+    function next() {
+      if (bulkStop || i >= cards.length) {
+        prog.textContent = bulkStop ? 'Stopped after ' + i + ' of ' + cards.length + '.' : 'Done: looked up ' + cards.length + ' dish' + (cards.length === 1 ? '' : 'es') + '. Results are under each dish.';
+        go.disabled = false; stop.hidden = true; return;
+      }
+      var card = cards[i++], b = card.querySelector('[data-lookup]'), name = b.getAttribute('data-lookup');
+      prog.textContent = 'Looking up ' + i + ' of ' + cards.length + ': ' + name + '…';
+      var cached = !!savedLookup(cleanFoodName(name));
+      runLookup(name, b.nextElementSibling, b).then(function () { return cached ? null : wait(6500); }).then(next);
+    }
+    next();
+  }
+
   $('menuResults').addEventListener('click', function (e) {
+    if (e.target.id === 'lookupAll') { lookupAll(); return; }
+    if (e.target.id === 'lookupStop') { bulkStop = true; return; }
+    var lb = e.target.closest('[data-lookup]');
+    if (lb) { runLookup(lb.getAttribute('data-lookup'), lb.nextElementSibling, lb); return; }
     var f = e.target.getAttribute('data-filter');
     if (!f) return;
     Array.prototype.forEach.call(document.querySelectorAll('#menuResults .dish'), function (d) {
@@ -427,8 +619,40 @@
       }).join('') + '</ul>' : '') +
       (groups.length ? '<p class="small"><strong>Swap ideas:</strong></p><ul class="small">' + groups.map(function (g) { return '<li><strong>' + esc(F.GROUPS[g].name) + ':</strong> ' + esc(F.GROUPS[g].swap) + '</li>'; }).join('') + '</ul>' : '') +
       (good.length ? '<p class="small"><strong>Recognised as low FODMAP:</strong> ' + good.map(esc).join(' · ') + '</p>' : '') +
-      (unknown.length ? '<p class="small"><strong>Not recognised, so check these yourself:</strong> ' + unknown.map(esc).join(' · ') + '</p>' : '') +
+      (unknown.length ? '<p class="small"><strong>Not recognised:</strong> ' + unknown.map(esc).join(' · ') + '</p>' +
+        '<div class="lookup"><button type="button" class="secondary small-btn" id="recipeLookup">🔎 Look up ' + (unknown.length === 1 ? 'it' : 'these ' + Math.min(unknown.length, 6)) + ' online</button><div id="recipeLookupOut"></div></div>' : '') +
       '<p class="muted small">Checked against the app\'s master food list (CDHF, Alberta Health Services, Michigan Medicine, Monash). Amounts and brands matter, so check with your dietitian.</p></article>';
+    var rl = $('recipeLookup');
+    if (rl) rl.addEventListener('click', function () {
+      var out = $('recipeLookupOut'); out.innerHTML = ''; rl.disabled = true;
+      var chain = Promise.resolve();
+      unknown.slice(0, 6).forEach(function (line) {
+        var box = document.createElement('div'); box.className = 'lookup-item';
+        box.innerHTML = '<p class="small"><strong>' + esc(cleanFoodName(line)) + '</strong></p><div></div>';
+        out.appendChild(box);
+        var cached = !!savedLookup(cleanFoodName(line));
+        chain = chain.then(function () { return runLookup(line, box.lastChild); }).then(function () { return cached ? null : wait(6500); });
+      });
+      chain.then(function () { rl.disabled = false; });
+    });
+  });
+
+  // Check a single food or dish
+  $('foodCheck').addEventListener('click', function () {
+    var q = $('foodQuery').value.trim(), out = $('foodResult');
+    if (!q) { out.innerHTML = '<p class="small">Type a food or dish first.</p>'; return; }
+    var a = F.assess(q, tolerance());
+    var reason = a.flags.length ? explain(a.flags)
+      : a.verdict === 'good' ? 'Recognised as low FODMAP: ' + a.good.join(', ') + '.'
+      : 'Not on the app\'s food list. Look it up online to see its typical ingredients.';
+    out.innerHTML = '<article class="dish ' + a.verdict + '"><header><h3>' + esc(q) + '</h3><span class="pill ' + a.verdict + '">' + VERDICT[a.verdict] + '</span></header>' +
+      '<p>' + esc(reason) + '</p><div class="lookup"><button type="button" class="secondary small-btn" data-lookup="' + esc(q) + '">🔎 Look up typical ingredients online</button><div class="lookup-out"></div></div></article>';
+    if (a.verdict === 'unknown') { var b = out.querySelector('[data-lookup]'); runLookup(q, b.nextElementSibling, b); }
+  });
+  $('foodQuery').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); $('foodCheck').click(); } });
+  $('foodResult').addEventListener('click', function (e) {
+    var lb = e.target.closest('[data-lookup]');
+    if (lb) runLookup(lb.getAttribute('data-lookup'), lb.nextElementSibling, lb);
   });
 
   var mealCtl = null;

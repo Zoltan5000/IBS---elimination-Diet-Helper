@@ -145,7 +145,9 @@
     ['cracker', 'fructan-grain', 'usually', 'N', 'usually made with wheat flour; Monash lists rye crispbread and snack products as high'],
     ['semolina', 'fructan-grain', 'usually', 'app', 'made from wheat'],
     ['farro', 'fructan-grain', 'usually', 'app', 'a type of wheat'],
-    ['flour', 'fructan-grain', 'usually', 'app', 'usually wheat flour; arrowroot, buckwheat, corn, millet, quinoa, rice and sorghum flours are low (CDHF)'],
+    ['flour', 'fructan-grain', 'usually', 'app', 'usually wheat flour; arrowroot, buckwheat, corn, millet, quinoa, rice and sorghum flours are low (CDHF)', ['gram flour', 'chickpea flour', 'rice flour', 'corn flour', 'cornflour', 'buckwheat flour', 'millet flour', 'quinoa flour', 'sorghum flour', 'arrowroot flour']],
+    ['gram flour', 'gos', 'usually', 'app', 'made from ground dried chickpeas, and dried legumes are high in GOS (CDHF, AHS, Michigan, Monash)'],
+    ['chickpea flour', 'gos', 'usually', 'app', 'made from ground dried chickpeas, and dried legumes are high in GOS (CDHF, AHS, Michigan, Monash)'],
     ['granola', 'fructan-grain|fructose', 'usually', 'A', 'often made with muesli or dried fruit; AHS lists muesli-based and fruit-filled granola bars as high'],
     // ---- GOS: legumes and nuts ----
     ['baked bean', 'gos', 'high', 'CMN'],
@@ -343,6 +345,18 @@
     ['egg roll', 'fructan-grain|fructan-garlic', 'usually', 'app', 'usually a wheat wrapper, often with garlic or onion'],
     ['wonton', 'fructan-grain|fructan-garlic', 'usually', 'app', 'usually a wheat wrapper, often with garlic or spring onion'],
     ['gyoza', 'fructan-grain|fructan-garlic', 'usually', 'app', 'usually a wheat wrapper, often with garlic'],
+    ['pakora', 'gos|fructan-onion', 'usually', 'app', 'usually a gram (chickpea) flour batter, often with onion'],
+    ['bhaji', 'gos|fructan-onion', 'usually', 'app', 'usually onion in a gram (chickpea) flour batter'],
+    ['tikka', 'fructan-garlic|lactose', 'often', 'app', 'usually marinated in yogurt with garlic and spices'],
+    ['tandoori', 'fructan-garlic|lactose', 'often', 'app', 'usually marinated in yogurt with garlic and spices'],
+    ['spaetzle', 'fructan-grain', 'usually', 'app', 'egg noodles made with wheat flour'],
+    ['spätzle', 'fructan-grain', 'usually', 'app', 'egg noodles made with wheat flour'],
+    ['spatzle', 'fructan-grain', 'usually', 'app', 'egg noodles made with wheat flour'],
+    ['chowder', 'fructan-onion|lactose', 'usually', 'app', 'usually made with onion, and New England style with milk or cream'],
+    ['potato salad', 'fructan-onion', 'often', 'app', 'often made with onion'],
+    ['obatzda', 'fructan-onion|lactose', 'usually', 'app', 'a Bavarian cheese spread usually made with onion and soft cheese'],
+    ['dry rub', 'fructan-garlic|fructan-onion', 'often', 'app', 'often made with garlic or onion powder'],
+    ['spice rub', 'fructan-garlic|fructan-onion', 'often', 'app', 'often made with garlic or onion powder'],
     ['samosa', 'fructan-grain|fructan-onion|gos', 'usually', 'app', 'usually wheat pastry with onion and often peas'],
     ['empanada', 'fructan-grain|fructan-onion', 'usually', 'app', 'usually wheat pastry, often with onion'],
     ['pierogi', 'fructan-grain|fructan-onion', 'usually', 'app', 'usually a wheat dough, often with onion'],
@@ -581,8 +595,11 @@
     var note = f.note ? ': ' + f.note : '';
     if (f.level === 'high') return '“' + f.word + '” is high in ' + g + src + (f.note ? '. ' + capital(f.note) + '.' : '.');
     if (f.level === 'serve') return '“' + f.word + '” is low FODMAP only in small serves' + note + '.';
-    if (f.level === 'usually') return '“' + f.word + '” is ' + (f.note || 'usually made with a high-FODMAP ingredient') + ' (' + g + '; ' + sourceNames(f.src) + ').';
-    return '“' + f.word + '” is ' + (f.note || 'often made with a high-FODMAP ingredient') + ' (' + g + '; ' + sourceNames(f.src) + '). Ask how it\'s made.';
+    var n = f.note || (f.level === 'usually' ? 'usually' : 'often') + ' made with a high-FODMAP ingredient';
+    // Notes are written to follow "is", follow the word directly ("may contain"), or stand alone
+    var lead = /^(usually|often|made|sometimes|a|an|the|onion|egg)\b/.test(n) ? '” is ' : /^(may|contains)\b/.test(n) ? '” ' : '”: ';
+    if (lead === '”: ') n = capital(n);
+    return '“' + f.word + lead + n + ' (' + g + '; ' + sourceNames(f.src) + ').' + (f.level === 'usually' ? '' : ' Ask how it\'s made.');
   }
   function capital(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
