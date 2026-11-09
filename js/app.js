@@ -248,7 +248,7 @@
   function tipCard() {
     var i = (daysIn(state.phase) + state.diary.length) % TIPS.length;
     var t = TIPS[i];
-    return '<div class="say"><div class="say-who">' + spriteSVG(40) + '</div><div class="say-box"><span class="say-name">Tip</span><p>' + esc(t[0]) + '</p>' +
+    return '<div class="say"><div class="say-who">' + spriteSVG(40) + '</div><div class="say-box"><span class="say-name"><img class="bulb" src="icons/light-bulb.png" alt="" width="12" height="12">Tip</span><p>' + esc(t[0]) + '</p>' +
       (t[1] ? '<p class="read-more"><a href="' + esc(t[1]) + '" target="_blank" rel="noopener">Read more ↗</a></p>' : '') + '</div></div>';
   }
   function toolCards() {

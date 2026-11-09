@@ -61,7 +61,7 @@ Each source was found by searching the official domain shown. These are official
 | Barlow Condensed font (headings and numbers) | SIL Open Font License 1.1 | `fonts/OFL-BarlowCondensed.txt` (from the @fontsource/barlow-condensed package; self-hosted) |
 | pdf.js | Apache License 2.0 | [mozilla/pdf.js](https://github.com/mozilla/pdf.js/); [PDF.js home](https://mozilla.github.io/pdf.js/) |
 | Tesseract.js | Apache License 2.0 | [LICENSE.md](https://github.com/naptha/tesseract.js/blob/master/LICENSE.md) |
-| Light-bulb icon (planned) | Flaticon free license: requires a credit line | Pending: flaticon.com is blocked from the build environment |
+| Light-bulb icon (`icons/light-bulb.png`, resized to 96px) | Flaticon free license: requires a credit line. Credit shown in Settings and in the Terms: "Light bulb icon by Magnific from Flaticon" | [Flaticon page](https://www.flaticon.com/free-icon/light-bulb_217871); image supplied by the owner |
 
 ### Content permissions
 | Content | Terms | What to do |
@@ -86,5 +86,5 @@ Each source was found by searching the official domain shown. These are official
 - [x] ~~TheMealDB production key~~: no longer needed, since Meal ideas now uses a web search
 - [ ] Check each search engine's terms on linking to search results (normally allowed)
 - [ ] Written permission from AHS and CDHF for commercial use
-- [ ] Add the Flaticon credit line once the icon is added
+- [x] Add the Flaticon credit line once the icon is added
 - [ ] Choose a LICENSE for the code

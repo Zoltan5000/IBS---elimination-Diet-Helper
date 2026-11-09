@@ -1,7 +1,7 @@
 /* Offline support: cache the app shell; always try the network first so updates arrive. */
-var CACHE = 'ibs-diet-helper-20261109g';
-var SHELL = ['./', 'index.html', 'css/frames.css?v=20261109g', 'css/style.css?v=20261109g', 'js/app.js?v=20261109g', 'js/features.js?v=20261109g', 'js/fodmap-data.js?v=20261109g',
-  'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'fonts/press-start-2p-latin.woff2', 'fonts/barlow-condensed-latin-700-normal.woff2', 'fonts/barlow-condensed-latin-800-italic.woff2', 'privacy.html', 'terms.html', 'consumer-health-data.html'];
+var CACHE = 'ibs-diet-helper-20261109h';
+var SHELL = ['./', 'index.html', 'css/frames.css?v=20261109h', 'css/style.css?v=20261109h', 'js/app.js?v=20261109h', 'js/features.js?v=20261109h', 'js/fodmap-data.js?v=20261109h',
+  'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/light-bulb.png', 'fonts/press-start-2p-latin.woff2', 'fonts/barlow-condensed-latin-700-normal.woff2', 'fonts/barlow-condensed-latin-800-italic.woff2', 'privacy.html', 'terms.html', 'consumer-health-data.html'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
